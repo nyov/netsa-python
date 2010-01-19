@@ -1,0 +1,10 @@
+syntax: glob
+doc/netsa-python.pdf
+doc/coverage/*
+doc/latex/*
+doc/html/*
+doc/site-html/*
+*~
+*.pyc
+\#*\#
+.hgrevision

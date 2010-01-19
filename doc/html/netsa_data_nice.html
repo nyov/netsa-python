@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>netsa.data.nice — “Nice” Numbers for Chart Bounds &mdash; NetSA Python v0.9 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="NetSA Python v0.9 documentation" href="index.html" />
+    <link rel="up" title="Data Manipulation" href="netsa_data.html" />
+    <link rel="next" title="netsa.data.times — Time and Date Manipulation" href="netsa_data_times.html" />
+    <link rel="prev" title="netsa.data.format — Formatting Data for Output" href="netsa_data_format.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_times.html" title="netsa.data.times — Time and Date Manipulation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_format.html" title="netsa.data.format — Formatting Data for Output"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="netsa_data.html" accesskey="U">Data Manipulation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-netsa.data.nice">
+<h1><tt class="xref docutils literal"><span class="pre">netsa.data.nice</span></tt> &#8212; &#8220;Nice&#8221; Numbers for Chart Bounds<a class="headerlink" href="#module-netsa.data.nice" title="Permalink to this headline">¶</a></h1>
+<p>A set of functions to produce ranges of aesthetically-pleasing numbers
+that have the specified length and include the specified range.
+Functions are provided for producing nice numeric and time-based
+ranges.</p>
+<dl class="function">
+<dt id="netsa.data.nice.nice_ticks">
+<tt class="descclassname">netsa.data.nice.</tt><tt class="descname">nice_ticks</tt><big>(</big><em>lo : num</em>, <em>hi : num</em><span class="optional">[</span>, <em>ticks=5</em>, <em>inside=False</em><span class="optional">]</span><big>)</big> &rarr; num, num, num iter<a class="headerlink" href="#netsa.data.nice.nice_ticks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find &#8216;nice&#8217; places to put <em>ticks</em> tick marks for numeric data
+spanning from <em>lo</em> to <em>hi</em>.  If <em>inside</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, then the
+nice range will be contained within the input range.  If <em>inside</em>
+is <tt class="xref docutils literal"><span class="pre">False</span></tt>, then the nice range will contain the input range.
+To find nice numbers for time data, use <a title="netsa.data.nice.nice_time_ticks" class="reference" href="#netsa.data.nice.nice_time_ticks"><tt class="xref docutils literal"><span class="pre">nice_time_ticks</span></tt></a>.</p>
+<p>The result is a tuple containing the minimum value of the nice
+range, the maximum value of the nice range, and an iterator over
+the tick marks.</p>
+<p>See also <a title="netsa.data.nice.nice_ticks_seq" class="reference" href="#netsa.data.nice.nice_ticks_seq"><tt class="xref docutils literal"><span class="pre">nice_ticks_seq</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.nice.nice_ticks_seq">
+<tt class="descclassname">netsa.data.nice.</tt><tt class="descname">nice_ticks_seq</tt><big>(</big><em>lo : num</em>, <em>hi : num</em><span class="optional">[</span>, <em>ticks=5</em>, <em>inside=False</em><span class="optional">]</span><big>)</big> &rarr; num seq<a class="headerlink" href="#netsa.data.nice.nice_ticks_seq" title="Permalink to this definition">¶</a></dt>
+<dd>A convenience wrapper of <a title="netsa.data.nice.nice_ticks" class="reference" href="#netsa.data.nice.nice_ticks"><tt class="xref docutils literal"><span class="pre">nice_ticks</span></tt></a> to return the nice
+range as a sequence.</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.nice.nice_time_ticks">
+<tt class="descclassname">netsa.data.nice.</tt><tt class="descname">nice_time_ticks</tt><big>(</big><em>lo : datetime</em>, <em>hi : datetime</em><span class="optional">[</span>, <em>ticks=5</em>, <em>inside=False</em>, <em>as_datetime=True</em><span class="optional">]</span><big>)</big> &rarr; datetime/int, datetime/int, datetime/int iter<a class="headerlink" href="#netsa.data.nice.nice_time_ticks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find &#8216;nice&#8217; places to put <em>ticks</em> tick marks for time data
+spanning from <em>lo</em> to <em>hi</em>.  If <em>inside</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, then the
+nice range will be contained within the input range.  If <em>inside</em>
+is <tt class="xref docutils literal"><span class="pre">False</span></tt>, then the nice range will contain the input range.
+To find nice numbers for numerical data, use <a title="netsa.data.nice.nice_ticks" class="reference" href="#netsa.data.nice.nice_ticks"><tt class="xref docutils literal"><span class="pre">nice_ticks</span></tt></a>.</p>
+<p>The result is a tuple containing the minimum value of the nice
+range, the maximum value of the nice range, and an iterator over
+the ticks marks.  If <em>as_datetime</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result values
+will be <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> objects.  Otherwise, the result
+values will be numbers of seconds since UNIX epoch.</p>
+<p>See also <a title="netsa.data.nice.nice_time_ticks_seq" class="reference" href="#netsa.data.nice.nice_time_ticks_seq"><tt class="xref docutils literal"><span class="pre">nice_time_ticks_seq</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.nice.nice_time_ticks_seq">
+<tt class="descclassname">netsa.data.nice.</tt><tt class="descname">nice_time_ticks_seq</tt><big>(</big><em>lo : datetime</em>, <em>hi : datetime</em><span class="optional">[</span>, <em>ticks=5</em>, <em>inside=False</em>, <em>as_datetime=True</em><span class="optional">]</span><big>)</big> &rarr; datetime/int seq<a class="headerlink" href="#netsa.data.nice.nice_time_ticks_seq" title="Permalink to this definition">¶</a></dt>
+<dd>A convenience wrapper of <a title="netsa.data.nice.nice_time_ticks" class="reference" href="#netsa.data.nice.nice_time_ticks"><tt class="xref docutils literal"><span class="pre">nice_time_ticks</span></tt></a> to return the
+nice range as a sequence.</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="netsa_data_format.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">netsa.data.format</span></tt> &#8212; Formatting Data for Output</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="netsa_data_times.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">netsa.data.times</span></tt> &#8212; Time and Date Manipulation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/netsa_data_nice.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_times.html" title="netsa.data.times — Time and Date Manipulation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_format.html" title="netsa.data.format — Formatting Data for Output"
+             >previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="netsa_data.html" >Data Manipulation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2010, Carnegie Mellon University.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

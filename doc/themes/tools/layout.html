@@ -1,0 +1,34 @@
+{% extends "basic/layout.html" %}
+
+{% block header %}
+<!--#include virtual="/tools-page-header.shtml"-->
+
+<div class="tool-header">
+<div class="bigtext">
+  <a href="/netsa-python/">netsa-python 0.9</a> -
+  Documentation
+</div>
+Documentation <a href="/netsa-python/netsa-python.pdf">(PDF)</a> |
+<a href="/netsa-python/download.html">Downloads</a>
+</div><!-- tool-header -->
+
+<div class="page-content">
+{% endblock %}
+
+{% block footer %}
+<div class="page-footer">
+<!--#include virtual="/tools-page-footer.shtml"-->
+<div class="copyright">
+<a href="/netsa-python/">NetSA Python</a> is part of
+the <a href="/">NetSA Security Suite</a>, developed by
+the <a href="http://www.cert.org/">CERT</a>
+<a href="http://www.cert.org/netsa/">NetSA</a> group<br /> at
+the <a href="http://www.sei.cmu.edu/">Software Engineering
+Institute</a> at <a href="http://www.cmu.edu/">Carnegie Mellon
+University</a>.
+<br />
+<br />
+&copy; 2002-2010 Carnegie Mellon University
+</div>
+</div><!-- page-footer -->
+{% endblock %}

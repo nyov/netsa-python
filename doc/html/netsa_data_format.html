@@ -1,0 +1,390 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>netsa.data.format — Formatting Data for Output &mdash; NetSA Python v0.9 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="NetSA Python v0.9 documentation" href="index.html" />
+    <link rel="up" title="Data Manipulation" href="netsa_data.html" />
+    <link rel="next" title="netsa.data.nice — “Nice” Numbers for Chart Bounds" href="netsa_data_nice.html" />
+    <link rel="prev" title="netsa.data.countries — Country and Region Codes" href="netsa_data_countries.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_nice.html" title="netsa.data.nice — “Nice” Numbers for Chart Bounds"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_countries.html" title="netsa.data.countries — Country and Region Codes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="netsa_data.html" accesskey="U">Data Manipulation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-netsa.data.format">
+<h1><tt class="xref docutils literal"><span class="pre">netsa.data.format</span></tt> &#8212; Formatting Data for Output<a class="headerlink" href="#module-netsa.data.format" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref docutils literal"><span class="pre">netsa.data.format</span></tt> module contains functions useful for
+formatting data to be displayed in human-readable output.</p>
+<div class="section" id="numbers">
+<h2>Numbers<a class="headerlink" href="#numbers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="netsa.data.format.num_fixed">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">num_fixed</tt><big>(</big><em>value : num</em><span class="optional">[</span>, <em>units : str</em>, <em>dec_fig=2</em>, <em>thousands_sep : str</em><span class="optional">]</span><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.num_fixed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> using a fixed number of figures after the decimal
+point.  (e.g. &#8220;1234&#8221; is formatted as &#8220;1234.00&#8221;) If <em>units</em> is
+provided, this unit of measurement is included in the output.
+<em>dec_fig</em> specifies the number of figures after the decimal point.</p>
+<p>If <em>thousands_sep</em> is given, it is used to separate each group of
+three digits to the left of the decimal point.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">num_fixed</span><span class="p">(</span><span class="mi">1234</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">)</span>
+<span class="go">&#39;1234.00m&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_fixed</span><span class="p">(</span><span class="mi">1234</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="n">dec_fig</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">&#39;1234.0000m&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_fixed</span><span class="p">(</span><span class="mf">1234.5678</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="n">dec_fig</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">&#39;1235m&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_fixed</span><span class="p">(</span><span class="mi">123456789</span><span class="p">,</span> <span class="n">dec_fig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">thousands_sep</span><span class="o">=</span><span class="s">&quot;,&quot;</span><span class="p">)</span>
+<span class="go">&#39;123,456,789.000&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.format.num_exponent">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">num_exponent</tt><big>(</big><em>value : num</em><span class="optional">[</span>, <em>units : str</em>, <em>sig_fig=3</em><span class="optional">]</span><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.num_exponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> using exponential notation.  (i.e. &#8220;1234&#8221; becomes
+&#8220;1.23e+3&#8221; for three significant digits, or &#8220;1.234e+4&#8221; for four
+significant digits.)  If <em>units</em> is provided, this unit of
+measurement is included in the output.  <em>sig_fig</em> is the number of
+significant figures to display in the formatted result.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">num_exponent</span><span class="p">(</span><span class="mi">1234</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">)</span>
+<span class="go">&#39;1.23e+3m&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_exponent</span><span class="p">(</span><span class="mi">1234</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="n">sig_fig</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">&#39;1.234e+3m&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_exponent</span><span class="p">(</span><span class="mf">1234.5678</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="n">sig_fig</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="go">&#39;1.23457e+3m&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_exponent</span><span class="p">(</span><span class="mi">123456789</span><span class="p">,</span> <span class="n">sig_fig</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">&#39;1.2e+8&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_exponent</span><span class="p">(</span><span class="mi">123456</span><span class="p">,</span> <span class="n">sig_fig</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="go">&#39;1.23456e+5&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.format.num_prefix">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">num_prefix</tt><big>(</big><em>value : num</em><span class="optional">[</span>, <em>units : str</em>, <em>sig_fig=3</em>, <em>use_binary=False</em>, <em>thousands_sep : str</em><span class="optional">]</span><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.num_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> using SI prefix notation.  (e.g. 1k is 1000) If
+<em>units</em> is provided, this unit of measurement is included in the
+output.  <em>sig_fig</em> is the number of significant figures to display
+in the formatted result.</p>
+<p>If <em>use_binary</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, then SI binary prefixes are used
+(e.g. 1Ki is 1024).  Note that there are no binary prefixes for
+negative exponents, so standard prefixes are always used for such
+cases.</p>
+<p>For very large or very small values, exponential notation
+(e.g. &#8220;1e-30&#8221;) is used.</p>
+<p>If <em>thousands_sep</em> is given, it is used to separate each group of
+three digits to the left of the decimal point.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">)</span>
+<span class="go">&#39;1.02kb&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">use_binary</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">&#39;1.00Kib&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mi">12345</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">sig_fig</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">&#39;12kb&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mi">12345</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">sig_fig</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">&#39;12345.00b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mi">12345678901234567890</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">)</span>
+<span class="go">&#39;12.3Eb&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mi">12345678901234567890</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">sig_fig</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">&#39;12345.68Pb&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mi">1234567890123456789012345</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">)</span>
+<span class="go">&#39;1.23e+24s&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">)</span>
+<span class="go">&#39;1.00ms&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_prefix</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">,</span> <span class="n">use_binary</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">&#39;1.00ms&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="dates-and-times">
+<h2>Dates and Times<a class="headerlink" href="#dates-and-times" title="Permalink to this headline">¶</a></h2>
+<p>Dates and times may be formatted to a variety of precisions.  The
+formatting functions support the following precisions, except
+where otherwise noted: <tt class="xref docutils literal"><span class="pre">DATETIME_YEAR</span></tt>,
+<tt class="xref docutils literal"><span class="pre">DATETIME_MONTH</span></tt>, <tt class="xref docutils literal"><span class="pre">DATETIME_DAY</span></tt>,
+<tt class="xref docutils literal"><span class="pre">DATETIME_HOUR</span></tt>, <tt class="xref docutils literal"><span class="pre">DATETIME_MINUTE</span></tt>,
+<tt class="xref docutils literal"><span class="pre">DATETIME_SECOND</span></tt>, <tt class="xref docutils literal"><span class="pre">DATETIME_MSEC</span></tt>, and
+<tt class="xref docutils literal"><span class="pre">DATETIME_USEC</span></tt>.</p>
+<dl class="function">
+<dt id="netsa.data.format.datetime_silk">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">datetime_silk</tt><big>(</big><em>value : datetime</em><span class="optional">[</span>, <em>precision=DATETIME_SECOND</em><span class="optional">]</span><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.datetime_silk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> as a SiLK format date and time
+(<tt class="docutils literal"><span class="pre">YYYY/MM/DDTHH:MM:SS.SSS</span></tt>).  Implicitly coerces the time into
+UTC.</p>
+<p><em>precision</em> is the amount of precision that should be included in
+the output.</p>
+<p>For a more general way to round times, see
+<tt class="xref docutils literal"><span class="pre">netsa.data.times.bin_datetime</span></tt>.  See also
+<a title="netsa.data.format.datetime_silk_hour" class="reference" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
+most common ways to format incomplete dates in SiLK format.</p>
+<dl class="docutils">
+<dt>Examples::</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03T04:05:06&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_YEAR</span><span class="p">)</span>
+<span class="go">&#39;2010&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MONTH</span><span class="p">)</span>
+<span class="go">&#39;2010/02&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_DAY</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_HOUR</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03T04&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MINUTE</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03T04:05&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_SECOND</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03T04:05:06&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MSEC</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03T04:05:06.007&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_USEC</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03T04:05:06.007000&#39;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.format.datetime_silk_hour">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">datetime_silk_hour</tt><big>(</big><em>value : datetime</em><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.datetime_silk_hour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> as a SiLK format datetime to the precision of an
+hour (<tt class="docutils literal"><span class="pre">YYYY/MM/DDTHH</span></tt>).  Implicitly coerces time into UTC.  This
+is shorthand for <tt class="docutils literal"><span class="pre">datetime_silk(value,</span> <span class="pre">precision=DATETIME_HOUR)</span></tt>.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk_hour</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03T04&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.format.datetime_silk_day">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">datetime_silk_day</tt><big>(</big><em>v : datetime</em><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.datetime_silk_day" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> as a SiLK format datetime to the precision of a day
+(<tt class="docutils literal"><span class="pre">YYYY/MM/DD</span></tt>).  Implicitly coerces time into UTC.  This is
+shorthand for <tt class="docutils literal"><span class="pre">datetime_silk(value,</span> <span class="pre">precision=DATETIME_DAY)</span></tt>.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk_day</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;2010/02/03&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.format.datetime_iso">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">datetime_iso</tt><big>(</big><em>value : datetime</em><span class="optional">[</span>, <em>precision=DATETIME_SECOND</em><span class="optional">]</span><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.datetime_iso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> as an ISO 8601 extended format date and time
+(<tt class="docutils literal"><span class="pre">YYYY/MM/DDTHH:MM:SS.SSSSSS[TZ]</span></tt>).  Includes timezone offset
+unless the value has no timezone or the value&#8217;s timezone is UTC.</p>
+<p><em>precision</em> is the amount of precision that should be included in
+the output.</p>
+<p>For a more general way to round times, see
+<tt class="xref docutils literal"><span class="pre">netsa.data.times.bin_datetime</span></tt>.  See also
+<a title="netsa.data.format.datetime_silk_hour" class="reference" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
+most common ways to format incomplete dates in SiLK format.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007008&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03T04:05:06&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_YEAR</span><span class="p">)</span>
+<span class="go">&#39;2010&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MONTH</span><span class="p">)</span>
+<span class="go">&#39;2010-02&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_DAY</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_HOUR</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03T04&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MINUTE</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03T04:05&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_SECOND</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03T04:05:06&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MSEC</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03T04:05:06.007&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_USEC</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03T04:05:06.007008&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007008+09:10&quot;</span><span class="p">,</span> <span class="n">utc_only</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03T04:05:06+09:10&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.format.datetime_iso_day">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">datetime_iso_day</tt><big>(</big><em>value : datetime</em><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.datetime_iso_day" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> as an ISO 8601 extended format date to the
+precision of a day (<tt class="docutils literal"><span class="pre">YYYY-MM-DD[TZ]</span></tt>).  Includes timezone offset
+unless the value has no timezone or the value&#8217;s timezone is UTC.
+This is shorthand for <tt class="docutils literal"><span class="pre">datetime_iso(value,</span>
+<span class="pre">precision=DATETIME_DAY)</span></tt>.</p>
+<dl class="docutils">
+<dt>Example::</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_day</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007+03:00&quot;</span><span class="p">,</span> <span class="n">utc_only</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_day</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;2010-02-03+03:00&#39;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.data.format.datetime_iso_basic">
+<tt class="descclassname">netsa.data.format.</tt><tt class="descname">datetime_iso_basic</tt><big>(</big><em>value : datetime</em><span class="optional">[</span>, <em>precision=DATETIME_SECOND</em><span class="optional">]</span><big>)</big> &rarr; str<a class="headerlink" href="#netsa.data.format.datetime_iso_basic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <em>value</em> as an ISO 8601 basic (compact) format date and time
+(<tt class="docutils literal"><span class="pre">YYYYMMDDTHHMMSS.SSSSSS[TZ]</span></tt>).  Includes timezone offset unless
+the value has no timezone or the value&#8217;s timezone is UTC.</p>
+<p><em>precision</em> is the amount of precision that should be included in
+the output.  Note that in accordance with the ISO 8601
+specification, this format does not support the
+<tt class="xref docutils literal"><span class="pre">DATETIME_MONTH</span></tt> precision, because <tt class="docutils literal"><span class="pre">YYYYMM</span></tt> and
+<tt class="docutils literal"><span class="pre">YYMMDD</span></tt> would be potentially ambiguous.</p>
+<p>For a more general way to round times, see
+<tt class="xref docutils literal"><span class="pre">netsa.data.times.bin_datetime</span></tt>.  See also
+<a title="netsa.data.format.datetime_silk_hour" class="reference" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
+most common ways to format incomplete dates in SiLK format.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007008&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;20100203T040506&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_YEAR</span><span class="p">)</span>
+<span class="go">&#39;2010&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_DAY</span><span class="p">)</span>
+<span class="go">&#39;20100203&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_HOUR</span><span class="p">)</span>
+<span class="go">&#39;20100203T04&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MINUTE</span><span class="p">)</span>
+<span class="go">&#39;20100203T0405&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_SECOND</span><span class="p">)</span>
+<span class="go">&#39;20100203T040506&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_MSEC</span><span class="p">)</span>
+<span class="go">&#39;20100203T040506.007&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_USEC</span><span class="p">)</span>
+<span class="go">&#39;20100203T040506.007008&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007008+09:10&quot;</span><span class="p">,</span> <span class="n">utc_only</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_basic</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">&#39;20100203T040506+0910&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference" href=""><tt class="docutils literal"><span class="pre">netsa.data.format</span></tt> &#8212; Formatting Data for Output</a><ul>
+<li><a class="reference" href="#numbers">Numbers</a></li>
+<li><a class="reference" href="#dates-and-times">Dates and Times</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="netsa_data_countries.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">netsa.data.countries</span></tt> &#8212; Country and Region Codes</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="netsa_data_nice.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">netsa.data.nice</span></tt> &#8212; &#8220;Nice&#8221; Numbers for Chart Bounds</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/netsa_data_format.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_nice.html" title="netsa.data.nice — “Nice” Numbers for Chart Bounds"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_countries.html" title="netsa.data.countries — Country and Region Codes"
+             >previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="netsa_data.html" >Data Manipulation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2010, Carnegie Mellon University.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

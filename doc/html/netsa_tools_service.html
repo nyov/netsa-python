@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>netsa.tools.service — Tools for building services &mdash; NetSA Python v0.9 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="NetSA Python v0.9 documentation" href="index.html" />
+    <link rel="up" title="Miscellaneous Facilities" href="other.html" />
+    <link rel="next" title="Licenses" href="license.html" />
+    <link rel="prev" title="netsa.json — JSON Wrapper Module" href="netsa_json.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="license.html" title="Licenses"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="netsa_json.html" title="netsa.json — JSON Wrapper Module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="other.html" accesskey="U">Miscellaneous Facilities</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-netsa.tools.service">
+<h1><tt class="xref docutils literal"><span class="pre">netsa.tools.service</span></tt> &#8212; Tools for building services<a class="headerlink" href="#module-netsa.tools.service" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="netsa.tools.service.check_pidfile">
+<tt class="descclassname">netsa.tools.service.</tt><tt class="descname">check_pidfile</tt><big>(</big><em>path : str</em><span class="optional">[</span>, <em>unlink=True</em><span class="optional">]</span><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.tools.service.check_pidfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to create a locking PID file at the requested pathname
+<em>path</em>.  If the file does not exist, creates it with the current
+process ID, and sets up an <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/atexit.html#module-atexit"><tt class="xref docutils literal"><span class="pre">atexit</span></tt></a> process to remove it.  If
+the file does exist but refers to a no-longer-existing process,
+replaces it and does the above.  If the file does exist and refers
+to a running process, does nothing.</p>
+<p>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if the PID file was created or replaced (which
+means we should continue processing), or <tt class="xref docutils literal"><span class="pre">False</span></tt> if the PID file
+was left in place (which means someone else is processing and we
+should exit.)</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="netsa_json.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">netsa.json</span></tt> &#8212; JSON Wrapper Module</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="license.html"
+                                  title="next chapter">Licenses</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/netsa_tools_service.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="license.html" title="Licenses"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="netsa_json.html" title="netsa.json — JSON Wrapper Module"
+             >previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="other.html" >Miscellaneous Facilities</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2010, Carnegie Mellon University.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

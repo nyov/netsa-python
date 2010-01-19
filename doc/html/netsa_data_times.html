@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>netsa.data.times — Time and Date Manipulation &mdash; NetSA Python v0.9 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="NetSA Python v0.9 documentation" href="index.html" />
+    <link rel="up" title="Data Manipulation" href="netsa_data.html" />
+    <link rel="next" title="Miscellaneous Facilities" href="other.html" />
+    <link rel="prev" title="netsa.data.nice — “Nice” Numbers for Chart Bounds" href="netsa_data_nice.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="other.html" title="Miscellaneous Facilities"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_nice.html" title="netsa.data.nice — “Nice” Numbers for Chart Bounds"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="netsa_data.html" accesskey="U">Data Manipulation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-netsa.times">
+<h1><tt class="xref docutils literal"><span class="pre">netsa.data.times</span></tt> &#8212; Time and Date Manipulation<a class="headerlink" href="#module-netsa.times" title="Permalink to this headline">¶</a></h1>
+<p>Backwards-compatibility binding for <tt class="xref docutils literal"><span class="pre">netsa.data.times</span></tt>.  New code
+should be sure to use <tt class="xref docutils literal"><span class="pre">netsa.data.times</span></tt> directly instead.</p>
+<dl class="function">
+<dt id="netsa.times.make_datetime">
+<tt class="descclassname">netsa.times.</tt><tt class="descname">make_datetime</tt><big>(</big><em>v : num or str or datetime or mxDateTime</em><span class="optional">[</span>, <em>utc_only=True</em><span class="optional">]</span><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.times.make_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object from a number
+(seconds from UNIX epoch), a string (in ISO format, SiLK format,
+or old SiLK format), or a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object.  If
+<em>utc_only</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, coerces the result to be in the UTC time
+zone.</p>
+<p>If the <a class="reference" href="http://www.egenix.com/products/python/mxBase/mxDateTime/">mxDateTime</a> library is installed, this function also
+accepts <tt class="xref docutils literal"><span class="pre">mxDateTime</span></tt> objects.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.times.bin_datetime">
+<tt class="descclassname">netsa.times.</tt><tt class="descname">bin_datetime</tt><big>(</big><em>dt : timedelta</em>, <em>t : datetime</em><span class="optional">[</span>, <em>z=UNIX_EPOCH : datetime</em><span class="optional">]</span><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.times.bin_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object which is the floor
+of the <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> <em>t</em> in a <em>dt</em>-sized bin.  For
+example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bin_datetime</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will return the beginning of a five-minute bin containing the time
+<em>t</em>.  If you have very specific requirements, you can replace the
+origin point for binning (<em>z</em>) with a time of your choice.  By
+default, the UNIX epoch is used, which is appropriate for most
+uses.</p>
+</dd></dl>
+
+<div class="section" id="date-snappers">
+<h2>Date Snappers<a class="headerlink" href="#date-snappers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="netsa.times.DateSnapper">
+<em class="property">
+class </em><tt class="descclassname">netsa.times.</tt><tt class="descname">DateSnapper</tt><big>(</big><em>size : timedelta</em><span class="optional">[</span>, <em>epoch=UNIX_EPOCH : datetime</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.times.DateSnapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for date bin manipulations</p>
+<dl class="method">
+<dt id="netsa.times.DateSnapper.date_aligned">
+<tt class="descname">date_aligned</tt><big>(</big><em>date</em><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.times.DateSnapper.date_aligned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests whether or not the provided date is the beginning
+<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> for the containing time bin.</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for date descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.date_bin">
+<tt class="descname">date_bin</tt><big>(</big><em>date</em><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.times.DateSnapper.date_bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object representing the
+beginning of the date bin containing the provided date
+(&#8216;snapping&#8217; the date into place)</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for date descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.date_bin_end">
+<tt class="descname">date_bin_end</tt><big>(</big><em>date</em><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.times.DateSnapper.date_bin_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object representing the
+last date of the date bin which contains the provided date.</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for date descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.date_binner">
+<tt class="descname">date_binner</tt><big>(</big><em>dates : date seq</em><big>)</big> &rarr; seq<a class="headerlink" href="#netsa.times.DateSnapper.date_binner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of datetimes, returns an iterator which produces
+tuples containing two datetime objects for each provided
+datetime. The first value of the tuple is the beginning of the
+date bin containing the datetime in question and the second
+value is the original datetime.</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for datetime descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.date_clumper">
+<tt class="descname">date_clumper</tt><big>(</big><em>date_ranges : seq</em><big>)</big> &rarr; datetime seq<a class="headerlink" href="#netsa.times.DateSnapper.date_clumper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of date ranges, return a list of date bins that
+intersect the union of the given date ranges. Each date range in
+the provided list can be a single datetime descriptor or a tuple
+representing a beginning and end datetime for the range.</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for date descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.date_sequencer">
+<tt class="descname">date_sequencer</tt><big>(</big><em>date_list : date seq</em><big>)</big> &rarr; seq<a class="headerlink" href="#netsa.times.DateSnapper.date_sequencer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of datetimes, returns an iterator which produces
+tuples containing two datetime objects. The first value of the
+tuple is the begining of the date bin and the second value is
+the original datetime. Both bins and datetimes will be
+repeated where necessary to fill in gaps not present in the
+original list of datetimes.</p>
+<p>If, for example, the span between each successive datetime in
+the provided list is smaller than the defined bin size, the same
+bin will be returned for each datetime residing in that bin. (An
+example of this would be a bin size of 7 days and a list of
+daily dates &#8211; the same bin would be returned for each week of
+dates within that bin).</p>
+<p>If, on the other hand, the span between successive datetimes in
+the provided list is larger than the defined bin size, each
+provided date will be repeatly returned with each bin that
+exists between the provided datetimes. (An example of this would
+be a bin size of 7 days and a list of monthly dates &#8211; each
+monthly date would be succesively returned with the 4 (or so)
+bins touched by that month)</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for date descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.next_date_bin">
+<tt class="descname">next_date_bin</tt><big>(</big><em>date</em><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.times.DateSnapper.next_date_bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object representing the
+beginning of the date bin following the date bin in which the
+given date resides.</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for date descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.prior_date_bin">
+<tt class="descname">prior_date_bin</tt><big>(</big><em>date</em><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.times.DateSnapper.prior_date_bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object representing the
+beginning of the date bin prior to the date bin in which the
+given date resides.</p>
+<p>See <a title="netsa.times.make_datetime" class="reference" href="#netsa.times.make_datetime"><tt class="xref docutils literal"><span class="pre">make_datetime</span></tt></a> for more detail on acceptable
+formats for date descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.times.DateSnapper.today_bin">
+<tt class="descname">today_bin</tt><big>(</big><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.times.DateSnapper.today_bin" title="Permalink to this definition">¶</a></dt>
+<dd>Returns a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object representing the
+beginning of the date bin containing the current date.</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.times.dow_day_snapper">
+<tt class="descclassname">netsa.times.</tt><tt class="descname">dow_day_snapper</tt><big>(</big><em>size : int</em><span class="optional">[</span>, <em>dow=0</em><span class="optional">]</span><big>)</big> &rarr; DateSnapper<a class="headerlink" href="#netsa.times.dow_day_snapper" title="Permalink to this definition">¶</a></dt>
+<dd>Given an integer size in days and an integer day-of-the-week,
+returns a :class:<tt class="docutils literal"><span class="pre">DateSnapper</span></tt> object anchored on the first
+occurring instance of that DOW after the UNIX epoch. Monday is the
+0th DOW.  DOW values are modulo 7, so the 7th DOW would also
+represent Monday.</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference" href=""><tt class="docutils literal"><span class="pre">netsa.data.times</span></tt> &#8212; Time and Date Manipulation</a><ul>
+<li><a class="reference" href="#date-snappers">Date Snappers</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="netsa_data_nice.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">netsa.data.nice</span></tt> &#8212; &#8220;Nice&#8221; Numbers for Chart Bounds</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="other.html"
+                                  title="next chapter">Miscellaneous Facilities</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/netsa_data_times.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="other.html" title="Miscellaneous Facilities"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="netsa_data_nice.html" title="netsa.data.nice — “Nice” Numbers for Chart Bounds"
+             >previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="netsa_data.html" >Data Manipulation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2010, Carnegie Mellon University.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
