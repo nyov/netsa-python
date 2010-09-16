@@ -56,8 +56,7 @@
 <h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
 <dl class="exception">
 <dt id="netsa.files.datefiles.DateFileParseError">
-<em class="property">
-exception </em><tt class="descclassname">netsa.files.datefiles.</tt><tt class="descname">DateFileParseError</tt><big>(</big><em>message : str</em><big>)</big><a class="headerlink" href="#netsa.files.datefiles.DateFileParseError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">netsa.files.datefiles.</tt><tt class="descname">DateFileParseError</tt><big>(</big><em>message : str</em><big>)</big><a class="headerlink" href="#netsa.files.datefiles.DateFileParseError" title="Permalink to this definition">¶</a></dt>
 <dd>Raised if a function is unable to parse a date within the provided
 filename.</dd></dl>
 
@@ -69,7 +68,7 @@ filename.</dd></dl>
 <tt class="descclassname">netsa.files.datefiles.</tt><tt class="descname">date_from_file</tt><big>(</big><em>file : str</em><big>)</big> &rarr; datetime<a class="headerlink" href="#netsa.files.datefiles.date_from_file" title="Permalink to this definition">¶</a></dt>
 <dd>Attempt to extract dates from a filename. The filename can be a
 full pathname or relative path. Dates are presumed to exist
-somewhere in the pathname.  See <a title="netsa.files.datefiles.split_on_date" class="reference" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more
+somewhere in the pathname.  See <a title="netsa.files.datefiles.split_on_date" class="reference internal" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more
 detail on how dates are parsed from filenames.</dd></dl>
 
 <dl class="function">
@@ -137,7 +136,7 @@ filename corresponding to that date.</dd></dl>
 <dd><p>Returns an iterator based on the dated files that exist in
 directory <em>dir</em>.  Each value returned by the iterator is a tuple
 of <tt class="docutils literal"><span class="pre">(date,</span> <span class="pre">[file1,</span> <span class="pre">file2,</span> <span class="pre">...])</span></tt>, where each file matches the
-given date.  See <a title="netsa.files.datefiles.split_on_date" class="reference" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more detail on how
+given date.  See <a title="netsa.files.datefiles.split_on_date" class="reference internal" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more detail on how
 dates are parsed from filenames.</p>
 <p>If <em>descend</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the entire directory tree will be
 traversed.  Otherwise, only the top-level directory is examined.</p>
@@ -146,7 +145,7 @@ date in descending order.  Otherwise, entries are returns in
 ascending order.</p>
 <p>If a <tt class="xref docutils literal"><span class="pre">netsa.data.times.DateSnapper</span></tt> <em>snapper</em> is provided,
 it will be used to enforce the alignment of dates, throwing a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/exceptions.html#exceptions.ValueError"><tt class="xref docutils literal"><span class="pre">ValueError</span></tt></a> if a misaligned date is encountered.</p>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.ValueError"><tt class="xref docutils literal"><span class="pre">ValueError</span></tt></a> if a misaligned date is encountered.</p>
 </dd></dl>
 
 <dl class="function">
@@ -155,13 +154,13 @@ it will be used to enforce the alignment of dates, throwing a
 <dd><p>Traverses the given directory and returns a single tuple <tt class="docutils literal"><span class="pre">(date,</span>
 <span class="pre">[file1,</span> <span class="pre">file2,</span> <span class="pre">...])</span></tt> where date is the latest date present and
 each file in the list contains that date.  See
-<a title="netsa.files.datefiles.split_on_date" class="reference" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more detail on how dates are parsed from
+<a title="netsa.files.datefiles.split_on_date" class="reference internal" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more detail on how dates are parsed from
 filenames.</p>
 <p>If <em>descend</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the entire directory tree is traversed
 recursively.  Otherwise, only the top-level directory is examined.</p>
 <p>If a <tt class="xref docutils literal"><span class="pre">netsa.data.times.DateSnapper</span></tt> <em>snapper</em> is provided, it
 will be used to enforce the alignment of dates, throwing a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/exceptions.html#exceptions.ValueError"><tt class="xref docutils literal"><span class="pre">ValueError</span></tt></a> if a misaligned date is encountered.</p>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.ValueError"><tt class="xref docutils literal"><span class="pre">ValueError</span></tt></a> if a misaligned date is encountered.</p>
 </dd></dl>
 
 <dl class="function">
@@ -189,7 +188,7 @@ extension are ignored.</p>
 by <em>sources</em>.  Each value returned by the iterator is a tuple
 <tt class="docutils literal"><span class="pre">(date,</span> <span class="pre">(dir,</span> <span class="pre">file),</span> <span class="pre">(dir2,</span> <span class="pre">file2),</span> <span class="pre">...)</span></tt>, where the given
 directory contains the given file, which contains this date in its
-name.  See <a title="netsa.files.datefiles.split_on_date" class="reference" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more detail on how dates are
+name.  See <a title="netsa.files.datefiles.split_on_date" class="reference internal" href="#netsa.files.datefiles.split_on_date"><tt class="xref docutils literal"><span class="pre">split_on_date</span></tt></a> for more detail on how dates are
 parsed from filenames.</p>
 <p>For example, given: <tt class="docutils literal"><span class="pre">('/dir/one',</span> <span class="pre">/dir/two')</span></tt>, a returned tuple
 might look like:</p>
@@ -205,7 +204,7 @@ descending order.  Otherwise, dates are generated in ascending
 order.</p>
 <p>If a <tt class="xref docutils literal"><span class="pre">netsa.data.times.DateSnapper</span></tt> <em>snapper</em> is provided,
 it will be used to enforce the alignment of dates, throwing a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/exceptions.html#exceptions.ValueError"><tt class="xref docutils literal"><span class="pre">ValueError</span></tt></a> if a misaligned date is encountered.</p>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/exceptions.html#exceptions.ValueError"><tt class="xref docutils literal"><span class="pre">ValueError</span></tt></a> if a misaligned date is encountered.</p>
 </dd></dl>
 
 </div>
@@ -219,10 +218,10 @@ it will be used to enforce the alignment of dates, throwing a
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference" href=""><tt class="docutils literal"><span class="pre">netsa.files.datefiles</span></tt> &#8212; Date-based filenames</a><ul>
-<li><a class="reference" href="#exceptions">Exceptions</a></li>
-<li><a class="reference" href="#filename-manipulation">Filename Manipulation</a></li>
-<li><a class="reference" href="#directory-walking">Directory Walking</a></li>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">netsa.files.datefiles</span></tt> &#8212; Date-based filenames</a><ul>
+<li><a class="reference external" href="#exceptions">Exceptions</a></li>
+<li><a class="reference external" href="#filename-manipulation">Filename Manipulation</a></li>
+<li><a class="reference external" href="#directory-walking">Directory Walking</a></li>
 </ul>
 </li>
 </ul>
@@ -276,7 +275,7 @@ it will be used to enforce the alignment of dates, throwing a
     </div>
     <div class="footer">
       &copy; Copyright 2008-2010, Carnegie Mellon University.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
 </html>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>netsa.tools.service — Tools for building services &mdash; NetSA Python v0.9 documentation</title>
+    <title>Changes &mdash; NetSA Python v0.9 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -20,9 +20,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="NetSA Python v0.9 documentation" href="index.html" />
-    <link rel="up" title="Miscellaneous Facilities" href="other.html" />
-    <link rel="next" title="netsa.util.clitest — Utility for testing CLI tools" href="netsa_util_clitest.html" />
-    <link rel="prev" title="netsa.json — JSON Wrapper Module" href="netsa_json.html" /> 
+    <link rel="next" title="Licenses" href="license.html" />
+    <link rel="prev" title="netsa.util.clitest — Utility for testing CLI tools" href="netsa_util_clitest.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,13 +34,12 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="netsa_util_clitest.html" title="netsa.util.clitest — Utility for testing CLI tools"
+          <a href="license.html" title="Licenses"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="netsa_json.html" title="netsa.json — JSON Wrapper Module"
+          <a href="netsa_util_clitest.html" title="netsa.util.clitest — Utility for testing CLI tools"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
-          <li><a href="other.html" accesskey="U">Miscellaneous Facilities</a> &raquo;</li> 
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -50,23 +48,28 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-netsa.tools.service">
-<h1><tt class="xref docutils literal"><span class="pre">netsa.tools.service</span></tt> &#8212; Tools for building services<a class="headerlink" href="#module-netsa.tools.service" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="netsa.tools.service.check_pidfile">
-<tt class="descclassname">netsa.tools.service.</tt><tt class="descname">check_pidfile</tt><big>(</big><em>path : str</em><span class="optional">[</span>, <em>unlink=True</em><span class="optional">]</span><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.tools.service.check_pidfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Attempts to create a locking PID file at the requested pathname
-<em>path</em>.  If the file does not exist, creates it with the current
-process ID, and sets up an <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/atexit.html#module-atexit"><tt class="xref docutils literal"><span class="pre">atexit</span></tt></a> process to remove it.  If
-the file does exist but refers to a no-longer-existing process,
-replaces it and does the above.  If the file does exist and refers
-to a running process, does nothing.</p>
-<p>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if the PID file was created or replaced (which
-means we should continue processing), or <tt class="xref docutils literal"><span class="pre">False</span></tt> if the PID file
-was left in place (which means someone else is processing and we
-should exit.)</p>
-</dd></dl>
-
+  <div class="section" id="changes">
+<h1>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-1-0-2010-09-14">
+<h2>Version 1.0 - 2010-09-14<a class="headerlink" href="#version-1-0-2010-09-14" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<ul class="simple">
+<li>Added netsa.util.clitest module to support CLI tool testing.</li>
+<li>Added PyGreSQL support to netsa.sql.</li>
+<li>Fixed a bug in netsa.sql db_query parsing code.</li>
+<li>Fixed a bug in netsa.sql database URI parsing code.</li>
+<li>Fixed bugs in netsa.data.nice nice_time_ticks.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="version-0-9-2010-01-19">
+<h2>Version 0.9 - 2010-01-19<a class="headerlink" href="#version-0-9-2010-01-19" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<ul class="simple">
+<li>First public release.</li>
+</ul>
+</blockquote>
+</div>
 </div>
 
 
@@ -75,15 +78,24 @@ should exit.)</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Changes</a><ul>
+<li><a class="reference external" href="#version-1-0-2010-09-14">Version 1.0 - 2010-09-14</a></li>
+<li><a class="reference external" href="#version-0-9-2010-01-19">Version 0.9 - 2010-01-19</a></li>
+</ul>
+</li>
+</ul>
+
             <h4>Previous topic</h4>
-            <p class="topless"><a href="netsa_json.html"
-                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">netsa.json</span></tt> &#8212; JSON Wrapper Module</a></p>
-            <h4>Next topic</h4>
             <p class="topless"><a href="netsa_util_clitest.html"
-                                  title="next chapter"><tt class="docutils literal docutils literal"><span class="pre">netsa.util.clitest</span></tt> &#8212; Utility for testing CLI tools</a></p>
+                                  title="previous chapter"><tt class="docutils literal"><span class="pre">netsa.util.clitest</span></tt> &#8212; Utility for testing CLI tools</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="license.html"
+                                  title="next chapter">Licenses</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/netsa_tools_service.txt"
+              <li><a href="_sources/changes.txt"
                      rel="nofollow">Show Source</a></li>
             </ul>
           <div id="searchbox" style="display: none">
@@ -113,13 +125,12 @@ should exit.)</p>
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="netsa_util_clitest.html" title="netsa.util.clitest — Utility for testing CLI tools"
+          <a href="license.html" title="Licenses"
              >next</a> |</li>
         <li class="right" >
-          <a href="netsa_json.html" title="netsa.json — JSON Wrapper Module"
+          <a href="netsa_util_clitest.html" title="netsa.util.clitest — Utility for testing CLI tools"
              >previous</a> |</li>
-        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
-          <li><a href="other.html" >Miscellaneous Facilities</a> &raquo;</li> 
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

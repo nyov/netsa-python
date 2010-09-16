@@ -63,17 +63,17 @@ ranges.</p>
 spanning from <em>lo</em> to <em>hi</em>.  If <em>inside</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, then the
 nice range will be contained within the input range.  If <em>inside</em>
 is <tt class="xref docutils literal"><span class="pre">False</span></tt>, then the nice range will contain the input range.
-To find nice numbers for time data, use <a title="netsa.data.nice.nice_time_ticks" class="reference" href="#netsa.data.nice.nice_time_ticks"><tt class="xref docutils literal"><span class="pre">nice_time_ticks</span></tt></a>.</p>
+To find nice numbers for time data, use <a title="netsa.data.nice.nice_time_ticks" class="reference internal" href="#netsa.data.nice.nice_time_ticks"><tt class="xref docutils literal"><span class="pre">nice_time_ticks</span></tt></a>.</p>
 <p>The result is a tuple containing the minimum value of the nice
 range, the maximum value of the nice range, and an iterator over
 the tick marks.</p>
-<p>See also <a title="netsa.data.nice.nice_ticks_seq" class="reference" href="#netsa.data.nice.nice_ticks_seq"><tt class="xref docutils literal"><span class="pre">nice_ticks_seq</span></tt></a>.</p>
+<p>See also <a title="netsa.data.nice.nice_ticks_seq" class="reference internal" href="#netsa.data.nice.nice_ticks_seq"><tt class="xref docutils literal"><span class="pre">nice_ticks_seq</span></tt></a>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="netsa.data.nice.nice_ticks_seq">
 <tt class="descclassname">netsa.data.nice.</tt><tt class="descname">nice_ticks_seq</tt><big>(</big><em>lo : num</em>, <em>hi : num</em><span class="optional">[</span>, <em>ticks=5</em>, <em>inside=False</em><span class="optional">]</span><big>)</big> &rarr; num seq<a class="headerlink" href="#netsa.data.nice.nice_ticks_seq" title="Permalink to this definition">¶</a></dt>
-<dd>A convenience wrapper of <a title="netsa.data.nice.nice_ticks" class="reference" href="#netsa.data.nice.nice_ticks"><tt class="xref docutils literal"><span class="pre">nice_ticks</span></tt></a> to return the nice
+<dd>A convenience wrapper of <a title="netsa.data.nice.nice_ticks" class="reference internal" href="#netsa.data.nice.nice_ticks"><tt class="xref docutils literal"><span class="pre">nice_ticks</span></tt></a> to return the nice
 range as a sequence.</dd></dl>
 
 <dl class="function">
@@ -83,19 +83,20 @@ range as a sequence.</dd></dl>
 spanning from <em>lo</em> to <em>hi</em>.  If <em>inside</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, then the
 nice range will be contained within the input range.  If <em>inside</em>
 is <tt class="xref docutils literal"><span class="pre">False</span></tt>, then the nice range will contain the input range.
-To find nice numbers for numerical data, use <a title="netsa.data.nice.nice_ticks" class="reference" href="#netsa.data.nice.nice_ticks"><tt class="xref docutils literal"><span class="pre">nice_ticks</span></tt></a>.</p>
+To find nice numbers for numerical data, use <a title="netsa.data.nice.nice_ticks" class="reference internal" href="#netsa.data.nice.nice_ticks"><tt class="xref docutils literal"><span class="pre">nice_ticks</span></tt></a>.</p>
 <p>The result is a tuple containing the minimum value of the nice
 range, the maximum value of the nice range, and an iterator over
 the ticks marks.  If <em>as_datetime</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the result values
-will be <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> objects.  Otherwise, the result
-values will be numbers of seconds since UNIX epoch.</p>
-<p>See also <a title="netsa.data.nice.nice_time_ticks_seq" class="reference" href="#netsa.data.nice.nice_time_ticks_seq"><tt class="xref docutils literal"><span class="pre">nice_time_ticks_seq</span></tt></a>.</p>
+will be <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> objects.  Otherwise, the result
+values will be numbers of seconds since UNIX epoch. Regardless,
+the return value is expressed in UTC.</p>
+<p>See also <a title="netsa.data.nice.nice_time_ticks_seq" class="reference internal" href="#netsa.data.nice.nice_time_ticks_seq"><tt class="xref docutils literal"><span class="pre">nice_time_ticks_seq</span></tt></a>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="netsa.data.nice.nice_time_ticks_seq">
 <tt class="descclassname">netsa.data.nice.</tt><tt class="descname">nice_time_ticks_seq</tt><big>(</big><em>lo : datetime</em>, <em>hi : datetime</em><span class="optional">[</span>, <em>ticks=5</em>, <em>inside=False</em>, <em>as_datetime=True</em><span class="optional">]</span><big>)</big> &rarr; datetime/int seq<a class="headerlink" href="#netsa.data.nice.nice_time_ticks_seq" title="Permalink to this definition">¶</a></dt>
-<dd>A convenience wrapper of <a title="netsa.data.nice.nice_time_ticks" class="reference" href="#netsa.data.nice.nice_time_ticks"><tt class="xref docutils literal"><span class="pre">nice_time_ticks</span></tt></a> to return the
+<dd>A convenience wrapper of <a title="netsa.data.nice.nice_time_ticks" class="reference internal" href="#netsa.data.nice.nice_time_ticks"><tt class="xref docutils literal"><span class="pre">nice_time_ticks</span></tt></a> to return the
 nice range as a sequence.</dd></dl>
 
 </div>
@@ -155,7 +156,7 @@ nice range as a sequence.</dd></dl>
     </div>
     <div class="footer">
       &copy; Copyright 2008-2010, Carnegie Mellon University.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
 </html>

@@ -1,5 +1,4 @@
 # Copyright 2008-2010 by Carnegie Mellon University
-
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
 # related source code is subject to the terms of the following licenses:
@@ -54,10 +53,11 @@ ranges.
 """
 
 from __future__ import division
-from datetime import date, datetime, timedelta
-import time
+from datetime import date, timedelta
+import calendar
 import copy
 import math
+import times
 
 
 
@@ -156,15 +156,6 @@ def nice_ticks_seq(lo, hi, ticks=5, inside=False):
 # totally differently, according to the method suggested by Wilkinson
 # in _The Grammar of Graphics_.
 #
-
-
-
-# Some unit definitions, for convenience later
-SECOND = 1
-MINUTE = 60 * SECOND
-HOUR   = 60 * MINUTE
-DAY    = 24 * HOUR
-WEEK   = 7  * DAY
 
 
 
@@ -305,6 +296,11 @@ class Years(RollingDatetime):
 #
 # This just does the "regular" time intervals. Months and years are
 # handled separately.
+SECOND = 1
+MINUTE = 60 * SECOND
+HOUR   = 60 * MINUTE
+DAY    = 24 * HOUR
+WEEK   = 7  * DAY
 T_r = [
     ([s for s in (1, 2, 5, 15, 30)], SECOND),
     ([m * MINUTE for m in (1, 2, 5, 15, 30)], MINUTE),
@@ -348,7 +344,7 @@ def calendar_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
     @type inside: bool
     @param inside: Should the ticks lie inside the lo-hi range?"""
     def as_seconds(dt):
-        return time.mktime(dt.timetuple())
+        return calendar.timegm(dt.timetuple())
     d_range = as_seconds(hi) - as_seconds(lo)
 
     def intv_time_ticks(lo, hi, intv):
@@ -390,7 +386,7 @@ def calendar_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
     # return the beginning and end of the range, and an iterator
     # through it
     def tts(dt):
-        return time.mktime(dt.timetuple())
+        return calendar.timegm(dt.timetuple())
     def dt_iter():
         curr = start
         while curr.dt <= stop.dt:
@@ -402,7 +398,7 @@ def calendar_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
         it = dt_iter()
         def as_seconds():
             for i in it:
-                yield time.mktime(i.timetuple())
+                yield calendar.timegm(i.timetuple())
         return tts(start.dt), tts(stop.dt), as_seconds()
         
 #
@@ -431,38 +427,51 @@ def regular_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
     candidate = (0, 0, 0, 0)
     for Q, unit in T_r:
         for q in Q:
-            #print "====================================="
-            #print "q:      ", q
-            #print "unit:   ", unit
-            #print "-------------------------------------"
+            # units_rlookup = {
+            #     SECOND : 'second',
+            #     MINUTE : 'minute',
+            #     HOUR   : 'hour',
+            #     DAY    : 'day',
+            #     WEEK   : 'week'
+            # }
+            # print "====================================="
+            # print "q:      %s (%s %ss)" % (q, q/unit, units_rlookup[unit])
+            # print "-------------------------------------"
             # range of the scale (r_s )
             if inside:
-                s_start = interval_ceil(unit, lo)
-                s_end = interval_floor(unit, hi)
+                s_start = interval_ceil(q, lo)
+                s_end = interval_floor(q, hi)
             else:
-                s_start = interval_floor(unit, lo)
-                s_end = interval_ceil(unit, hi)
+                s_start = interval_floor(q, lo)
+                s_end = interval_ceil(q, hi)
             s_range = s_end - s_start
-            #print "s_range:", s_range
-            s_ticks =  s_range / q
+            # Reject invalid ranges. (s_end <= s_start happens
+            # sometimes when inside == True)
+            if s_range <= 0:
+                continue
+            # print "s_range:", s_range
+            # Mind the fencepost
+            s_ticks =  (s_range / q) + 1
             g = granularity(s_ticks, ticks)
-            #print "g:      ", g
+            # print "g:      ", g
             c = coverage(drange, s_range)
-            #print "c:      ", c
+            # print "c:      ", c
             weighted_ave = (g + c)/2
-            #print "ave:    ", weighted_ave
+            # print "ave:    ", weighted_ave
             if weighted_ave > candidate[3]:
                 candidate = (s_start, s_end, q, weighted_ave)
     if candidate[0] is None:
         raise RuntimeError("Couldn't find usable time scale")
+    # print "Winner: %s" % str(candidate)
     start, stop, step, score = candidate
     # Some shorthand
     def fts(s):
-        return datetime.fromtimestamp(s)
+        return times.make_datetime(s)
     if as_datetime:
         def dt_iter():
             for secs in xrange(int(start), int(stop), step):
                 yield fts(secs)
+            yield fts(int(stop))
         return fts(start), fts(stop), dt_iter()
     else:
         def as_seconds():
@@ -471,6 +480,8 @@ def regular_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
         return start, stop, as_seconds()
 
 
+    
+    
 # Renamed from get_time_ticks
 def nice_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
     """
@@ -484,12 +495,13 @@ def nice_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
     range, the maximum value of the nice range, and an iterator over
     the ticks marks.  If *as_datetime* is ``True``, the result values
     will be :class:`datetime.datetime` objects.  Otherwise, the result
-    values will be numbers of seconds since UNIX epoch.
+    values will be numbers of seconds since UNIX epoch. Regardless,
+    the return value is expressed in UTC.
 
     See also :func:`nice_time_ticks_seq`.
     """
-    hi_secs = time.mktime(hi.timetuple())
-    lo_secs = time.mktime(lo.timetuple())
+    hi_secs = calendar.timegm(hi.timetuple())
+    lo_secs = calendar.timegm(lo.timetuple())
     # Give it to months/years algorithm if it's that big
     if hi_secs - lo_secs >= 8 * WEEK:
         return calendar_time_ticks(lo, hi, ticks, inside, as_datetime)

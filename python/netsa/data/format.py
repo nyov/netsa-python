@@ -283,6 +283,7 @@ def datetime_silk(value, precision=DATETIME_SECOND):
     most common ways to format incomplete dates in SiLK format.
 
     Examples::
+
         >>> t = netsa.data.times.make_datetime("2010-02-03T04:05:06.007")
         >>> datetime_silk(t)
         '2010/02/03T04:05:06'
@@ -543,6 +544,7 @@ def datetime_iso_day(value):
     precision=DATETIME_DAY)``.
 
     Example::
+
         >>> t = netsa.data.times.make_datetime("2010-02-03T04:05:06.007")
         >>> datetime_iso_day(t)
         '2010-02-03'

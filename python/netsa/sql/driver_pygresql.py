@@ -46,10 +46,11 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import psycopg2
+import datetime
+import pgdb
 import netsa.sql
 
-class ppg_driver(netsa.sql.db_driver):
+class pgs_driver(netsa.sql.db_driver):
     __slots__ = """
     """.split()
     def can_handle(self, uri_scheme):
@@ -61,7 +62,7 @@ class ppg_driver(netsa.sql.db_driver):
             return None
         params = dict(parsed_uri.get('params', []))
         database = parsed_uri['path'].lstrip('/')
-        return ppg_connection(
+        return pgs_connection(
             self, ['postgres'],
             database=parsed_uri['path'].lstrip('/'),
             host=parsed_uri['host'],
@@ -72,7 +73,7 @@ class ppg_driver(netsa.sql.db_driver):
             sslmode=params.get('sslmode', None)
         )
 
-class ppg_connection(netsa.sql.db_connection):
+class pgs_connection(netsa.sql.db_connection):
     __slots__ = """
         _database
         _host
@@ -80,7 +81,7 @@ class ppg_connection(netsa.sql.db_connection):
         _user
         _password
         _sslmode
-        _psycopg2_conn
+        _pgdb_conn
     """.split()
     def __init__(self, driver, variants, database, host, port, user,
                  password, sslmode):
@@ -91,7 +92,7 @@ class ppg_connection(netsa.sql.db_connection):
         self._user = user
         self._password = password
         self._sslmode = sslmode
-        self._psycopg2_conn = None
+        self._pgdb_conn = None
         self._connect()
     def _connect(self):
         kwargs = {}
@@ -107,36 +108,40 @@ class ppg_connection(netsa.sql.db_connection):
             kwargs['password'] = self._password
         if self._sslmode:
             kwargs['sslmode'] = self._sslmode
-        self._psycopg2_conn = psycopg2.connect(**kwargs)
+        self._pgdb_conn = pgdb.connect(**kwargs)
         self.execute("set timezone = 0")
     def clone(self):
-        return ppg_connection(self._driver, self._variants, self._database,
+        return pgs_connection(self._driver, self._variants, self._database,
                               self._host, self._port, self._user,
                               self._password, self._sslmode)
     def execute(self, query_or_sql, **params):
-        return ppg_result(self, query_or_sql, params)
+        return pgs_result(self, query_or_sql, params)
     def commit(self):
-        self._psycopg2_conn.commit()
+        self._pgdb_conn.commit()
     def rollback(self):
-        if self._psycopg2_conn:
-            self._psycopg2_conn.rollback()
+        if self._pgdb_conn:
+            self._pgdb_conn.rollback()
 
-class ppg_result(netsa.sql.db_result):
+class pgs_result(netsa.sql.db_result):
     __slots__ = """
-        _psycopg2_cursor
+        _pgdb_cursor
     """.split()
     def __init__(self, connection, query, params):
         netsa.sql.db_result.__init__(self, connection, query, params)
-        self._psycopg2_cursor = self._connection._psycopg2_conn.cursor()
+        self._pgdb_cursor = self._connection._pgdb_conn.cursor()
         variants = self._connection.get_variants()
         (query, params) = \
             self._query.get_variant_pyformat_params(variants, params)
-        self._psycopg2_cursor.execute(query, params)
+        # Work around mx vs. standard datetime issues
+        for k in params:
+            if isinstance(params[k], datetime.datetime):
+                params[k] = str(params[k])
+        self._pgdb_cursor.execute(query, params)
     def __iter__(self):
         while True:
-            r = self._psycopg2_cursor.fetchone()
+            r = self._pgdb_cursor.fetchone()
             if r == None:
                 return
             yield r
 
-netsa.sql.register_driver(ppg_driver())
+netsa.sql.register_driver(pgs_driver())

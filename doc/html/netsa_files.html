@@ -63,7 +63,7 @@ manipulation of files in the filesystem as well as pathnames.</p>
 relative path from the target to the reference.</p>
 <p>This is a logical operation that does not consult the physical
 filesystem.</p>
-<p><a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/os.path.html#os.path.relpath"><tt class="xref docutils literal"><span class="pre">os.path.relpath</span></tt></a> in Python 2.6 adds something similar to this.</p>
+<p><a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/os.path.html#os.path.relpath"><tt class="xref docutils literal"><span class="pre">os.path.relpath</span></tt></a> in Python 2.6 adds something similar to this.</p>
 </dd></dl>
 
 <dl class="function">
@@ -80,15 +80,13 @@ filesystem.</p>
 <h2>Directory-based Locking<a class="headerlink" href="#directory-based-locking" title="Permalink to this headline">¶</a></h2>
 <dl class="exception">
 <dt id="netsa.files.DirLockBlock">
-<em class="property">
-exception </em><tt class="descclassname">netsa.files.</tt><tt class="descname">DirLockBlock</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.files.DirLockBlock" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">netsa.files.</tt><tt class="descname">DirLockBlock</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.files.DirLockBlock" title="Permalink to this definition">¶</a></dt>
 <dd>Raised when an attempt to lock a directory is blocked for too long
 a time by another process holding the lock.</dd></dl>
 
 <dl class="class">
 <dt id="netsa.files.DirLocker">
-<em class="property">
-class </em><tt class="descclassname">netsa.files.</tt><tt class="descname">DirLocker</tt><big>(</big><em>name : str</em><span class="optional">[</span>, <em>dir : str</em>, <em>seize=False</em>, <em>debug=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.files.DirLocker" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">netsa.files.</tt><tt class="descname">DirLocker</tt><big>(</big><em>name : str</em><span class="optional">[</span>, <em>dir : str</em>, <em>seize=False</em>, <em>debug=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.files.DirLocker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides cheap cross-process locking via
 <tt class="docutils literal"><span class="pre">mkdir</span></tt>/<tt class="docutils literal"><span class="pre">rmdir</span></tt>. <em>name</em> is the token identifying the
 application group. <em>dir</em> optionally specifies the directory in
@@ -100,7 +98,7 @@ the old lock debris is removed.</p>
 locking. It is possible to have an orphaned lock or a ghosted lock.</p>
 <p>For simple scenarios such as avoiding long-running cron jobs from
 trampling over one another, it&#8217;s probably sufficient.</p>
-<p>See also <a title="netsa.tools.service.check_pidfile" class="reference" href="netsa_tools_service.html#netsa.tools.service.check_pidfile"><tt class="xref docutils literal"><span class="pre">netsa.tools.service.check_pidfile</span></tt></a>.</p>
+<p>See also <a title="netsa.tools.service.check_pidfile" class="reference external" href="netsa_tools_service.html#netsa.tools.service.check_pidfile"><tt class="xref docutils literal"><span class="pre">netsa.tools.service.check_pidfile</span></tt></a>.</p>
 </dd></dl>
 
 </div>
@@ -108,30 +106,28 @@ trampling over one another, it&#8217;s probably sufficient.</p>
 <h2>Garbage Collected Temporary Directories<a class="headerlink" href="#garbage-collected-temporary-directories" title="Permalink to this headline">¶</a></h2>
 <dl class="exception">
 <dt id="netsa.files.LocalTmpDirError">
-<em class="property">
-exception </em><tt class="descclassname">netsa.files.</tt><tt class="descname">LocalTmpDirError</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.files.LocalTmpDirError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">netsa.files.</tt><tt class="descname">LocalTmpDirError</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.files.LocalTmpDirError" title="Permalink to this definition">¶</a></dt>
 <dd>Raised when an unrecoverable error occurs within
-<a title="netsa.files.LocalTmpDir" class="reference" href="#netsa.files.LocalTmpDir"><tt class="xref docutils literal"><span class="pre">LocalTmpDir</span></tt></a>.</dd></dl>
+<a title="netsa.files.LocalTmpDir" class="reference internal" href="#netsa.files.LocalTmpDir"><tt class="xref docutils literal"><span class="pre">LocalTmpDir</span></tt></a>.</dd></dl>
 
 <dl class="class">
 <dt id="netsa.files.LocalTmpDir">
-<em class="property">
-class </em><tt class="descclassname">netsa.files.</tt><tt class="descname">LocalTmpDir</tt><big>(</big><span class="optional">[</span><em>dir : str</em>, <em>prefix='tmp'</em>, <em>create=True</em>, <em>verbose=False</em>, <em>autodelete=True</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.files.LocalTmpDir" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">netsa.files.</tt><tt class="descname">LocalTmpDir</tt><big>(</big><span class="optional">[</span><em>dir : str</em>, <em>prefix='tmp'</em>, <em>create=True</em>, <em>verbose=False</em>, <em>autodelete=True</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.files.LocalTmpDir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides ephemeral temporary directories, similar to
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a>. The resulting directory and
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a>. The resulting directory and
 all of its contents will be unlinked when the object goes out of
 scope.</p>
 <p>The parameter <em>prefix</em> is passed as the <em>prefix</em> parameter to
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a> when temporary files are
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a> when temporary files are
 created within the temporary directory.</p>
 <p>The parameter <em>create</em> controls whether the temporary directory is
 actually created. If you want to create the directory manually,
-you can use the method <a title="netsa.files.LocalTmpDir.assert_dir" class="reference" href="#netsa.files.LocalTmpDir.assert_dir"><tt class="xref docutils literal"><span class="pre">assert_dir</span></tt></a>.</p>
+you can use the method <a title="netsa.files.LocalTmpDir.assert_dir" class="reference internal" href="#netsa.files.LocalTmpDir.assert_dir"><tt class="xref docutils literal"><span class="pre">assert_dir</span></tt></a>.</p>
 <p>The parameter <em>verbose</em> controls whether status messages (such as
 creation/deletion of files and dirs) are printed to <tt class="docutils literal"><span class="pre">stderr</span></tt>.</p>
 <p>The parameter <em>autodelete</em> controls whether the temporary
 directory, and all its contents, are deleted once the
-<a title="netsa.files.LocalTmpDir" class="reference" href="#netsa.files.LocalTmpDir"><tt class="xref docutils literal"><span class="pre">LocalTmpDir</span></tt></a> object goes out of scope. (mostly useful for
+<a title="netsa.files.LocalTmpDir" class="reference internal" href="#netsa.files.LocalTmpDir"><tt class="xref docutils literal"><span class="pre">LocalTmpDir</span></tt></a> object goes out of scope. (mostly useful for
 debugging)</p>
 <dl class="method">
 <dt id="netsa.files.LocalTmpDir.assert_dir">
@@ -143,12 +139,12 @@ Normally this happens during object creation.</dd></dl>
 <dt id="netsa.files.LocalTmpDir.prefix">
 <tt class="descname">prefix</tt><big>(</big><big>)</big><a class="headerlink" href="#netsa.files.LocalTmpDir.prefix" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the value of &#8216;prefix&#8217; that is passed to
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a>.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.files.LocalTmpDir.tmp_file">
 <tt class="descname">tmp_file</tt><big>(</big><big>)</big> &rarr; NamedTemporaryFile<a class="headerlink" href="#netsa.files.LocalTmpDir.tmp_file" title="Permalink to this definition">¶</a></dt>
-<dd>Returns a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a> object within
+<dd>Returns a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/tempfile.html#tempfile.NamedTemporaryFile"><tt class="xref docutils literal"><span class="pre">tempfile.NamedTemporaryFile</span></tt></a> object within
 within this temp dir.</dd></dl>
 
 <dl class="method">
@@ -175,10 +171,10 @@ temp dir.</dd></dl>
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference" href=""><tt class="docutils literal"><span class="pre">netsa.files</span></tt> &#8212; File and Path Manipulation</a><ul>
-<li><a class="reference" href="#paths">Paths</a></li>
-<li><a class="reference" href="#directory-based-locking">Directory-based Locking</a></li>
-<li><a class="reference" href="#garbage-collected-temporary-directories">Garbage Collected Temporary Directories</a></li>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">netsa.files</span></tt> &#8212; File and Path Manipulation</a><ul>
+<li><a class="reference external" href="#paths">Paths</a></li>
+<li><a class="reference external" href="#directory-based-locking">Directory-based Locking</a></li>
+<li><a class="reference external" href="#garbage-collected-temporary-directories">Garbage Collected Temporary Directories</a></li>
 </ul>
 </li>
 </ul>
@@ -232,7 +228,7 @@ temp dir.</dd></dl>
     </div>
     <div class="footer">
       &copy; Copyright 2008-2010, Carnegie Mellon University.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
 </html>

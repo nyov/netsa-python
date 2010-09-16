@@ -194,7 +194,11 @@ class PipelineException(Exception):
     discovered, including stderr output for each sub-command if
     available.
     """
-    pass
+    def __init__(self, message, exit_statuses):
+        Exception.__init__(self, message)
+        self._exit_statuses = exit_statuses
+    def get_exit_statuses(self):
+        return self._exit_statuses
 
 def format_arg(x):
     if isinstance(x, basestring):
@@ -294,6 +298,18 @@ class Task(object):
     def get_status(self):
         "Human readable status description."
         raise NotImplementedError("Task.get_status")
+    def get_exit_status(self):
+        """Returns a list of process exit statuses. For groups of
+        tasks, each element represents a process in the group, in
+        their order in the pipeline; for individual tasks, this method
+        returns a one-element list.
+
+        For completed processes, statuses are integers encoded in the
+        format defined for the :func:`os.wait` function.  Tasks that
+        have not been completed (e.g., due to an error in a pipeline
+        before the process was run), will have an exit status of
+        ``None``."""
+        raise NotImplementedError("Task.get_exit_status")
 
 class Task_group(object):
     __slots__ = ['_name', '_tasks', '_running_tasks', '_failed', '_cond_var']
@@ -373,6 +389,8 @@ class Task_group(object):
             self._cond_var.release()
     def get_status(self):
         return '\n'.join(task.get_status() for task in self._tasks)
+    def get_exit_status(self):
+        return [s for task in self._tasks for s in task.get_exit_status()]
 
 NUKE_DELAY = 4.0                # Seconds before using SIGKILL after SIGTERM
 
@@ -559,6 +577,9 @@ class Task_process(Task):
             return stat_line
         finally:
             self._cond_var.release()
+    def get_exit_status(self):
+        return [self._exit_status]
+                
 
 def _interpolate_vars(arg_list, vars):
     # First interpolate any "argument list" variables
@@ -1071,6 +1092,8 @@ def pipeline(*commands, **options):
     commands = [command(x) for x in commands]
     return PipelineSpec(commands, options)
 
+
+
 def run_parallel(*args, **options):
     """
     Runs a series of commands (as specified by the arguments provided)
@@ -1094,6 +1117,14 @@ def run_parallel(*args, **options):
     to the :func:`pipeline` and :func:`command` specifications making
     up this :func:`run_parallel` call.
 
+    The :func:`run_parallel` function returns the list of exit codes
+    of the processes in each pipeline as a list of lists. Each list
+    corresponds to a pipeline, in the order in which they were passed
+    into the function. Each element represents a process in the
+    pipeline, in the order they were defined in the pipeline. If a
+    process is not run (e.g., because a process preceding it in the
+    pipeline fails), the exit status will be `None`.
+
     Example: Run three mkdirs in parallel and fail if any of them fails::
 
         run_parallel("mkdir a", "mkdir b", "mkdir c")
@@ -1107,7 +1138,15 @@ def run_parallel(*args, **options):
         run_parallel("mkfifo test.fifo")
         run_parallel(["cat /etc/passwd", "sort -r", "cut -f1 -d:", ">%(f)s"],
                      ["cat %(f)s", "sed -e 's/a/b/g'", ">%(f2)s"],
-                     vars={'f': 'test.fifo', 'f2': 'test.out'})
+                     vars={'f': 'test.fifo', 'f2': 'test.
+
+    Example: run two pipelines in parallel, then investigate their
+    processes' exit statuses::
+
+        exits = run_parallel(["ls -l", "grep ^d"],
+                             ["cat /etc/passwd", "sort -r", "cut -f1 -d:"])
+        # If all complete successfully, exits will be:
+        #  [[0, 0], [0, 0, 0]]
     """
 
     # By default, provide no substitutions
@@ -1119,17 +1158,34 @@ def run_parallel(*args, **options):
 
     # Parse the arguments into pipeline specifications
     pipelines = [pipeline(x) for x in args]
-    
+
+    def chew_exit_statuses(statuses):
+        # Note that this _destructively edits_ the exit statuses
+        # list....
+        all_exits = []
+        for p in pipelines:
+            p_exits = []
+            for c in p.commands:
+                if len(statuses) == 0:
+                    p_exits.append(None)
+                else:
+                    p_exits.append(statuses.pop(0))
+                    all_exits.append(p_exits)
+        return all_exits
+
     task_group = Task_group()
     for p in pipelines:
         fork_children(task_group, p, vars, options)
     task_group.wait()
+    exit_statuses = chew_exit_statuses(task_group.get_exit_status())
     if not task_group.is_success():
         # It failed, raise an exception
         pipeline_failure = \
             PipelineException("Failure processing pipeline\n" +
-                                task_group.get_status())
+                              task_group.get_status(), exit_statuses)
         raise pipeline_failure
+    else:
+        return exit_statuses
 
 
 def run_collect(*args, **options):
@@ -1187,6 +1243,7 @@ def run_collect(*args, **options):
     stderr_tmp.seek(0)
     # Return the full contents as output
     return (stdout_tmp.read(), stderr_tmp.read())
+
 
 __all__ = """
 

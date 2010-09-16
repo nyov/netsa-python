@@ -88,7 +88,8 @@ class sl_connection(netsa.sql.db_connection):
     def commit(self):
         self._sqlite_conn.commit()
     def rollback(self):
-        self._sqlite_conn.rollback()
+        if self._sqlite_conn:
+            self._sqlite_conn.rollback()
 
 class sl_result(netsa.sql.db_result):
     __slots__ = """

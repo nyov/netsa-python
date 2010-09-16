@@ -159,11 +159,10 @@ UTC.</p>
 the output.</p>
 <p>For a more general way to round times, see
 <tt class="xref docutils literal"><span class="pre">netsa.data.times.bin_datetime</span></tt>.  See also
-<a title="netsa.data.format.datetime_silk_hour" class="reference" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
+<a title="netsa.data.format.datetime_silk_hour" class="reference internal" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference internal" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
 most common ways to format incomplete dates in SiLK format.</p>
-<dl class="docutils">
-<dt>Examples::</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 <span class="go">&#39;2010/02/03T04:05:06&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_silk</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">DATETIME_YEAR</span><span class="p">)</span>
@@ -184,8 +183,6 @@ most common ways to format incomplete dates in SiLK format.</p>
 <span class="go">&#39;2010/02/03T04:05:06.007000&#39;</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -226,7 +223,7 @@ unless the value has no timezone or the value&#8217;s timezone is UTC.</p>
 the output.</p>
 <p>For a more general way to round times, see
 <tt class="xref docutils literal"><span class="pre">netsa.data.times.bin_datetime</span></tt>.  See also
-<a title="netsa.data.format.datetime_silk_hour" class="reference" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
+<a title="netsa.data.format.datetime_silk_hour" class="reference internal" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference internal" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
 most common ways to format incomplete dates in SiLK format.</p>
 <p>Examples:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007008&quot;</span><span class="p">)</span>
@@ -263,9 +260,8 @@ precision of a day (<tt class="docutils literal"><span class="pre">YYYY-MM-DD[TZ
 unless the value has no timezone or the value&#8217;s timezone is UTC.
 This is shorthand for <tt class="docutils literal"><span class="pre">datetime_iso(value,</span>
 <span class="pre">precision=DATETIME_DAY)</span></tt>.</p>
-<dl class="docutils">
-<dt>Example::</dt>
-<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">datetime_iso_day</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 <span class="go">&#39;2010-02-03&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007+03:00&quot;</span><span class="p">,</span> <span class="n">utc_only</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -273,8 +269,6 @@ This is shorthand for <tt class="docutils literal"><span class="pre">datetime_is
 <span class="go">&#39;2010-02-03+03:00&#39;</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="function">
@@ -290,7 +284,7 @@ specification, this format does not support the
 <tt class="docutils literal"><span class="pre">YYMMDD</span></tt> would be potentially ambiguous.</p>
 <p>For a more general way to round times, see
 <tt class="xref docutils literal"><span class="pre">netsa.data.times.bin_datetime</span></tt>.  See also
-<a title="netsa.data.format.datetime_silk_hour" class="reference" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
+<a title="netsa.data.format.datetime_silk_hour" class="reference internal" href="#netsa.data.format.datetime_silk_hour"><tt class="xref docutils literal"><span class="pre">datetime_silk_hour</span></tt></a> and <a title="netsa.data.format.datetime_silk_day" class="reference internal" href="#netsa.data.format.datetime_silk_day"><tt class="xref docutils literal"><span class="pre">datetime_silk_day</span></tt></a> for the
 most common ways to format incomplete dates in SiLK format.</p>
 <p>Examples:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">netsa</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">make_datetime</span><span class="p">(</span><span class="s">&quot;2010-02-03T04:05:06.007008&quot;</span><span class="p">)</span>
@@ -328,9 +322,9 @@ most common ways to format incomplete dates in SiLK format.</p>
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference" href=""><tt class="docutils literal"><span class="pre">netsa.data.format</span></tt> &#8212; Formatting Data for Output</a><ul>
-<li><a class="reference" href="#numbers">Numbers</a></li>
-<li><a class="reference" href="#dates-and-times">Dates and Times</a></li>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">netsa.data.format</span></tt> &#8212; Formatting Data for Output</a><ul>
+<li><a class="reference external" href="#numbers">Numbers</a></li>
+<li><a class="reference external" href="#dates-and-times">Dates and Times</a></li>
 </ul>
 </li>
 </ul>
@@ -384,7 +378,7 @@ most common ways to format incomplete dates in SiLK format.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008-2010, Carnegie Mellon University.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
 </html>

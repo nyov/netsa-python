@@ -160,7 +160,7 @@ help will indicate that expert options are available.</p>
 </div>
 <p>Parameters involving flow data are handled separately, in order to
 ensure that flows are handled consistently across all of our scripts.
-The <a title="netsa.script.add_flow_params" class="reference" href="#netsa.script.add_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.add_flow_params</span></tt></a> function is used to add all
+The <a title="netsa.script.add_flow_params" class="reference internal" href="#netsa.script.add_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.add_flow_params</span></tt></a> function is used to add all
 of the flow related command-line arguments at once.  There is
 currently only one option.  If the <em>require_pull</em> option is set, the
 flow data must come from an <tt class="docutils literal"><span class="pre">rwfilter</span></tt> data pull (including switches
@@ -183,7 +183,7 @@ description of the contents of the file be included.</p>
 </pre></div>
 </div>
 <p>In this example, the <tt class="docutils literal"><span class="pre">process_hourly_data</span></tt> function would be
-expected to use the functions in <a title="" class="reference" href="netsa_util_shell.html#module-netsa.util.shell"><tt class="xref docutils literal"><span class="pre">netsa.util.shell</span></tt></a> to acquire
+expected to use the functions in <a title="" class="reference external" href="netsa_util_shell.html#module-netsa.util.shell"><tt class="xref docutils literal"><span class="pre">netsa.util.shell</span></tt></a> to acquire
 and process flow data for each hour (based on the <em>flow_params</em>
 argument).  The details have been elided for simplicity in this
 example.</p>
@@ -206,7 +206,7 @@ if the script is given <tt class="docutils literal"><span class="pre">--help</sp
 </pre></div>
 </div>
 <p>The final statement in the script should be a call to
-<a title="netsa.script.execute" class="reference" href="#netsa.script.execute"><tt class="xref docutils literal"><span class="pre">netsa.script.execute</span></tt></a>, as shown above.  This allows the
+<a title="netsa.script.execute" class="reference internal" href="#netsa.script.execute"><tt class="xref docutils literal"><span class="pre">netsa.script.execute</span></tt></a>, as shown above.  This allows the
 framework to process any command-line arguments (including producing
 help output, etc.), then call your <tt class="docutils literal"><span class="pre">main</span></tt> function, and finally do
 clean-up work after the completion of your script.</p>
@@ -217,8 +217,7 @@ individual features, including further examples.</p>
 <h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
 <dl class="exception">
 <dt id="netsa.script.ParamError">
-<em class="property">
-exception </em><tt class="descclassname">netsa.script.</tt><tt class="descname">ParamError</tt><big>(</big><em>param</em>, <em>value</em>, <em>message</em><big>)</big><a class="headerlink" href="#netsa.script.ParamError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">netsa.script.</tt><tt class="descname">ParamError</tt><big>(</big><em>param</em>, <em>value</em>, <em>message</em><big>)</big><a class="headerlink" href="#netsa.script.ParamError" title="Permalink to this definition">¶</a></dt>
 <dd><p>This exception represents an error in the arguments provided to a
 script at the command-line.  For example, <tt class="docutils literal"><span class="pre">ParamError('foo',</span>
 <span class="pre">'2x5',</span> <span class="pre">'not</span> <span class="pre">a</span> <span class="pre">valid</span> <span class="pre">integer')</span></tt> is the exception generated when
@@ -231,8 +230,7 @@ produce the following error output when thrown from a script&#8217;s
 
 <dl class="exception">
 <dt id="netsa.script.UserError">
-<em class="property">
-exception </em><tt class="descclassname">netsa.script.</tt><tt class="descname">UserError</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.script.UserError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">netsa.script.</tt><tt class="descname">UserError</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.script.UserError" title="Permalink to this definition">¶</a></dt>
 <dd><p>This exception represents an error reported by the script that
 should be presented in a standard way.  For example,
 <tt class="docutils literal"><span class="pre">UserError('your</span> <span class="pre">message</span> <span class="pre">here')</span></tt> will produce the following
@@ -243,8 +241,7 @@ error output when thrown from a script&#8217;s <tt class="docutils literal"><spa
 
 <dl class="exception">
 <dt id="netsa.script.ScriptError">
-<em class="property">
-exception </em><tt class="descclassname">netsa.script.</tt><tt class="descname">ScriptError</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.script.ScriptError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">netsa.script.</tt><tt class="descname">ScriptError</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#netsa.script.ScriptError" title="Permalink to this definition">¶</a></dt>
 <dd>This exception represents an error in script definition or an
 error in processing script data.  This is thrown by some
 <tt class="xref docutils literal"><span class="pre">netsa.script</span></tt> calls.</dd></dl>
@@ -293,13 +290,13 @@ string containing:</p>
 <tt class="descclassname">netsa.script.</tt><tt class="descname">set_authors</tt><big>(</big><em>script_authors : str list</em><big>)</big><a class="headerlink" href="#netsa.script.set_authors" title="Permalink to this definition">¶</a></dt>
 <dd>Set the list of authors for this script, which must be a list
 of strings.  It is recommended that each author be listed in
-the form described for <a title="netsa.script.set_contact" class="reference" href="#netsa.script.set_contact"><tt class="xref docutils literal"><span class="pre">set_contact</span></tt></a>.</dd></dl>
+the form described for <a title="netsa.script.set_contact" class="reference internal" href="#netsa.script.set_contact"><tt class="xref docutils literal"><span class="pre">set_contact</span></tt></a>.</dd></dl>
 
 <dl class="function">
 <dt id="netsa.script.add_author">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_author</tt><big>(</big><em>script_author : str</em><big>)</big><a class="headerlink" href="#netsa.script.add_author" title="Permalink to this definition">¶</a></dt>
 <dd>Add another author to the list of authors for this script,
-which must be a single string.  See <a title="netsa.script.set_authors" class="reference" href="#netsa.script.set_authors"><tt class="xref docutils literal"><span class="pre">set_authors</span></tt></a> for
+which must be a single string.  See <a title="netsa.script.set_authors" class="reference internal" href="#netsa.script.set_authors"><tt class="xref docutils literal"><span class="pre">set_authors</span></tt></a> for
 notes on the content of this string.</dd></dl>
 
 </div>
@@ -317,15 +314,15 @@ function&#8221; here.</p>
 here, you can use one of the basic param types and then do
 additional checking in the <tt class="docutils literal"><span class="pre">main</span></tt> function.  Note, however, that
 a GUI will not aid users in choosing acceptable values for params
-defined in this way.  Also, make sure to raise <a title="netsa.script.ParamError" class="reference" href="#netsa.script.ParamError"><tt class="xref docutils literal"><span class="pre">ParamError</span></tt></a>
+defined in this way.  Also, make sure to raise <a title="netsa.script.ParamError" class="reference internal" href="#netsa.script.ParamError"><tt class="xref docutils literal"><span class="pre">ParamError</span></tt></a>
 with appropriate information when you reject a value, so that the
 error can be most effectively communicated back to the user.</p>
 <dl class="function">
 <dt id="netsa.script.add_text_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_text_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : str</em>, <em>default_help : str</em>, <em>expert=False</em>, <em>regex : str</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_text_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a text parameter to this script.  This parameter can later
-be fetched as a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> by the script using
-<a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
+be fetched as a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> by the script using
+<a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
 <em>default_help</em>, and <em>expert</em> arguments are used by all
 <tt class="docutils literal"><span class="pre">add_X_param</span></tt> calls, but each kind of parameter also has
 additional features that may be used.  See below for a list of
@@ -398,10 +395,10 @@ match a specific pattern for phone numbers:</p>
 <dt id="netsa.script.add_int_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_int_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : int</em>, <em>default_help : str</em>, <em>expert=False</em>, <em>minimum : int</em>, <em>maximum : int</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_int_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an integer parameter to this script.  This parameter can
-later be fetched as an <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#int"><tt class="xref docutils literal"><span class="pre">int</span></tt></a> by the script using
-<a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
+later be fetched as an <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#int"><tt class="xref docutils literal"><span class="pre">int</span></tt></a> by the script using
+<a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
 <em>default_help</em>, and <em>expert</em> arguments are described in the
-help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
+help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
 <p>Other keyword arguments meaningful for integer parameters:</p>
 <blockquote>
 <dl class="docutils">
@@ -427,9 +424,9 @@ in the range 0 &lt;= x &lt;= 65535.</p>
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_float_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : float</em>, <em>default_help : str</em>, <em>expert=False</em>, <em>minimum : float</em>, <em>maximum : float</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_float_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a floating-point parameter to this script.  This parameter
 can later be fetched as a :class`float` by the script using
-<a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
+<a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
 <em>default_help</em> and <em>expert</em> arguments are described in the
-help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
+help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
 <p>Other keyword arguments meaningful for floating-point parameters:</p>
 <blockquote>
 <dl class="docutils">
@@ -447,19 +444,19 @@ for this param.</dd>
 <dt id="netsa.script.add_date_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_date_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : datetime</em>, <em>default_help : str</em>, <em>expert=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_date_param" title="Permalink to this definition">¶</a></dt>
 <dd>Add a date parameter to this script.  This parameter can later
-be fetched by the script as a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a>
-object using <a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>,
+be fetched by the script as a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a>
+object using <a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>,
 <em>default</em>, <em>default_help</em>, and <em>expert</em> arguments are
-described in the help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
+described in the help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
 
 <dl class="function">
 <dt id="netsa.script.add_label_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_label_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : str</em>, <em>default_help : str</em>, <em>expert=False</em>, <em>regex : str</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_label_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a label parameter to this script.  This parameter can
-later be fetched by the script as a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> using
-<a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
+later be fetched by the script as a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> using
+<a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
 <em>default_help</em>, and <em>expert</em> arguments are described in the
-help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
+help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
 <p>Other keyword arguments meaningful for label params:</p>
 <blockquote>
 <dl class="docutils">
@@ -481,10 +478,10 @@ match a specific pattern for phone numbers:</p>
 <dt id="netsa.script.add_file_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_file_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : str</em>, <em>default_help : str</em>, <em>expert=False</em>, <em>mime_type : str</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_file_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a file parameter to this script.  This parameter can later
-be fetched by the script as a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> filename
-using <a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>,
+be fetched by the script as a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> filename
+using <a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>,
 <em>default</em>, <em>default_help</em>, and <em>expert</em> arguments are
-described in the help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
+described in the help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
 <p>When the script is run at the command-line, an error will be
 reported to the user if they specify a file that does not
 exist, or the path of a directory.</p>
@@ -501,11 +498,11 @@ exist, or the path of a directory.</p>
 <dt id="netsa.script.add_dir_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_dir_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : str</em>, <em>default_help : str</em>, <em>expert=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_dir_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a directory parameter to this script.  This parameter can
-later be fetched by the script as a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
-filename using <a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The
+later be fetched by the script as a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
+filename using <a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The
 <em>required</em>, <em>default</em>, <em>default_help</em>, and <em>expert</em> arguments
 are described in the help for
-<a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
+<a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</p>
 <p>When the script is run at the command-line, an error will be
 reported to the user if they specify a directory that does not
 exist, or the path of a file.</p>
@@ -515,36 +512,36 @@ exist, or the path of a file.</p>
 <dt id="netsa.script.add_path_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_path_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : str</em>, <em>default_help : str</em>, <em>expert=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_path_param" title="Permalink to this definition">¶</a></dt>
 <dd>Add a path parameter to this script.  This parameter can later
-be fetched by the script as a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> using
-<a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
+be fetched by the script as a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> using
+<a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
 <em>default_help</em>, and <em>expert</em> arguments are described in the
-help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
+help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
 
 <dl class="function">
 <dt>
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_path_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=False</em>, <em>default : str</em>, <em>default_help : str</em>, <em>expert=False</em><span class="optional">]</span><big>)</big></dt>
 <dd>Add a path parameter to this script.  This parameter can later
-be fetched by the script as a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> using
-<a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
+be fetched by the script as a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a> using
+<a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>required</em>, <em>default</em>,
 <em>default_help</em>, and <em>expert</em> arguments are described in the
-help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
+help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
 
 <dl class="function">
 <dt id="netsa.script.add_flag_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_flag_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>default=False</em>, <em>default_help : str</em>, <em>expert=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_flag_param" title="Permalink to this definition">¶</a></dt>
 <dd>Add a flag parameter to this script.  This parameter can later
-be fetched by the script as a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#bool"><tt class="xref docutils literal"><span class="pre">bool</span></tt></a> using
-<a title="netsa.script.get_param" class="reference" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>default</em>,
+be fetched by the script as a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#bool"><tt class="xref docutils literal"><span class="pre">bool</span></tt></a> using
+<a title="netsa.script.get_param" class="reference internal" href="#netsa.script.get_param"><tt class="xref docutils literal"><span class="pre">netsa.script.get_param</span></tt></a>.  The <em>default</em>,
 <em>default_help</em>, and <em>expert</em> arguments are described in the
-help for <a title="netsa.script.add_text_param" class="reference" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
+help for <a title="netsa.script.add_text_param" class="reference internal" href="#netsa.script.add_text_param"><tt class="xref docutils literal"><span class="pre">netsa.script.add_text_param</span></tt></a>.</dd></dl>
 
 <dl class="function">
 <dt id="netsa.script.get_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">get_param</tt><big>(</big><em>name : str</em><big>)</big> &rarr; value<a class="headerlink" href="#netsa.script.get_param" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the value of the parameter given by the <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
+<dd>Returns the value of the parameter given by the <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
 argument <em>name</em>.  This parameter will be in the type specified for
 the param when it was added (for example, date parameters will
-return a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object.)  Note that a
+return a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object.)  Note that a
 parameter with no default that is not required may return
 <tt class="xref docutils literal"><span class="pre">None</span></tt>.</dd></dl>
 
@@ -567,14 +564,14 @@ the script.  Verbosity is set from the command-line via the
 verbosity is greater than or equal to <em>min_verbosity</em>.  Verbosity
 is set from the command-line via the <tt class="docutils literal"><span class="pre">--verbose</span></tt> or <tt class="docutils literal"><span class="pre">-v</span></tt>
 flags.  The current verbosity level may be retrieved by using the
-<a title="netsa.script.get_verbosity" class="reference" href="#netsa.script.get_verbosity"><tt class="xref docutils literal"><span class="pre">get_verbosity</span></tt></a> function.</p>
+<a title="netsa.script.get_verbosity" class="reference internal" href="#netsa.script.get_verbosity"><tt class="xref docutils literal"><span class="pre">get_verbosity</span></tt></a> function.</p>
 <p>Use this function to write debugging or informational messages
 from your script for command-line use.  For example, writing out
 which file you are processing, or what stage of processing is in
 progress.</p>
 <p>Do not use it to write out important information such as error
-messages or actual output.  (See <a title="netsa.script.UserError" class="reference" href="#netsa.script.UserError"><tt class="xref docutils literal"><span class="pre">UserError</span></tt></a> or
-<a title="netsa.script.add_output_file_param" class="reference" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a> and <a title="netsa.script.add_output_dir_param" class="reference" href="#netsa.script.add_output_dir_param"><tt class="xref docutils literal"><span class="pre">add_output_dir_param</span></tt></a> for
+messages or actual output.  (See <a title="netsa.script.UserError" class="reference internal" href="#netsa.script.UserError"><tt class="xref docutils literal"><span class="pre">UserError</span></tt></a> or
+<a title="netsa.script.add_output_file_param" class="reference internal" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a> and <a title="netsa.script.add_output_dir_param" class="reference internal" href="#netsa.script.add_output_dir_param"><tt class="xref docutils literal"><span class="pre">add_output_dir_param</span></tt></a> for
 error messages and output.)</p>
 </dd></dl>
 
@@ -589,7 +586,7 @@ can be used to work with flow data input.</p>
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_flow_annotation</tt><big>(</big><em>script_annotation : str</em><big>)</big><a class="headerlink" href="#netsa.script.add_flow_annotation" title="Permalink to this definition">¶</a></dt>
 <dd>Add a note that will automatically be included in SiLK data pulls
 generated by this script.  This will be included only by rwfilter
-pulls created by this script using <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a>.</dd></dl>
+pulls created by this script using <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a>.</dd></dl>
 
 <dl class="function">
 <dt id="netsa.script.add_flow_params">
@@ -635,7 +632,7 @@ not specified, defaults to value in <cite>start-date</cite>.</dd>
 </dl>
 </blockquote>
 <p>If the <em>require_pull</em> argument to
-<a title="netsa.script.add_flow_params" class="reference" href="#netsa.script.add_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.add_flow_params</span></tt></a> is not <tt class="xref docutils literal"><span class="pre">True</span></tt>, input
+<a title="netsa.script.add_flow_params" class="reference internal" href="#netsa.script.add_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.add_flow_params</span></tt></a> is not <tt class="xref docutils literal"><span class="pre">True</span></tt>, input
 filenames may be specified bare on the command-line, and the
 following additional options are recognized:</p>
 <blockquote>
@@ -649,29 +646,28 @@ pathname or <tt class="docutils literal"><span class="pre">stdin</span></tt>. No
 </dl>
 </blockquote>
 <p>The values of these parameters can later be retrieved as a
-<a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.Flow_params</span></tt></a> object using
-<a title="netsa.script.get_flow_params" class="reference" href="#netsa.script.get_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.get_flow_params</span></tt></a>.</p>
+<a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.Flow_params</span></tt></a> object using
+<a title="netsa.script.get_flow_params" class="reference internal" href="#netsa.script.get_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.get_flow_params</span></tt></a>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="netsa.script.get_flow_params">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">get_flow_params</tt><big>(</big><big>)</big> &rarr; Flow_params<a class="headerlink" href="#netsa.script.get_flow_params" title="Permalink to this definition">¶</a></dt>
-<dd>Returns a <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object encapsulating the
+<dd>Returns a <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object encapsulating the
 <tt class="docutils literal"><span class="pre">rwfilter</span></tt> flow selection parameters the script was invoked
 with.  This object is filled in based on the command-line
-arguments described in <a title="netsa.script.add_flow_params" class="reference" href="#netsa.script.add_flow_params"><tt class="xref docutils literal"><span class="pre">add_flow_params</span></tt></a>.</dd></dl>
+arguments described in <a title="netsa.script.add_flow_params" class="reference internal" href="#netsa.script.add_flow_params"><tt class="xref docutils literal"><span class="pre">add_flow_params</span></tt></a>.</dd></dl>
 
 <dl class="class">
 <dt id="netsa.script.Flow_params">
-<em class="property">
-class </em><tt class="descclassname">netsa.script.</tt><tt class="descname">Flow_params</tt><big>(</big><span class="optional">[</span><em>flow_class : str</em>, <em>flow_type : str</em>, <em>flowtypes : str list</em>, <em>sensors : str list</em>, <em>start_date : datetime</em>, <em>end_date : datetime</em>, <em>input_pipe : str</em>, <em>xargs : str</em>, <em>filenames : str list</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.Flow_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">netsa.script.</tt><tt class="descname">Flow_params</tt><big>(</big><span class="optional">[</span><em>flow_class : str</em>, <em>flow_type : str</em>, <em>flowtypes : str list</em>, <em>sensors : str list</em>, <em>start_date : datetime</em>, <em>end_date : datetime</em>, <em>input_pipe : str</em>, <em>xargs : str</em>, <em>filenames : str list</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.Flow_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>This object represents the flow selection arguments to an
 <tt class="docutils literal"><span class="pre">rwfilter</span></tt> data pull.  In typical use it is built automatically
 from command-line arguments by the
-<a title="netsa.script.get_flow_params" class="reference" href="#netsa.script.get_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.get_flow_params</span></tt></a> call.  Afterwards, methods
-such as <a title="netsa.script.Flow_params.by_hour" class="reference" href="#netsa.script.Flow_params.by_hour"><tt class="xref docutils literal"><span class="pre">by_hour</span></tt></a> are used to modify the scope of the data
+<a title="netsa.script.get_flow_params" class="reference internal" href="#netsa.script.get_flow_params"><tt class="xref docutils literal"><span class="pre">netsa.script.get_flow_params</span></tt></a> call.  Afterwards, methods
+such as <a title="netsa.script.Flow_params.by_hour" class="reference internal" href="#netsa.script.Flow_params.by_hour"><tt class="xref docutils literal"><span class="pre">by_hour</span></tt></a> are used to modify the scope of the data
 pull, and then the parameters are included in a call to
-<tt class="docutils literal"><span class="pre">rwfilter</span></tt> using the functions in <a title="" class="reference" href="netsa_util_shell.html#module-netsa.util.shell"><tt class="xref docutils literal"><span class="pre">netsa.util.shell</span></tt></a>.</p>
+<tt class="docutils literal"><span class="pre">rwfilter</span></tt> using the functions in <a title="" class="reference external" href="netsa_util_shell.html#module-netsa.util.shell"><tt class="xref docutils literal"><span class="pre">netsa.util.shell</span></tt></a>.</p>
 <p><strong>Example:</strong> Process SMTP data from the user&#8217;s requested flow
 data:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">netsa</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">shell</span><span class="o">.</span><span class="n">run_parallel</span><span class="p">(</span>
@@ -699,16 +695,16 @@ user&#8217;s request flow data:</p>
 <dl class="method">
 <dt id="netsa.script.Flow_params.by_day">
 <tt class="descname">by_day</tt><big>(</big><big>)</big> &rarr; Flow_params iter<a class="headerlink" href="#netsa.script.Flow_params.by_day" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object including a <tt class="docutils literal"><span class="pre">start-date</span></tt>
+<dd><p>Given a <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object including a <tt class="docutils literal"><span class="pre">start-date</span></tt>
 and an <tt class="docutils literal"><span class="pre">end-date</span></tt>, returns an iterator yielding a
-<a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> for each individual day in the time span.</p>
-<p>If the original <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> starts or ends on an hour
+<a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> for each individual day in the time span.</p>
+<p>If the original <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> starts or ends on an hour
 that is not midnight, the first or last yielded pulls will not
 be for full days.  All of the other pulls will be full days
 stretching from midnight to midnight.</p>
-<p>See also <a title="netsa.script.Flow_params.by_hour" class="reference" href="#netsa.script.Flow_params.by_hour"><tt class="xref docutils literal"><span class="pre">by_hour</span></tt></a> which iterates over the time span
-of the <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> by hours instead of days.</p>
-<p>Raises a <a title="netsa.script.ScriptError" class="reference" href="#netsa.script.ScriptError"><tt class="xref docutils literal"><span class="pre">ScriptError</span></tt></a> if the <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> has
+<p>See also <a title="netsa.script.Flow_params.by_hour" class="reference internal" href="#netsa.script.Flow_params.by_hour"><tt class="xref docutils literal"><span class="pre">by_hour</span></tt></a> which iterates over the time span
+of the <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> by hours instead of days.</p>
+<p>Raises a <a title="netsa.script.ScriptError" class="reference internal" href="#netsa.script.ScriptError"><tt class="xref docutils literal"><span class="pre">ScriptError</span></tt></a> if the <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> has
 no date information (for example, the script user specified
 input files rather than a data pull.)  This can be prevented
 by using <em>require_pull</em> in your call to
@@ -718,11 +714,11 @@ by using <em>require_pull</em> in your call to
 <dl class="method">
 <dt id="netsa.script.Flow_params.by_hour">
 <tt class="descname">by_hour</tt><big>(</big><big>)</big> &rarr; Flow_params iter<a class="headerlink" href="#netsa.script.Flow_params.by_hour" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object including a <tt class="docutils literal"><span class="pre">start-date</span></tt>
+<dd><p>Given a <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object including a <tt class="docutils literal"><span class="pre">start-date</span></tt>
 and an <tt class="docutils literal"><span class="pre">end-date</span></tt>, returns an iterator yielding new
-<a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object identical to this one specialized
+<a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object identical to this one specialized
 for each hour in the time period.</p>
-<p>Example (strings are schematic of the <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a>
+<p>Example (strings are schematic of the <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a>
 involved):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Note: Flow_params cannot actually take a str argument like this.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">some_flows</span> <span class="o">=</span> <span class="n">Flow_params</span><span class="p">(</span><span class="s">&#39;--type in,inweb --start-date 2009/01/01T00 &#39;</span>
@@ -736,9 +732,9 @@ involved):</p>
 <span class="go">                          &#39;--end-date 2009/01/01T02&#39;)]</span>
 </pre></div>
 </div>
-<p>See also <a title="netsa.script.Flow_params.by_day" class="reference" href="#netsa.script.Flow_params.by_day"><tt class="xref docutils literal"><span class="pre">by_day</span></tt></a> which iterates over the time span of
-the <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> by days instead of hours.</p>
-<p>Raises a <a title="netsa.script.ScriptError" class="reference" href="#netsa.script.ScriptError"><tt class="xref docutils literal"><span class="pre">ScriptError</span></tt></a> if the <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> has
+<p>See also <a title="netsa.script.Flow_params.by_day" class="reference internal" href="#netsa.script.Flow_params.by_day"><tt class="xref docutils literal"><span class="pre">by_day</span></tt></a> which iterates over the time span of
+the <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> by days instead of hours.</p>
+<p>Raises a <a title="netsa.script.ScriptError" class="reference internal" href="#netsa.script.ScriptError"><tt class="xref docutils literal"><span class="pre">ScriptError</span></tt></a> if the <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> has
 no date information (for example, the script user specified
 input files rather than a data pull.)  This can be prevented
 by using <em>require_pull</em> in your call to
@@ -748,8 +744,8 @@ by using <em>require_pull</em> in your call to
 <dl class="method">
 <dt id="netsa.script.Flow_params.by_sensor">
 <tt class="descname">by_sensor</tt><big>(</big><big>)</big> &rarr; Flow_params iter<a class="headerlink" href="#netsa.script.Flow_params.by_sensor" title="Permalink to this definition">¶</a></dt>
-<dd>Given a <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object including a data pull,
-returns an interator yielding a <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> for each
+<dd>Given a <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object including a data pull,
+returns an interator yielding a <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> for each
 individual sensor defined in the system.</dd></dl>
 
 <dl class="method">
@@ -758,83 +754,83 @@ individual sensor defined in the system.</dd></dl>
 <dd>Returns the bundle of flow selection parameters as a list of
 strings suitable for use as command-line arguments in an
 <tt class="docutils literal"><span class="pre">rwfilter</span></tt> call.  This is automatically called by the
-<a title="" class="reference" href="netsa_util_shell.html#module-netsa.util.shell"><tt class="xref docutils literal"><span class="pre">netsa.util.shell</span></tt></a> routines when a <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a>
+<a title="" class="reference external" href="netsa_util_shell.html#module-netsa.util.shell"><tt class="xref docutils literal"><span class="pre">netsa.util.shell</span></tt></a> routines when a <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a>
 object is used as part of a command.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_class">
 <tt class="descname">get_class</tt><big>(</big><big>)</big> &rarr; str or None<a class="headerlink" href="#netsa.script.Flow_params.get_class" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--class</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_end_date">
 <tt class="descname">get_end_date</tt><big>(</big><big>)</big> &rarr; datetime or None<a class="headerlink" href="#netsa.script.Flow_params.get_end_date" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--end-date</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_filenames">
 <tt class="descname">get_filenames</tt><big>(</big><big>)</big> &rarr; str list or None<a class="headerlink" href="#netsa.script.Flow_params.get_filenames" title="Permalink to this definition">¶</a></dt>
 <dd>Returns any files given on the command-line for an
-<tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull as a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
+<tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull as a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_flowtypes">
 <tt class="descname">get_flowtypes</tt><big>(</big><big>)</big> &rarr; str list or None<a class="headerlink" href="#netsa.script.Flow_params.get_flowtypes" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--flowtypes</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_input_pipe">
 <tt class="descname">get_input_pipe</tt><big>(</big><big>)</big> &rarr; str or None<a class="headerlink" href="#netsa.script.Flow_params.get_input_pipe" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--input-pipe</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_sensors">
 <tt class="descname">get_sensors</tt><big>(</big><big>)</big> &rarr; str list or None<a class="headerlink" href="#netsa.script.Flow_params.get_sensors" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--sensors</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> of <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> of <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_start_date">
 <tt class="descname">get_start_date</tt><big>(</big><big>)</big> &rarr; datetime or None<a class="headerlink" href="#netsa.script.Flow_params.get_start_date" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--start-date</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/datetime.html#datetime.datetime"><tt class="xref docutils literal"><span class="pre">datetime.datetime</span></tt></a> object.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_type">
 <tt class="descname">get_type</tt><big>(</big><big>)</big> &rarr; str or None<a class="headerlink" href="#netsa.script.Flow_params.get_type" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--type</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.get_xargs">
 <tt class="descname">get_xargs</tt><big>(</big><big>)</big> &rarr; str or None<a class="headerlink" href="#netsa.script.Flow_params.get_xargs" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the <tt class="docutils literal"><span class="pre">rwfilter</span></tt> pull <tt class="docutils literal"><span class="pre">--xargs</span></tt> argument as a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.is_files">
 <tt class="descname">is_files</tt><big>(</big><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.script.Flow_params.is_files" title="Permalink to this definition">¶</a></dt>
-<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if this <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object
+<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if this <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object
 represents processing of already retrieved files.</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.is_pull">
 <tt class="descname">is_pull</tt><big>(</big><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.script.Flow_params.is_pull" title="Permalink to this definition">¶</a></dt>
-<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if this <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object
+<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if this <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object
 represents a data pull from the repository.  (i.e. it contains
 selection switches.)</dd></dl>
 
 <dl class="method">
 <dt id="netsa.script.Flow_params.using">
 <tt class="descname">using</tt><big>(</big><span class="optional">[</span><em>flow_class : str</em>, <em>flow_type : str</em>, <em>flowtypes : str list</em>, <em>sensors : str list</em>, <em>start_date : datetime</em>, <em>end_date : datetime</em>, <em>input_pipe : str</em>, <em>xargs : str</em>, <em>filenames : str list</em><span class="optional">]</span><big>)</big> &rarr; Flow_params<a class="headerlink" href="#netsa.script.Flow_params.using" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a new <a title="netsa.script.Flow_params" class="reference" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object in which the
+<dd><p>Returns a new <a title="netsa.script.Flow_params" class="reference internal" href="#netsa.script.Flow_params"><tt class="xref docutils literal"><span class="pre">Flow_params</span></tt></a> object in which the
 arguments in this call have replaced the parameters in <em>self</em>,
 but all other parameters are the same.</p>
-<p>Raises a <a title="netsa.script.ScriptError" class="reference" href="#netsa.script.ScriptError"><tt class="xref docutils literal"><span class="pre">ScriptError</span></tt></a> if the new parameters are
+<p>Raises a <a title="netsa.script.ScriptError" class="reference internal" href="#netsa.script.ScriptError"><tt class="xref docutils literal"><span class="pre">ScriptError</span></tt></a> if the new parameters are
 inconsistent or incorrectly typed.</p>
 </dd></dl>
 
@@ -854,14 +850,14 @@ suspicious.&#8221;</p>
 <dt id="netsa.script.add_output_file_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_output_file_param</tt><big>(</big><em>name : str</em>, <em>help: str</em><span class="optional">[</span>, <em>required=True</em>, <em>expert=False</em>, <em>description : str</em>, <em>mime_type='application/octet-stream'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_output_file_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an output file parameter to this script.  This parameter
-can later be fetched by the script as a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
-filename or a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object using
-<a title="netsa.script.get_output_file_name" class="reference" href="#netsa.script.get_output_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file_name</span></tt></a> or
-<a title="netsa.script.get_output_file" class="reference" href="#netsa.script.get_output_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file</span></tt></a>.  Note that if you ask
+can later be fetched by the script as a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
+filename or a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object using
+<a title="netsa.script.get_output_file_name" class="reference internal" href="#netsa.script.get_output_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file_name</span></tt></a> or
+<a title="netsa.script.get_output_file" class="reference internal" href="#netsa.script.get_output_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file</span></tt></a>.  Note that if you ask
 for the file name, you may wish to handle the filenames
 <tt class="docutils literal"><span class="pre">stdout</span></tt>, <tt class="docutils literal"><span class="pre">stderr</span></tt>, and <tt class="docutils literal"><span class="pre">-</span></tt> specially to be consistent
 with other tools.  (See the documentation of
-<a title="netsa.script.get_output_file_name" class="reference" href="#netsa.script.get_output_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file_name</span></tt></a> for details.)
+<a title="netsa.script.get_output_file_name" class="reference internal" href="#netsa.script.get_output_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file_name</span></tt></a> for details.)
 Unlike most parameters, output file parameters never have
 default values, and are required by default.  If an output
 file parameter is not required, the implication is that if the
@@ -892,7 +888,7 @@ automatically convert from one type to another.  Examples:</p>
 <dd>SiLK prefix map data</dd>
 <dt><tt class="docutils literal"><span class="pre">image/png</span></tt></dt>
 <dd>etc.  Various standard formats, many of which are listed
-<a class="reference" href="http://www.iana.org/assignments/media-types/">on IANA&#8217;s website</a>.</dd>
+<a class="reference external" href="http://www.iana.org/assignments/media-types/">on IANA&#8217;s website</a>.</dd>
 </dl>
 </blockquote>
 <p>It is by no means necessary to provide a useful MIME type, but
@@ -917,7 +913,7 @@ required that you handle these special names, but it helps with
 interoperability.  Note that you may need to take care when
 passing these filenames to SiLK command-line tools for output or
 input locations, for the same reason.</p>
-<p>If you use <a title="netsa.script.get_output_file" class="reference" href="#netsa.script.get_output_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file</span></tt></a>, it will
+<p>If you use <a title="netsa.script.get_output_file" class="reference internal" href="#netsa.script.get_output_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file</span></tt></a>, it will
 automatically handle these special filenames.</p>
 <p>If this output file is optional, and the user has not specified a
 location for it, this function will return <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
@@ -926,12 +922,12 @@ location for it, this function will return <tt class="xref docutils literal"><sp
 <dl class="function">
 <dt id="netsa.script.get_output_file">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">get_output_file</tt><big>(</big><em>name : str</em><big>)</big> &rarr; file<a class="headerlink" href="#netsa.script.get_output_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an open <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object for the output parameter
+<dd><p>Returns an open <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object for the output parameter
 <em>name</em>.  The special names <tt class="docutils literal"><span class="pre">stdout</span></tt>, <tt class="docutils literal"><span class="pre">-</span></tt> are both translated
 to standard output, and <tt class="docutils literal"><span class="pre">stderr</span></tt> is translated to standard
 error.</p>
 <p>If you need the output file name, use
-<a title="netsa.script.get_output_file_name" class="reference" href="#netsa.script.get_output_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file_name</span></tt></a> instead.</p>
+<a title="netsa.script.get_output_file_name" class="reference internal" href="#netsa.script.get_output_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_file_name</span></tt></a> instead.</p>
 <p>If <em>append</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, then the file is opened for append.
 Otherwise it is opened for write.</p>
 </dd></dl>
@@ -940,22 +936,22 @@ Otherwise it is opened for write.</p>
 <dt id="netsa.script.add_output_dir_param">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">add_output_dir_param</tt><big>(</big><em>name : str</em>, <em>help : str</em><span class="optional">[</span>, <em>required=True</em>, <em>expert=False</em>, <em>description : str</em>, <em>mime_type : str</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.script.add_output_dir_param" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an output directory parameter to this script.  This
-parameter can later be used to construct a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
-filename or a Python <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object using
-<a title="netsa.script.get_output_dir_file_name" class="reference" href="#netsa.script.get_output_dir_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file_name</span></tt></a> or
-<a title="netsa.script.get_output_dir_file" class="reference" href="#netsa.script.get_output_dir_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file</span></tt></a>.  Unlike most
+parameter can later be used to construct a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>
+filename or a Python <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object using
+<a title="netsa.script.get_output_dir_file_name" class="reference internal" href="#netsa.script.get_output_dir_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file_name</span></tt></a> or
+<a title="netsa.script.get_output_dir_file" class="reference internal" href="#netsa.script.get_output_dir_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file</span></tt></a>.  Unlike most
 parameters, output directory parameters never have default
 values, and are required by default.  If an output directory
 parameter is not required, the implication is that if the user
 does not specify this argument, then this output is not
 produced.</p>
-<p>See <a title="netsa.script.add_output_file_param" class="reference" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a> for the meanings of the
+<p>See <a title="netsa.script.add_output_file_param" class="reference internal" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a> for the meanings of the
 <em>description</em> and <em>mime_type</em> arguments.  In this context,
 these arguments provide default values for files created in
 this output directory.  Each individual file can be given its
 own <em>mime_type</em> and <em>description</em> when using the
-<a title="netsa.script.get_output_dir_file_name" class="reference" href="#netsa.script.get_output_dir_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file_name</span></tt></a> and
-<a title="netsa.script.get_output_dir_file" class="reference" href="#netsa.script.get_output_dir_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file</span></tt></a> functions.</p>
+<a title="netsa.script.get_output_dir_file_name" class="reference internal" href="#netsa.script.get_output_dir_file_name"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file_name</span></tt></a> and
+<a title="netsa.script.get_output_dir_file" class="reference internal" href="#netsa.script.get_output_dir_file"><tt class="xref docutils literal"><span class="pre">netsa.script.get_output_dir_file</span></tt></a> functions.</p>
 </dd></dl>
 
 <dl class="function">
@@ -965,9 +961,9 @@ own <em>mime_type</em> and <em>description</em> when using the
 directory specified by the parameter <em>dir_name</em>.  Also lets the
 <tt class="xref docutils literal"><span class="pre">netsa.script</span></tt> system know that this output file is about to
 be used.  If provided, the <em>description</em> and <em>mime_type</em> arguments
-have meanings as described in <a title="netsa.script.add_output_file_param" class="reference" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a>.  If
+have meanings as described in <a title="netsa.script.add_output_file_param" class="reference internal" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a>.  If
 these arguments are not provided, the defaults from the call where
-<em>dir_name</em> was defined in <a title="netsa.script.add_output_dir_param" class="reference" href="#netsa.script.add_output_dir_param"><tt class="xref docutils literal"><span class="pre">add_output_dir_param</span></tt></a> are used.</p>
+<em>dir_name</em> was defined in <a title="netsa.script.add_output_dir_param" class="reference internal" href="#netsa.script.add_output_dir_param"><tt class="xref docutils literal"><span class="pre">add_output_dir_param</span></tt></a> are used.</p>
 <p>If the output directory parameter is optional, and the user has
 not specified a location for it, this function will return
 <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
@@ -976,14 +972,14 @@ not specified a location for it, this function will return
 <dl class="function">
 <dt id="netsa.script.get_output_dir_file">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">get_output_dir_file</tt><big>(</big><em>dir_name : str</em>, <em>file_name : str</em><span class="optional">[</span>, <em>description : str</em>, <em>mime_type : str</em><span class="optional">]</span><big>)</big> &rarr; file<a class="headerlink" href="#netsa.script.get_output_dir_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the an open <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object for the file named
+<dd><p>Returns the an open <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object for the file named
 <em>file_name</em> in the output directory specified by the parameter
 <em>dir_name</em>.  Also lets the <tt class="xref docutils literal"><span class="pre">netsa.script</span></tt> system know that
 this output file is about to be used.  If provided, the
 <em>description</em> and <em>mime_type</em> arguments have meanings as described
-in <a title="netsa.script.add_output_file_param" class="reference" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a>.  If these arguments are not
+in <a title="netsa.script.add_output_file_param" class="reference internal" href="#netsa.script.add_output_file_param"><tt class="xref docutils literal"><span class="pre">add_output_file_param</span></tt></a>.  If these arguments are not
 provided, the defaults from the call where <em>dir_name</em> was defined
-in <a title="netsa.script.add_output_dir_param" class="reference" href="#netsa.script.add_output_dir_param"><tt class="xref docutils literal"><span class="pre">add_output_dir_param</span></tt></a> are used.</p>
+in <a title="netsa.script.add_output_dir_param" class="reference internal" href="#netsa.script.add_output_dir_param"><tt class="xref docutils literal"><span class="pre">add_output_dir_param</span></tt></a> are used.</p>
 <p>If the output dir param is optional, and the user has not
 specified a location for it, this function will return <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
 <p>If <em>append</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the file is opened for append.
@@ -1004,7 +1000,7 @@ not been used before.</dd></dl>
 <dl class="function">
 <dt id="netsa.script.get_temp_dir_file">
 <tt class="descclassname">netsa.script.</tt><tt class="descname">get_temp_dir_file</tt><big>(</big><span class="optional">[</span><em>file_name : str</em>, <em>append=False</em><span class="optional">]</span><big>)</big> &rarr; file<a class="headerlink" href="#netsa.script.get_temp_dir_file" title="Permalink to this definition">¶</a></dt>
-<dd>Returns an open <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object for the file named
+<dd>Returns an open <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object for the file named
 <em>file_name</em> in the script&#8217;s temporary working directory.  If
 <em>append</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the file is opened for append.  Otherwise,
 the file is opened for write.  If <em>file_name</em> is <tt class="xref docutils literal"><span class="pre">None</span></tt> then a
@@ -1037,16 +1033,16 @@ metadata queries to be very inefficient.</p>
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference" href=""><tt class="docutils literal"><span class="pre">netsa.script</span></tt> &#8212; The NetSA Scripting Framework</a><ul>
-<li><a class="reference" href="#overview">Overview</a></li>
-<li><a class="reference" href="#exceptions">Exceptions</a></li>
-<li><a class="reference" href="#metadata-functions">Metadata Functions</a></li>
-<li><a class="reference" href="#script-parameters">Script Parameters</a></li>
-<li><a class="reference" href="#verbose-output">Verbose Output</a></li>
-<li><a class="reference" href="#flow-data-parameters">Flow Data Parameters</a></li>
-<li><a class="reference" href="#producing-output">Producing Output</a></li>
-<li><a class="reference" href="#temporary-files">Temporary Files</a></li>
-<li><a class="reference" href="#script-execution">Script Execution</a></li>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">netsa.script</span></tt> &#8212; The NetSA Scripting Framework</a><ul>
+<li><a class="reference external" href="#overview">Overview</a></li>
+<li><a class="reference external" href="#exceptions">Exceptions</a></li>
+<li><a class="reference external" href="#metadata-functions">Metadata Functions</a></li>
+<li><a class="reference external" href="#script-parameters">Script Parameters</a></li>
+<li><a class="reference external" href="#verbose-output">Verbose Output</a></li>
+<li><a class="reference external" href="#flow-data-parameters">Flow Data Parameters</a></li>
+<li><a class="reference external" href="#producing-output">Producing Output</a></li>
+<li><a class="reference external" href="#temporary-files">Temporary Files</a></li>
+<li><a class="reference external" href="#script-execution">Script Execution</a></li>
 </ul>
 </li>
 </ul>
@@ -1099,7 +1095,7 @@ metadata queries to be very inefficient.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008-2010, Carnegie Mellon University.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
 </html>

@@ -62,13 +62,13 @@ capabilities, but without either sufficient text substitution
 protections or sufficient error-checking and recovery mechanisms:</p>
 <blockquote>
 <ul class="simple">
-<li>The <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/os.html#os.system"><tt class="xref docutils literal"><span class="pre">os.system</span></tt></a> function</li>
-<li>The <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/subprocess.html#module-subprocess"><tt class="xref docutils literal"><span class="pre">subprocess</span></tt></a> module</li>
-<li>The <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/popen2.html#module-popen2"><tt class="xref docutils literal"><span class="pre">popen2</span></tt></a> module</li>
+<li>The <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/os.html#os.system"><tt class="xref docutils literal"><span class="pre">os.system</span></tt></a> function</li>
+<li>The <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/subprocess.html#module-subprocess"><tt class="xref docutils literal"><span class="pre">subprocess</span></tt></a> module</li>
+<li>The <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/popen2.html#module-popen2"><tt class="xref docutils literal"><span class="pre">popen2</span></tt></a> module</li>
 </ul>
 </blockquote>
 <p>Here are some examples, in increasing complexity, of the use of the
-<a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> and <a title="netsa.util.shell.run_collect" class="reference" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a> functions:</p>
+<a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> and <a title="netsa.util.shell.run_collect" class="reference internal" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a> functions:</p>
 <p>Run a single process and wait for it to complete:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Shell: rm -rf /tmp/test</span>
 <span class="n">run_parallel</span><span class="p">(</span><span class="s">&quot;rm -rf /tmp/test&quot;</span><span class="p">)</span>
@@ -118,9 +118,9 @@ variables <em>out</em> and <em>err</em>:</p>
 </pre></div>
 </div>
 <p>The following examples are more complicated, and require the use of
-the long forms of <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> and <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> specifications.
+the long forms of <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> and <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> specifications.
 (All of the examples above have used the short-hand forms.)  You
-should read the documentation for <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> and <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>
+should read the documentation for <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> and <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>
 to see how the long forms and short-hand forms are related.</p>
 <p>Run a pipeline, collect standard output of the pipeline to one file,
 and append standard error from all of the commands to another file:</p>
@@ -165,10 +165,9 @@ command:</p>
 <h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
 <dl class="exception">
 <dt id="netsa.util.shell.PipelineException">
-<em class="property">
-exception </em><tt class="descclassname">netsa.util.shell.</tt><tt class="descname">PipelineException</tt><a class="headerlink" href="#netsa.util.shell.PipelineException" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">netsa.util.shell.</tt><tt class="descname">PipelineException</tt><big>(</big><em>message</em>, <em>exit_statuses</em><big>)</big><a class="headerlink" href="#netsa.util.shell.PipelineException" title="Permalink to this definition">¶</a></dt>
 <dd>This exception represents a failure to process a pipeline in
-either <a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or <a title="netsa.util.shell.run_collect" class="reference" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>.  It can be
+either <a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or <a title="netsa.util.shell.run_collect" class="reference internal" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>.  It can be
 triggered by any of the commands being run by the function failing
 (either because the file was not found or because the command&#8217;s
 exit status was unacceptable.)  The message contains a summary of
@@ -184,21 +183,21 @@ available.</dd></dl>
 <tt class="descclassname">netsa.util.shell.</tt><tt class="descname">command</tt><big>(</big><em>&lt;command spec&gt;</em><span class="optional">[</span>, <em>stderr : str or file</em>, <em>stderr_append=False</em>, <em>ignore_exit_status=False</em>, <em>ignore_exit_statuses : int seq</em><span class="optional">]</span><big>)</big> &rarr; command<a class="headerlink" href="#netsa.util.shell.command" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interprets the arguments as a &#8220;command specification&#8221;, and returns
 that specification as a value.</p>
-<p>If there is only a single argument and it is a <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>,
+<p>If there is only a single argument and it is a <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>,
 then a new command is returned with the options provided by this
 call.  For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">new_command</span> <span class="o">=</span> <span class="n">command</span><span class="p">(</span><span class="n">old_command</span><span class="p">,</span> <span class="n">ignore_exit_status</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If there is only a single argument and it is a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>, the
+<p>If there is only a single argument and it is a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>, the
 string is parsed as if it were a simple shell command.
 (i.e. respecting single and double quotation marks, backslashes,
 etc.)  For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">new_command</span> <span class="o">=</span> <span class="n">command</span><span class="p">(</span><span class="s">&quot;ls /etc&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If there is only a single argument and it is a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> or a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#tuple"><tt class="xref docutils literal"><span class="pre">tuple</span></tt></a>, interpret it as being the argument vector for the
+<p>If there is only a single argument and it is a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> or a
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#tuple"><tt class="xref docutils literal"><span class="pre">tuple</span></tt></a>, interpret it as being the argument vector for the
 command (with the first argument being the command to be
 executed.)  For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">new_command</span> <span class="o">=</span> <span class="n">command</span><span class="p">([</span><span class="s">&quot;ls&quot;</span><span class="p">,</span> <span class="s">&quot;/etc&quot;</span><span class="p">])</span>
@@ -215,7 +214,7 @@ command specification:</p>
 <blockquote>
 <dl class="docutils">
 <dt><em>stderr</em></dt>
-<dd>Filename (<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>) or open <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object of
+<dd>Filename (<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>) or open <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object of
 destination for stderr.</dd>
 <dt><em>stderr_append</em></dt>
 <dd><tt class="xref docutils literal"><span class="pre">True</span></tt> if <em>stderr</em> should be opened for append.  Does
@@ -229,8 +228,8 @@ errors when they are encountered.</dd>
 </dl>
 </blockquote>
 <p>In addition, these options may be &#8220;handed down&#8221; from the
-<a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> call, or from <a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or
-<a title="netsa.util.shell.run_collect" class="reference" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>.  If so, then options given locally to the
+<a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> call, or from <a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or
+<a title="netsa.util.shell.run_collect" class="reference internal" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>.  If so, then options given locally to the
 command take precedence.</p>
 <p>Example: Define a command spec using a single string:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">command</span><span class="p">(</span><span class="s">&quot;ls -lR /tmp/foo&quot;</span><span class="p">)</span>
@@ -250,8 +249,8 @@ different options:</p>
 </pre></div>
 </div>
 <p><strong>Short-hand Form:</strong></p>
-<p>In the <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>, <a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a>, and
-<a title="netsa.util.shell.run_collect" class="reference" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a> functions, commands may be given in a
+<p>In the <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>, <a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a>, and
+<a title="netsa.util.shell.run_collect" class="reference internal" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a> functions, commands may be given in a
 short-hand form where convenient.  The short-hand form of a
 command is a single string.  Here are some examples:</p>
 <div class="highlight-python"><pre>"ls -lR"              =&gt;  command(["ls", "-lR"])
@@ -260,19 +259,19 @@ command is a single string.  Here are some examples:</p>
 "'weird program'"     =&gt;  command(["weird program"])</pre>
 </div>
 <p>There is no way to associate options with a short-hand
-<a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>.  If you wish to redirect error output or ignore
+<a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>.  If you wish to redirect error output or ignore
 exit statuses, you will need to use the long form.</p>
 <p><strong>Variable Expansion:</strong></p>
 <p>When commands are executed, variable expansion is performed.  The
 expansions are provided by the argument <cite>vars</cite> to
-<a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or <a title="netsa.util.shell.run_collect" class="reference" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>.  Note that commands
+<a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or <a title="netsa.util.shell.run_collect" class="reference internal" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>.  Note that commands
 are split into arguments <em>before</em> this expansion occurs, which is
 a security measure.  This means that no matter what whitespace or
 punctuation is in an expansion, it can&#8217;t change the sense of the
 command.  The down side of that is that on occasions when you
 would like to add multiple arguments to a command, you must
-construct the <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> using the list syntax.</p>
-<p>Expansion variable references are placed using the <a class="reference" href="http://docs.python.org/library/stdtypes.html#string-formatting">Python String
+construct the <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> using the list syntax.</p>
+<p>Expansion variable references are placed using the <a class="reference external" href="http://docs.python.org/library/stdtypes.html#string-formatting">Python String
 formatting operations</a>.</p>
 <p>Here is an example substitution, showing how <tt class="docutils literal"><span class="pre">%(target)s</span></tt>
 becomes a single argument before the subsitution occurs.</p>
@@ -305,8 +304,8 @@ immediately.</p>
 lifecycles of various objects will behave when the Python
 interpreter is forked and two copies are running at once.</p>
 <p>The command function is called with <em>vars</em> (as given to
-<a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or <a title="netsa.util.shell.run_collect" class="reference" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>) as its first
-argument, and the remainder of <em>argv</em> from calling <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>
+<a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> or <a title="netsa.util.shell.run_collect" class="reference internal" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>) as its first
+argument, and the remainder of <em>argv</em> from calling <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>
 as its remaining arguments.</p>
 </dd></dl>
 
@@ -315,14 +314,14 @@ as its remaining arguments.</p>
 <tt class="descclassname">netsa.util.shell.</tt><tt class="descname">pipeline</tt><big>(</big><em>&lt;pipeline spec&gt;</em><span class="optional">[</span>, <em>stdin : str or file</em>, <em>stdout : str or file</em>, <em>stdout_append=False</em>, <em>...</em><span class="optional">]</span><big>)</big> &rarr; pipeline<a class="headerlink" href="#netsa.util.shell.pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interprets the arguments as a &#8220;pipeline specification&#8221;, and
 returns that specification as a value.</p>
-<p>If there is only a single argument and it is a <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>,
+<p>If there is only a single argument and it is a <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>,
 then a new pipeline is returned with the options provided by this
 call.  For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">new_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">old_pipeline</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="s">&quot;/tmp/newfile&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If there is only a single argument and it is a <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> or a
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#tuple"><tt class="xref docutils literal"><span class="pre">tuple</span></tt></a>, interpret it as being a list of commands and I/O
+<p>If there is only a single argument and it is a <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> or a
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#tuple"><tt class="xref docutils literal"><span class="pre">tuple</span></tt></a>, interpret it as being a list of commands and I/O
 redirection short-hands to run in the pipeline.  For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">new_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">([</span><span class="s">&quot;ls /etc&quot;</span><span class="p">,</span> <span class="s">&quot;tac&quot;</span><span class="p">])</span>
 </pre></div>
@@ -338,10 +337,10 @@ pipeline specification:</p>
 <blockquote>
 <dl class="docutils">
 <dt><em>stdin</em></dt>
-<dd>Filename (<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>) or open <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object of source
+<dd>Filename (<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>) or open <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object of source
 for stdin.</dd>
 <dt><em>stdout</em></dt>
-<dd>Filename (<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>) or open <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object of
+<dd>Filename (<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#str"><tt class="xref docutils literal"><span class="pre">str</span></tt></a>) or open <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> object of
 destination for stdout.</dd>
 <dt><em>stdout_append</em></dt>
 <dd><tt class="xref docutils literal"><span class="pre">True</span></tt> if <em>stdout</em> should be opened for append.  Does
@@ -356,9 +355,9 @@ string starting with <tt class="docutils literal"><span class="pre">&gt;</span><
 is interpreted as a filename for stdout (and if <tt class="docutils literal"><span class="pre">&gt;&gt;</span></tt> was used,
 it is opened for append.)</p>
 <p>In addition, any unrecognized keyword arguments will be provided
-as defaults for any <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> specifications used in this
+as defaults for any <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> specifications used in this
 pipeline.  (So, for example, if you give the <em>ignore_exit_status</em>
-option to <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>, all of the commands in that pipeline will
+option to <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>, all of the commands in that pipeline will
 use the same value of <em>ignore_exit_status</em> unless they have their
 own overriding setting.)</p>
 <p>Example: Define a pipeline using a list of commands:</p>
@@ -387,7 +386,7 @@ pipeline but with different options:</p>
 </pre></div>
 </div>
 <p><strong>Short-hand Form:</strong></p>
-<p>In the <a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> command, pipelines may be given in a
+<p>In the <a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> command, pipelines may be given in a
 short-hand form where convenient.  The short-hand form of a
 pipeline is a list of commands and I/O redirection short-hands.
 Here are some examples:</p>
@@ -398,11 +397,11 @@ Here are some examples:</p>
 <p>Note that although you can set <em>stdin</em>, <em>stdout</em>, and
 <em>stdout_append</em> using the short-hand form (by using the I/O
 redirection strings at the start and end of the list), you cannot
-set these options to open <a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> objects, only to
+set these options to open <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#file"><tt class="xref docutils literal"><span class="pre">file</span></tt></a> objects, only to
 filenames.  You also set other options to be passed down to the
 individual commands.</p>
 <p><strong>Variable Expansion:</strong></p>
-<p>As in <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>, pipelines have variable expansion.  Most
+<p>As in <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a>, pipelines have variable expansion.  Most
 variable expansion happens inside the actual commands in the
 pipeline.  However, variable expansion also occurs in filenames
 provided for the <em>stdin</em> and <em>stdout</em> options.  For example:</p>
@@ -420,24 +419,31 @@ provided for the <em>stdin</em> and <em>stdout</em> options.  For example:</p>
 <tt class="descclassname">netsa.util.shell.</tt><tt class="descname">run_parallel</tt><big>(</big><em>&lt;pipeline spec&gt;</em>, <em>...</em><span class="optional">[</span>, <em>vars : dict</em>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.util.shell.run_parallel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs a series of commands (as specified by the arguments provided)
 by forking and establishing pipes between commands.  Raises
-<a title="netsa.util.shell.PipelineException" class="reference" href="#netsa.util.shell.PipelineException"><tt class="xref docutils literal"><span class="pre">PipelineException</span></tt></a> and kills off all remaining subprocesses
+<a title="netsa.util.shell.PipelineException" class="reference internal" href="#netsa.util.shell.PipelineException"><tt class="xref docutils literal"><span class="pre">PipelineException</span></tt></a> and kills off all remaining subprocesses
 if any one command fails.</p>
-<p>Each argument is passed to the <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> function to create
+<p>Each argument is passed to the <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> function to create
 a new pipeline, which allows the short-hand form of pipelines (as
-<a title="(in Python v2.6)" class="reference" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> short-hands) to be used.</p>
+<a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/functions.html#list"><tt class="xref docutils literal"><span class="pre">list</span></tt></a> short-hands) to be used.</p>
 <p>The following keyword arguments may be given as <em>options</em> to
-<a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a>:</p>
+<a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a>:</p>
 <blockquote>
 <dl class="docutils">
 <dt><em>vars</em></dt>
 <dd>A dictionary of variable substitutions to make in the
-<a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> and <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> specifications in this
+<a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> and <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> specifications in this
 <cite>run_parallel</cite> call.</dd>
 </dl>
 </blockquote>
 <p>Additional keyword arguments will be passed down as default values
-to the <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> and <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> specifications making
-up this <a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> call.</p>
+to the <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> and <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> specifications making
+up this <a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> call.</p>
+<p>The <a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a> function returns the list of exit codes
+of the processes in each pipeline as a list of lists. Each list
+corresponds to a pipeline, in the order in which they were passed
+into the function. Each element represents a process in the
+pipeline, in the order they were defined in the pipeline. If a
+process is not run (e.g., because a process preceding it in the
+pipeline fails), the exit status will be <cite>None</cite>.</p>
 <p>Example: Run three mkdirs in parallel and fail if any of them fails:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">run_parallel</span><span class="p">(</span><span class="s">&quot;mkdir a&quot;</span><span class="p">,</span> <span class="s">&quot;mkdir b&quot;</span><span class="p">,</span> <span class="s">&quot;mkdir c&quot;</span><span class="p">)</span>
 </pre></div>
@@ -445,10 +451,17 @@ up this <a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.
 <p>Example: Make a fifo, then afterwards, use it to do some work.
 (Try making a typo in here and watch it kill everything off
 instead of hanging forever.)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">run_parallel</span><span class="p">(</span><span class="s">&quot;mkfifo test.fifo&quot;</span><span class="p">)</span>
-<span class="n">run_parallel</span><span class="p">([</span><span class="s">&quot;cat /etc/passwd&quot;</span><span class="p">,</span> <span class="s">&quot;sort -r&quot;</span><span class="p">,</span> <span class="s">&quot;cut -f1 -d:&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;</span><span class="si">%(f)s</span><span class="s">&quot;</span><span class="p">],</span>
-             <span class="p">[</span><span class="s">&quot;cat </span><span class="si">%(f)s</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;sed -e &#39;s/a/b/g&#39;&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;</span><span class="si">%(f2)s</span><span class="s">&quot;</span><span class="p">],</span>
-             <span class="nb">vars</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;f&#39;</span><span class="p">:</span> <span class="s">&#39;test.fifo&#39;</span><span class="p">,</span> <span class="s">&#39;f2&#39;</span><span class="p">:</span> <span class="s">&#39;test.out&#39;</span><span class="p">})</span>
+<div class="highlight-python"><pre>run_parallel("mkfifo test.fifo")
+run_parallel(["cat /etc/passwd", "sort -r", "cut -f1 -d:", "&gt;%(f)s"],
+             ["cat %(f)s", "sed -e 's/a/b/g'", "&gt;%(f2)s"],
+             vars={'f': 'test.fifo', 'f2': 'test.</pre>
+</div>
+<p>Example: run two pipelines in parallel, then investigate their
+processes&#8217; exit statuses:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">exits</span> <span class="o">=</span> <span class="n">run_parallel</span><span class="p">([</span><span class="s">&quot;ls -l&quot;</span><span class="p">,</span> <span class="s">&quot;grep ^d&quot;</span><span class="p">],</span>
+                     <span class="p">[</span><span class="s">&quot;cat /etc/passwd&quot;</span><span class="p">,</span> <span class="s">&quot;sort -r&quot;</span><span class="p">,</span> <span class="s">&quot;cut -f1 -d:&quot;</span><span class="p">])</span>
+<span class="c"># If all complete successfully, exits will be:</span>
+<span class="c">#  [[0, 0], [0, 0, 0]]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -461,13 +474,13 @@ and establishing pipes between commands.  The output of the final
 command is collected and returned in the result.  stderr across
 all commands is returned in the result.  The final result is a
 tuple (<cite>stdout</cite>, <cite>stderr</cite>)</p>
-<p>Raises <a title="netsa.util.shell.PipelineException" class="reference" href="#netsa.util.shell.PipelineException"><tt class="xref docutils literal"><span class="pre">PipelineException</span></tt></a> and kills off all remaining
+<p>Raises <a title="netsa.util.shell.PipelineException" class="reference internal" href="#netsa.util.shell.PipelineException"><tt class="xref docutils literal"><span class="pre">PipelineException</span></tt></a> and kills off all remaining
 subprocesses if any one command fails.</p>
 <p>The arguments are passed as arguments to a single call of the
-<a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> function to create a pipeline specification.
-That is: each argument is a <a title="netsa.util.shell.command" class="reference" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> specification.  Note
-that this is not the same as <a title="netsa.util.shell.run_parallel" class="reference" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a>, which
-interprets its arguments as multiple <a title="netsa.util.shell.pipeline" class="reference" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>
+<a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a> function to create a pipeline specification.
+That is: each argument is a <a title="netsa.util.shell.command" class="reference internal" href="#netsa.util.shell.command"><tt class="xref docutils literal"><span class="pre">command</span></tt></a> specification.  Note
+that this is not the same as <a title="netsa.util.shell.run_parallel" class="reference internal" href="#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">run_parallel</span></tt></a>, which
+interprets its arguments as multiple <a title="netsa.util.shell.pipeline" class="reference internal" href="#netsa.util.shell.pipeline"><tt class="xref docutils literal"><span class="pre">pipeline</span></tt></a>
 specifications.</p>
 <p>You can also redirect stderr independently for each command if
 needed, allowing you to send some stderr to <tt class="docutils literal"><span class="pre">/dev/null</span></tt> or
@@ -504,11 +517,11 @@ returned in the variable <cite>c_stderr</cite>:</p>
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference" href=""><tt class="docutils literal"><span class="pre">netsa.util.shell</span></tt> &#8212; Robust Shell Pipelines</a><ul>
-<li><a class="reference" href="#overview">Overview</a></li>
-<li><a class="reference" href="#exceptions">Exceptions</a></li>
-<li><a class="reference" href="#building-commands-and-pipelines">Building Commands and Pipelines</a></li>
-<li><a class="reference" href="#running-pipelines">Running Pipelines</a></li>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">netsa.util.shell</span></tt> &#8212; Robust Shell Pipelines</a><ul>
+<li><a class="reference external" href="#overview">Overview</a></li>
+<li><a class="reference external" href="#exceptions">Exceptions</a></li>
+<li><a class="reference external" href="#building-commands-and-pipelines">Building Commands and Pipelines</a></li>
+<li><a class="reference external" href="#running-pipelines">Running Pipelines</a></li>
 </ul>
 </li>
 </ul>
@@ -561,7 +574,7 @@ returned in the variable <cite>c_stderr</cite>:</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008-2010, Carnegie Mellon University.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
     </div>
   </body>
 </html>

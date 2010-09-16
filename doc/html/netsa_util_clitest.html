@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>netsa.util.clitest — Utility for testing CLI tools &mdash; NetSA Python v0.9 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="NetSA Python v0.9 documentation" href="index.html" />
+    <link rel="up" title="Miscellaneous Facilities" href="other.html" />
+    <link rel="next" title="Changes" href="changes.html" />
+    <link rel="prev" title="netsa.tools.service — Tools for building services" href="netsa_tools_service.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="changes.html" title="Changes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="netsa_tools_service.html" title="netsa.tools.service — Tools for building services"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="other.html" accesskey="U">Miscellaneous Facilities</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-netsa.util.clitest">
+<h1><tt class="xref docutils literal"><span class="pre">netsa.util.clitest</span></tt> &#8212; Utility for testing CLI tools<a class="headerlink" href="#module-netsa.util.clitest" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref docutils literal"><span class="pre">netsa.util.clitest</span></tt> module provides an API for driving
+automated tests of command-line applications. It doesn&#8217;t do the work
+of a test framekwork; for that, use a framework library such as
+unittest or functest.</p>
+<p>Enough of <tt class="xref docutils literal"><span class="pre">netsa.util.clitest</span></tt> has been implemented to fulfill a
+minimal set of requirements. Additional features will be added as
+necessary to support more complex testing.</p>
+<p>This module is influenced by <a class="reference external" href="http://pythonpaste.org/scripttest/">http://pythonpaste.org/scripttest/</a>.</p>
+<p>A usage example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">clitest</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="s">&quot;./test-output&quot;</span><span class="p">)</span>
+<span class="c"># Run the command</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s">&quot;ryscatterplot --help&quot;</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">success</span><span class="p">())</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;whatever the help output is&quot;</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+<span class="c"># Clean up whatever detritus the command left</span>
+<span class="n">env</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="netsa.util.clitest.TestingException">
+<em class="property">exception </em><tt class="descclassname">netsa.util.clitest.</tt><tt class="descname">TestingException</tt><a class="headerlink" href="#netsa.util.clitest.TestingException" title="Permalink to this definition">¶</a></dt>
+<dd>Class of exceptions raised by the <tt class="xref docutils literal"><span class="pre">clitest</span></tt> module.</dd></dl>
+
+</div>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="netsa.util.clitest.Environment">
+<em class="property">class </em><tt class="descclassname">netsa.util.clitest.</tt><tt class="descname">Environment</tt><big>(</big><span class="optional">[</span><em>work_dir : str</em><span class="optional">]</span><span class="optional">[</span>, <em>save_work_dir : bool</em><span class="optional">]</span><span class="optional">[</span>, <em>debug : bool</em><span class="optional">]</span><span class="optional">[</span>, <em>&lt;env_name&gt;=&lt;env_val&gt;</em>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#netsa.util.clitest.Environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>An environment for running commands, including a set of
+environment variables and a working directory.</p>
+<p>The <em>work_dir</em> argument is the working directory in which the
+commands are run. If <em>work_dir</em> is <tt class="xref docutils literal"><span class="pre">None</span></tt>, a directory will be
+made using <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/tempfile.html#tempfile.mkdtemp"><tt class="xref docutils literal"><span class="pre">tempfile.mkdtemp</span></tt></a> with default values.</p>
+<p><em>work_dir</em> must not already exist or <a title="netsa.util.clitest.Environment.run" class="reference internal" href="#netsa.util.clitest.Environment.run"><tt class="xref docutils literal"><span class="pre">run</span></tt></a> will raise a
+<a title="netsa.util.clitest.TestingException" class="reference internal" href="#netsa.util.clitest.TestingException"><tt class="xref docutils literal"><span class="pre">TestingException</span></tt></a>. If <em>save_work_dir</em> is <tt class="xref docutils literal"><span class="pre">False</span></tt>,
+<a title="netsa.util.clitest.Environment.cleanup" class="reference internal" href="#netsa.util.clitest.Environment.cleanup"><tt class="xref docutils literal"><span class="pre">cleanup</span></tt></a> will remove this directory when it is called.</p>
+<p>If <em>debug</em> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, several debug messages will be emitted on
+<tt class="docutils literal"><span class="pre">stderr</span></tt>.</p>
+<p>Any additional keyword arguments are used as environment
+variables.</p>
+<dl class="method">
+<dt id="netsa.util.clitest.Environment.get_env">
+<tt class="descname">get_env</tt><big>(</big><em>env_name : str</em><big>)</big> &rarr; str<a class="headerlink" href="#netsa.util.clitest.Environment.get_env" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the value of <em>env_name</em> in the environment. If
+<em>env_name</em> does not exist in the environment, this method
+returns <tt class="xref docutils literal"><span class="pre">None</span></tt>.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Environment.set_env">
+<tt class="descname">set_env</tt><big>(</big><em>env_name : str</em>, <em>env_val : str</em><big>)</big><a class="headerlink" href="#netsa.util.clitest.Environment.set_env" title="Permalink to this definition">¶</a></dt>
+<dd>Sets the value of <em>env_name</em> in the environment to
+<em>env_val</em>. <em>env_val</em> must be a string.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Environment.del_env">
+<tt class="descname">del_env</tt><big>(</big><em>env_name : str</em><big>)</big><a class="headerlink" href="#netsa.util.clitest.Environment.del_env" title="Permalink to this definition">¶</a></dt>
+<dd>Removes <em>env_name</em> from the environment. If <em>env_name</em> doesn&#8217;t
+exist, this method has no effect.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Environment.get_work_dir">
+<tt class="descname">get_work_dir</tt><big>(</big><big>)</big> &rarr; str<a class="headerlink" href="#netsa.util.clitest.Environment.get_work_dir" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the working directory in which the commands are run.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Environment.run">
+<tt class="descname">run</tt><big>(</big><em>command : str</em><span class="optional">[</span>, <em>&lt;keyword&gt;=&lt;value&gt;</em>, <em>...</em><span class="optional">]</span><big>)</big> &rarr; Result<a class="headerlink" href="#netsa.util.clitest.Environment.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a single command, capturing and returning result
+information.  Keyword arguments are passed to
+<a title="netsa.util.shell.run_parallel" class="reference external" href="netsa_util_shell.html#netsa.util.shell.run_parallel"><tt class="xref docutils literal"><span class="pre">netsa.util.shell.run_parallel</span></tt></a>.  See the documentation
+of that function for an explanation of how such arguments are
+interpreted.</p>
+<p>Returns a <a title="netsa.util.clitest.Result" class="reference internal" href="#netsa.util.clitest.Result"><tt class="xref docutils literal"><span class="pre">Result</span></tt></a> object representing the outcome.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Environment.cleanup">
+<tt class="descname">cleanup</tt><big>(</big><big>)</big><a class="headerlink" href="#netsa.util.clitest.Environment.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd>Cleans up resources left behind by the test process.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="netsa.util.clitest.Result">
+<em class="property">class </em><tt class="descclassname">netsa.util.clitest.</tt><tt class="descname">Result</tt><big>(</big><em>command</em>, <em>envars</em>, <em>exit_codes</em>, <em>stdout</em>, <em>stderr</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#netsa.util.clitest.Result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains information on a command&#8217;s exit status and output.</p>
+<dl class="method">
+<dt id="netsa.util.clitest.Result.success">
+<tt class="descname">success</tt><big>(</big><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.util.clitest.Result.success" title="Permalink to this definition">¶</a></dt>
+<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if the exit code of the process was 0. This
+usually, but not always, indicates that the process ran
+successfully. Know Your Tool before relying on this function.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.exited">
+<tt class="descname">exited</tt><big>(</big><span class="optional">[</span><em>code</em><span class="optional">]</span><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.util.clitest.Result.exited" title="Permalink to this definition">¶</a></dt>
+<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if the process exited with the specified exit
+code. If the exit code is <tt class="xref docutils literal"><span class="pre">None</span></tt> or unsupplied, returns
+<tt class="xref docutils literal"><span class="pre">True</span></tt> if the process terminated normally (e.g., not on a
+signal).</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.exit_status">
+<tt class="descname">exit_status</tt><big>(</big><big>)</big> &rarr; int or None<a class="headerlink" href="#netsa.util.clitest.Result.exit_status" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the exit status of the process, if the process exited
+normally (e.g., was not terminated on a signal). Otherwise,
+this function returns <tt class="xref docutils literal"><span class="pre">None</span></tt>.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.signal">
+<tt class="descname">signal</tt><big>(</big><big>)</big> &rarr; int or None<a class="headerlink" href="#netsa.util.clitest.Result.signal" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the signal on which the process terminated, if the
+process terminated on a signal. Otherwise, this function
+returns <tt class="xref docutils literal"><span class="pre">None</span></tt>.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.signaled">
+<tt class="descname">signaled</tt><big>(</big><big>)</big> &rarr; bool<a class="headerlink" href="#netsa.util.clitest.Result.signaled" title="Permalink to this definition">¶</a></dt>
+<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if the process terminated on the specified
+signal. If the signal is <tt class="xref docutils literal"><span class="pre">None</span></tt> or unsupplied, returns
+<tt class="xref docutils literal"><span class="pre">True</span></tt> if the process terminated on a signal.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.format_status">
+<tt class="descname">format_status</tt><big>(</big><big>)</big> &rarr; str<a class="headerlink" href="#netsa.util.clitest.Result.format_status" title="Permalink to this definition">¶</a></dt>
+<dd>Returns a human-readable representation of how the process
+exited.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.get_status">
+<tt class="descname">get_status</tt><big>(</big><big>)</big> &rarr; int<a class="headerlink" href="#netsa.util.clitest.Result.get_status" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the raw exit status of the process, as an integer
+formatted in the style of <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/library/os.html#os.wait"><tt class="xref docutils literal"><span class="pre">os.wait</span></tt></a>.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.get_stdout">
+<tt class="descname">get_stdout</tt><big>(</big><big>)</big> &rarr; str<a class="headerlink" href="#netsa.util.clitest.Result.get_stdout" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the standard output of the process as a string.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.get_stderr">
+<tt class="descname">get_stderr</tt><big>(</big><big>)</big> &rarr; str<a class="headerlink" href="#netsa.util.clitest.Result.get_stderr" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the standard error of the process as a string.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.util.clitest.Result.get_info">
+<tt class="descname">get_info</tt><big>(</big><big>)</big> &rarr; str<a class="headerlink" href="#netsa.util.clitest.Result.get_info" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the information contained in the result as a
+human-readable string.</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">netsa.util.clitest</span></tt> &#8212; Utility for testing CLI tools</a><ul>
+<li><a class="reference external" href="#overview">Overview</a></li>
+<li><a class="reference external" href="#exceptions">Exceptions</a></li>
+<li><a class="reference external" href="#classes">Classes</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="netsa_tools_service.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">netsa.tools.service</span></tt> &#8212; Tools for building services</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="changes.html"
+                                  title="next chapter">Changes</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/netsa_util_clitest.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="changes.html" title="Changes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="netsa_tools_service.html" title="netsa.tools.service — Tools for building services"
+             >previous</a> |</li>
+        <li><a href="index.html">NetSA Python v0.9 documentation</a> &raquo;</li>
+          <li><a href="other.html" >Miscellaneous Facilities</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2010, Carnegie Mellon University.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+    </div>
+  </body>
+</html>

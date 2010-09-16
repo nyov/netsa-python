@@ -330,32 +330,45 @@ def db_connect(uri, user=None, password=None):
         "No database driver for scheme %s found." % repr(parsed_uri['scheme']))
     raise no_driver
 
-param_quote_exp = r"""
-    (?xsm)
-    (?P<lead>[^:']*)
-    (?: (?P<quote> ' (?: [^'\\]+ | \\. | '' | '\s*\n\s*' )*  ' ) |
-        : (?P<param> (?: [a-zA-Z_][a-zA-Z_0-9]* )              ) |
-        $ )
-"""
+query_param_exp = r"(?xsm) : [a-zA-Z_][a-zA-Z_0-9]*"
+query_quote_exp = r"(?xsm) ' (?: [^'\\] | \\. | '' | '[ \t]*\n[ \t*]') * ' "
+query_other_exp = r"(?xsm) ([^:'] | ::)+"
 
-param_quote_re = re.compile(param_quote_exp)
+query_param_re = re.compile(query_param_exp)
+query_quote_re = re.compile(query_quote_exp)
+query_other_re = re.compile(query_other_exp)
 
 def _map_params(sql, param_func, other_func=None):
     # Convert query in a general way, calling param_func on each
     # param and putting what param_func returns into the
     # result.
-    def noop(x):
-        return x
     if other_func == None:
+        def noop(x):
+            return x
         other_func = noop
+    (i, l, m) = (0, len(sql), True)
     result = ""
-    for match in param_quote_re.finditer(sql):
-        (lead, quote, param) = match.groups()
-        result += other_func(lead)
-        if quote != None:
-            result += other_func(quote)
-        if param != None:
-            result += param_func(param)
+    while m and i < l:
+        m = query_param_re.match(sql, i)
+        if m:
+            result += param_func(m.group()[1:])
+            i = m.end()
+            continue
+        m = query_quote_re.match(sql, i)
+        if m:
+            result += other_func(m.group())
+            i = m.end()
+            continue
+        m = query_other_re.match(sql, i)
+        if m:
+            result += other_func(m.group())
+            i = m.end()
+            continue
+        # No matches.  Accept that, and pass through characters until
+        # we match again.
+        m = True
+        result += other_func(sql[i])
+        i += 1
     return result
 
 def _map_params_positional(sql, param_func, other_func=None):
@@ -517,7 +530,7 @@ def db_parse_uri(uri):
             (user, host) = (host[:i], host[i+1:])
             i = user.find(':')
             if i >= 0:
-                (user, passwd) = (user[:i], user[i+1:])
+                (user, password) = (user[:i], user[i+1:])
         i = host.find(':')
         if i >= 0:
             (host, port) = (host[:i], host[i+1:])
