@@ -487,7 +487,7 @@ needed, allowing you to send some stderr to <tt class="docutils literal"><span c
 another destination instead of collecting it.</p>
 <p>Example: Reverse sort the output of <tt class="docutils literal"><span class="pre">ls</span> <span class="pre">-1</span></tt> and store the output
 and error in the variables <cite>a_stdout</cite> and <cite>a_stderr</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># Reverse sort the output of ls -1 and store the output in a</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Reverse sort the output of ls -1</span>
 <span class="p">(</span><span class="n">a_stdout</span><span class="p">,</span> <span class="n">a_stderr</span><span class="p">)</span> <span class="o">=</span> <span class="n">run_collect</span><span class="p">(</span><span class="s">&quot;ls -1&quot;</span><span class="p">,</span> <span class="s">&quot;sort -r&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -502,6 +502,20 @@ directory instead of the current working directory:</p>
 writes it to a file.  If there were any error output, it would be
 returned in the variable <cite>c_stderr</cite>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">empty_stdout</span><span class="p">,</span> <span class="n">c_stderr</span><span class="p">)</span> <span class="o">=</span> <span class="n">run_collect</span><span class="p">(</span><span class="s">&quot;ls -1&quot;</span><span class="p">,</span> <span class="s">&quot;sort -r&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;test.out&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="netsa.util.shell.run_collect_files">
+<tt class="descclassname">netsa.util.shell.</tt><tt class="descname">run_collect_files</tt><big>(</big><em>&lt;command spec&gt;</em>, <em>...</em><span class="optional">[</span>, <em>vars : dict</em>, <em>...</em><span class="optional">]</span><big>)</big> &rarr; file, file<a class="headerlink" href="#netsa.util.shell.run_collect_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a series of commands like <a title="netsa.util.shell.run_collect" class="reference internal" href="#netsa.util.shell.run_collect"><tt class="xref docutils literal"><span class="pre">run_collect</span></tt></a>, but returns
+open file objects for <cite>stdout</cite> and <cite>stderr</cite> instead of strings.</p>
+<p>Example: Iterate over the lines of <tt class="docutils literal"><span class="pre">ls</span> <span class="pre">-l</span> <span class="pre">|</span> <span class="pre">sort</span> <span class="pre">-r</span></tt> and print
+them out with line numbers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">f_stdout</span><span class="p">,</span> <span class="n">f_stderr</span><span class="p">)</span> <span class="o">=</span> <span class="n">run_collect_files</span><span class="p">(</span><span class="s">&quot;ls -l&quot;</span><span class="p">,</span> <span class="s">&quot;sort -r&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">line_no</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f_stdout</span><span class="p">):</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s">&quot;</span><span class="si">%3d</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">line_no</span><span class="p">,</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
 </dd></dl>

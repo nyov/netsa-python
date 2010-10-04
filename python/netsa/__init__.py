@@ -46,7 +46,7 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-__version__ = "0.9"
+__version__ = "1.1"
 
 DEBUG = False
 """

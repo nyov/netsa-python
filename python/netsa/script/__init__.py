@@ -437,7 +437,7 @@ def _print_short(out, text):
 
 def _print_usage(out, expert=False):
     script_name = os.path.basename(sys.argv[0])
-    if _script._metadata['title']:
+    if _script._metadata.get('title', None):
         out.write("%s usage:\n" % _script._metadata['title'])
     else:
         out.write("usage:\n")
@@ -450,7 +450,7 @@ def _print_usage(out, expert=False):
         text += " [FILES]"
     out.write(_short_wrapper.fill(text))
     out.write("\n")
-    if _script._metadata['description']:
+    if _script._metadata.get('description', None):
         out.write("\n")
         _print_long(out, _script._metadata['description'])
     if not _script._params:
@@ -906,7 +906,7 @@ class Flow_params(object):
         if end_date != Nothing: result._end_date = end_date
         if input_pipe != Nothing: result._input_pipe = input_pipe
         if xargs != Nothing: result._xargs = xargs
-        if filenames != Nothing: result._filenames != filenames
+        if filenames != Nothing: result._filenames = filenames
         result._check_params()
         return result
         
@@ -1054,6 +1054,7 @@ _class_info_lock = threading.Lock()
 _default_class = None
 _class_sensors = {}
 _sensors = set()
+_site_config_warned = False
 
 def _generate_class_info():
     global _default_class
@@ -1079,9 +1080,13 @@ def _generate_class_info():
                 (mapsid_out, mapsid_err) = netsa.util.shell.run_collect(
                     "mapsid --print-classes")
             except:
-                # Failure means no site config file
-                _print_warning(sys.stderr, "Site configuration file not found")
-                sys.exit(1)
+                global _site_config_warned
+                if not _site_config_warned:
+                    # Failure means no site config file
+                    _print_warning(sys.stderr,
+                                   "Site configuration file not found")
+                    _site_config_warned = True
+                #sys.exit(1)
             for l in mapsid_out.split("\n"):
                 # Mapping lines have a -> in them.  Skip other lines.
                 if ' -> ' not in l:
@@ -1473,6 +1478,10 @@ def execute(func):
                        (", ".join(missing_required)))
     # Check and normalize flow params
     if _script._flow_params:
+        # 0) Check for site config file.  If not, immediately exit.  Warning
+        #    has already been printed at this point.
+        if _default_class == None:
+            sys.exit(1)
         # 1) Check that if input-pipe, xargs, or command-line filenames are
         # given, that no globbing params were given.
         input_sources = 0

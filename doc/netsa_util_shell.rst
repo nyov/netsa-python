@@ -21,3 +21,5 @@
     .. autofunction:: run_parallel(<pipeline spec>, ..., [vars : dict, ...])
 
     .. autofunction:: run_collect(<command spec>, ..., [vars : dict, ...]) -> str, str
+
+    .. autofunction:: run_collect_files(<command spec>, ..., [vars : dict, ...]) -> file, file

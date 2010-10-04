@@ -45,6 +45,7 @@ netsa.script.set_description function netsa_script.html
 netsa.script.get_output_file_name function netsa_script.html
 netsa.util.shell.run_collect function netsa_util_shell.html
 netsa.script.add_label_param function netsa_script.html
+netsa.sql.db_pool class netsa_sql.html
 netsa.sql.db_connection.get_driver method netsa_sql.html
 netsa.util.shell.PipelineException exception netsa_util_shell.html
 netsa.sql.db_query class netsa_sql.html
@@ -82,11 +83,14 @@ netsa.files.datefiles.date_file_template function netsa_files_datefiles.html
 netsa.times.DateSnapper.next_date_bin method netsa_data_times.html
 netsa.util.clitest.Result class netsa_util_clitest.html
 netsa.util.clitest.Result.signal method netsa_util_clitest.html
+netsa.sql.db_pool.connect method netsa_sql.html
 netsa.script.add_int_param function netsa_script.html
 netsa.script.Flow_params.get_start_date method netsa_script.html
 netsa.script.add_flow_params function netsa_script.html
 netsa.script.Flow_params.is_files method netsa_script.html
+netsa.sql.db_pool.get_driver method netsa_sql.html
 netsa.util.clitest.Result.format_status method netsa_util_clitest.html
+netsa.util.shell.run_collect_files function netsa_util_shell.html
 netsa.script.Flow_params.get_input_pipe method netsa_script.html
 netsa.script.get_param function netsa_script.html
 netsa.data.countries.get_country_numeric function netsa_data_countries.html
@@ -149,12 +153,14 @@ netsa.sql.db_connection.commit method netsa_sql.html
 netsa.util.clitest.Result.get_status method netsa_util_clitest.html
 netsa.util.clitest.Environment.del_env method netsa_util_clitest.html
 netsa.util.clitest.Environment.set_env method netsa_util_clitest.html
+netsa.sql.db_driver.create_pool method netsa_sql.html
 netsa.data.countries.get_country_name function netsa_data_countries.html
 netsa.sql.db_connection.get_variants method netsa_sql.html
 netsa.sql.sql_exception exception netsa_sql.html
 netsa.files.LocalTmpDir.tmp_filename method netsa_files.html
 netsa.script.Flow_params.get_flowtypes method netsa_script.html
 netsa.script.Flow_params.is_pull method netsa_script.html
+netsa.sql.db_create_pool function netsa_sql.html
 netsa.script.add_float_param function netsa_script.html
 netsa.script.get_output_dir_file function netsa_script.html
 netsa.files.datefiles.split_on_date function netsa_files_datefiles.html

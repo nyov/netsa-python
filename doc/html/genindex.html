@@ -94,10 +94,14 @@
 <dt><a href="netsa_sql.html#netsa.sql.db_driver.can_handle">can_handle() (netsa.sql.db_driver method)</a></dt>
 <dt><a href="netsa_tools_service.html#netsa.tools.service.check_pidfile">check_pidfile() (in module netsa.tools.service)</a></dt>
 <dt><a href="netsa_util_clitest.html#netsa.util.clitest.Environment.cleanup">cleanup() (netsa.util.clitest.Environment method)</a></dt>
-<dt><a href="netsa_sql.html#netsa.sql.db_connection.clone">clone() (netsa.sql.db_connection method)</a></dt></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="netsa_util_shell.html#netsa.util.shell.command">command() (in module netsa.util.shell)</a></dt>
+<dt><a href="netsa_sql.html#netsa.sql.db_connection.clone">clone() (netsa.sql.db_connection method)</a></dt>
+<dt><a href="netsa_util_shell.html#netsa.util.shell.command">command() (in module netsa.util.shell)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="netsa_sql.html#netsa.sql.db_connection.commit">commit() (netsa.sql.db_connection method)</a></dt>
 <dt><a href="netsa_sql.html#netsa.sql.db_driver.connect">connect() (netsa.sql.db_driver method)</a></dt>
+  <dd><dl>
+    <dt><a href="netsa_sql.html#netsa.sql.db_pool.connect">(netsa.sql.db_pool method)</a></dt>
+  </dl></dd>
+<dt><a href="netsa_sql.html#netsa.sql.db_driver.create_pool">create_pool() (netsa.sql.db_driver method)</a></dt>
 </dl></td></tr></table>
 
 <h2 id="D">D</h2>
@@ -118,13 +122,15 @@
 <dt><a href="netsa_data_times.html#netsa.times.DateSnapper">DateSnapper (class in netsa.times)</a></dt>
 <dt><a href="netsa_data_format.html#netsa.data.format.datetime_iso">datetime_iso() (in module netsa.data.format)</a></dt>
 <dt><a href="netsa_data_format.html#netsa.data.format.datetime_iso_basic">datetime_iso_basic() (in module netsa.data.format)</a></dt>
-<dt><a href="netsa_data_format.html#netsa.data.format.datetime_iso_day">datetime_iso_day() (in module netsa.data.format)</a></dt></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="netsa_data_format.html#netsa.data.format.datetime_silk">datetime_silk() (in module netsa.data.format)</a></dt>
+<dt><a href="netsa_data_format.html#netsa.data.format.datetime_iso_day">datetime_iso_day() (in module netsa.data.format)</a></dt>
+<dt><a href="netsa_data_format.html#netsa.data.format.datetime_silk">datetime_silk() (in module netsa.data.format)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="netsa_data_format.html#netsa.data.format.datetime_silk_day">datetime_silk_day() (in module netsa.data.format)</a></dt>
 <dt><a href="netsa_data_format.html#netsa.data.format.datetime_silk_hour">datetime_silk_hour() (in module netsa.data.format)</a></dt>
 <dt><a href="netsa_sql.html#netsa.sql.db_connect">db_connect() (in module netsa.sql)</a></dt>
 <dt><a href="netsa_sql.html#netsa.sql.db_connection">db_connection (class in netsa.sql)</a></dt>
-<dt><a href="netsa_sql.html#netsa.sql.db_driver">db_driver (class in netsa.sql)</a></dt>
+<dt><a href="netsa_sql.html#netsa.sql.db_create_pool">db_create_pool() (in module netsa.sql)</a></dt>
+<dt><a href="netsa_sql.html#netsa.sql.db_driver">db_driver (class in netsa.sql)</a>, <a href="netsa_sql.html#netsa.sql.db_driver">[1]</a></dt>
+<dt><a href="netsa_sql.html#netsa.sql.db_pool">db_pool (class in netsa.sql)</a></dt>
 <dt><a href="netsa_sql.html#netsa.sql.db_query">db_query (class in netsa.sql)</a></dt>
 <dt><a href="netsa_sql.html#netsa.sql.db_result">db_result (class in netsa.sql)</a></dt>
 <dt><a href="netsa_util_clitest.html#netsa.util.clitest.Environment.del_env">del_env() (netsa.util.clitest.Environment method)</a></dt>
@@ -171,6 +177,9 @@
 <dt><a href="netsa_data_countries.html#netsa.data.countries.get_country_numeric">get_country_numeric() (in module netsa.data.countries)</a></dt>
 <dt><a href="netsa_data_countries.html#netsa.data.countries.get_country_tlds">get_country_tlds() (in module netsa.data.countries)</a></dt>
 <dt><a href="netsa_sql.html#netsa.sql.db_connection.get_driver">get_driver() (netsa.sql.db_connection method)</a></dt>
+  <dd><dl>
+    <dt><a href="netsa_sql.html#netsa.sql.db_pool.get_driver">(netsa.sql.db_pool method)</a></dt>
+  </dl></dd>
 <dt><a href="netsa_script.html#netsa.script.Flow_params.get_end_date">get_end_date() (netsa.script.Flow_params method)</a></dt>
 <dt><a href="netsa_util_clitest.html#netsa.util.clitest.Environment.get_env">get_env() (netsa.util.clitest.Environment method)</a></dt>
 <dt><a href="netsa_script.html#netsa.script.Flow_params.get_filenames">get_filenames() (netsa.script.Flow_params method)</a></dt>
@@ -281,9 +290,10 @@
 <dt><a href="netsa_sql.html#netsa.sql.register_driver">register_driver() (in module netsa.sql)</a></dt>
 <dt><a href="netsa_files.html#netsa.files.relpath">relpath() (in module netsa.files)</a></dt>
 <dt><a href="netsa_util_clitest.html#netsa.util.clitest.Result">Result (class in netsa.util.clitest)</a></dt>
-<dt><a href="netsa_sql.html#netsa.sql.db_connection.rollback">rollback() (netsa.sql.db_connection method)</a></dt></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="netsa_util_clitest.html#netsa.util.clitest.Environment.run">run() (netsa.util.clitest.Environment method)</a></dt>
+<dt><a href="netsa_sql.html#netsa.sql.db_connection.rollback">rollback() (netsa.sql.db_connection method)</a></dt>
+<dt><a href="netsa_util_clitest.html#netsa.util.clitest.Environment.run">run() (netsa.util.clitest.Environment method)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="netsa_util_shell.html#netsa.util.shell.run_collect">run_collect() (in module netsa.util.shell)</a></dt>
+<dt><a href="netsa_util_shell.html#netsa.util.shell.run_collect_files">run_collect_files() (in module netsa.util.shell)</a></dt>
 <dt><a href="netsa_util_shell.html#netsa.util.shell.run_parallel">run_parallel() (in module netsa.util.shell)</a></dt>
 </dl></td></tr></table>
 

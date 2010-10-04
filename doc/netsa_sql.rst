@@ -135,6 +135,27 @@
 
     .. autofunction:: unregister_driver(driver : db_driver)
 
+    Experimental Connection Pooling
+    -------------------------------
+
+    This version of :mod:`netsa.sql` contains experimental support for
+    connection pooling.  Connections in a pool will be created before
+    they're needed and kept available for re-use.  Note that since
+    this API is still in the early stages of development, it is very
+    likely to change between versions of `netsa-python`.
+
+    .. autofunction:: db_create_pool(uri, [user : str, password : str], ...) -> db_pool
+
+    .. autoclass:: db_pool()
+
+        .. automethod:: get_driver() -> db_driver
+
+        .. automethod:: connect() -> db_connection
+
+    .. class:: db_driver()
+
+        .. automethod:: create_pool(uri, user : str or None, password : str or None, ...) -> db_pool
+
 
     Why Not DB API 2.0?
     -------------------

@@ -1187,6 +1187,33 @@ def run_parallel(*args, **options):
     else:
         return exit_statuses
 
+def run_collect_files(*args, **options):
+    """
+    Runs a series of commands like :func:`run_collect`, but returns
+    open file objects for `stdout` and `stderr` instead of strings.
+
+    Example: Iterate over the lines of ``ls -l | sort -r`` and print
+    them out with line numbers::
+
+        (f_stdout, f_stderr) = run_collect_files("ls -l", "sort -r")
+        for (line_no, line) in enumerate(f_stdout):
+            print ("%3d %s" % (line_no, line[:-1]))
+
+    """
+    # Create temporary files to collect output
+    stdout_tmp = os.tmpfile()
+    stderr_tmp = os.tmpfile()
+    # Replace any existing "stdout" and "stderr" definitions
+    options["stdout"] = stdout_tmp
+    options["stderr"] = stderr_tmp
+    # Use run_parallel to run *args as a single pipeline
+    run_parallel(pipeline(*args), **options)
+    # Seek back to the start of the temporary files
+    stdout_tmp.seek(0)
+    stderr_tmp.seek(0)
+    # Return the files as output
+    return (stdout_tmp, stderr_tmp)
+
 
 def run_collect(*args, **options):
     """
@@ -1213,7 +1240,7 @@ def run_collect(*args, **options):
     Example: Reverse sort the output of ``ls -1`` and store the output
     and error in the variables `a_stdout` and `a_stderr`::
 
-        # Reverse sort the output of ls -1 and store the output in a
+        # Reverse sort the output of ls -1
         (a_stdout, a_stderr) = run_collect("ls -1", "sort -r")
 
     Example: Do the same as the above, but run ``ls -1`` on a named
@@ -1230,17 +1257,7 @@ def run_collect(*args, **options):
         (empty_stdout, c_stderr) = run_collect("ls -1", "sort -r", ">test.out")
 
     """
-    # Create a temporary file to collect output
-    stdout_tmp = os.tmpfile()
-    stderr_tmp = os.tmpfile()
-    # Replace any existing "stdout" and "stderr" definitions
-    options["stdout"] = stdout_tmp
-    options["stderr"] = stderr_tmp
-    # Use run_parallel to run *args as a single pipeline
-    run_parallel(pipeline(*args), **options)
-    # Seek back to the start of the temporary file
-    stdout_tmp.seek(0)
-    stderr_tmp.seek(0)
+    (stdout_tmp, stderr_tmp) = run_collect_files(*args, **options)
     # Return the full contents as output
     return (stdout_tmp.read(), stderr_tmp.read())
 
@@ -1254,5 +1271,6 @@ __all__ = """
 
     run_parallel
     run_collect
+    run_collect_files
 
 """.split()

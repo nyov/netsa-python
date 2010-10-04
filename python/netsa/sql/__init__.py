@@ -95,6 +95,16 @@ class db_driver(object):
         values from the URI.
         """
         return None
+    def create_pool(self, uri, user, password, **params):
+        """
+        Returns ``None`` if this :class:`db_driver` does not support
+        pooled connections or cannot handle this database URI, or a
+        :class:`db_pool` subclass instance which can be used to obtain
+        connections from a pool.  The *user* and *password* parameters
+        and any other parameters passed in via this call override any
+        values from the URI.
+        """
+        return None
 
 class db_connection(object):
     """
@@ -156,6 +166,31 @@ class db_connection(object):
         Roll back any uncommitted changes in the connection.
         """
         self.rollback()
+        
+class db_pool(object):
+    """
+    A pool of database connections for a single specific connection
+    specification and pool configuration.  See :func:`db_create_pool`.
+    """
+    __slots__ = """
+        _pool
+    """.split()
+    def __init__(self, driver):
+        if not isinstance(driver, db_driver):
+            raise TypeError("db_pool must be created based on db_driver")
+        self._driver = driver
+    def get_driver(self):
+        """
+        Returns the :class:`db_driver` used to open this connection.
+        """
+        return self._driver
+    def connect(self):
+        """
+        Returns a :class:`db_connection` subclass instance from the
+        pool, open on the database specified when the pool was
+        created.
+        """
+        raise NotImplementedError("db_pool.connect")
 
 class db_result(object):
     """
@@ -328,6 +363,29 @@ def db_connect(uri, user=None, password=None):
             return d.connect(uri, user, password)
     no_driver = sql_no_driver_exception(
         "No database driver for scheme %s found." % repr(parsed_uri['scheme']))
+    raise no_driver
+
+def db_create_pool(uri, user=None, password=None, **params):
+    """
+    Given a database URI, an optional *user* and *password*, and
+    additional parameters, creates a driver-specific connection pool.
+    Returns a :class:`db_pool` from which connections can be obtained.
+
+    If a user and password (or other parameter) is given in this call
+    as well as in the URI, the values given in this call override the
+    values given in the URI.
+
+    See :func:`db_connect` for details on database URIs.
+    """
+    parsed_uri = db_parse_uri(uri)
+    for d in get_drivers():
+        if d.can_handle(parsed_uri['scheme']):
+            pool = d.create_pool(uri, user, password, **params)
+            if pool:
+                return pool
+    no_driver = sql_no_driver_exception(
+        "No pooled database driver for scheme %s found." %
+        repr(parsed_uri['scheme']))
     raise no_driver
 
 query_param_exp = r"(?xsm) : [a-zA-Z_][a-zA-Z_0-9]*"
@@ -577,6 +635,7 @@ __all__ = """
     sql_invalid_uri_exception
 
     db_connect
+    db_create_pool
     db_query
 
     connect_uri

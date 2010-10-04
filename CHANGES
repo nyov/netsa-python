@@ -1,3 +1,12 @@
+Version 1.1 - 2010-10-04
+========================
+
+ - Added experimental DB connection pooling to netsa.sql
+ - Made netsa.script flow_params --help work when site config file is missing.
+ - Added netsa.util.shell.run_collect_files
+ - Fixed a bug with netsa.script.Flow_params.using
+ - Fixed a bug involving netsa.script missing metadata causing crashes
+
 Version 1.0 - 2010-09-14
 ========================
 
@@ -11,3 +20,4 @@ Version 0.9 - 2010-01-19
 ========================
 
  - First public release.
+

@@ -377,6 +377,60 @@ writers.</dd></dl>
 of drivers registered with the <tt class="xref docutils literal"><span class="pre">netsa.sql</span></tt> module.</dd></dl>
 
 </div>
+<div class="section" id="experimental-connection-pooling">
+<h2>Experimental Connection Pooling<a class="headerlink" href="#experimental-connection-pooling" title="Permalink to this headline">¶</a></h2>
+<p>This version of <tt class="xref docutils literal"><span class="pre">netsa.sql</span></tt> contains experimental support for
+connection pooling.  Connections in a pool will be created before
+they&#8217;re needed and kept available for re-use.  Note that since
+this API is still in the early stages of development, it is very
+likely to change between versions of <cite>netsa-python</cite>.</p>
+<dl class="function">
+<dt id="netsa.sql.db_create_pool">
+<tt class="descclassname">netsa.sql.</tt><tt class="descname">db_create_pool</tt><big>(</big><em>uri</em><span class="optional">[</span>, <em>user : str</em>, <em>password : str</em><span class="optional">]</span>, <em>...</em><big>)</big> &rarr; db_pool<a class="headerlink" href="#netsa.sql.db_create_pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a database URI, an optional <em>user</em> and <em>password</em>, and
+additional parameters, creates a driver-specific connection pool.
+Returns a <a title="netsa.sql.db_pool" class="reference internal" href="#netsa.sql.db_pool"><tt class="xref docutils literal"><span class="pre">db_pool</span></tt></a> from which connections can be obtained.</p>
+<p>If a user and password (or other parameter) is given in this call
+as well as in the URI, the values given in this call override the
+values given in the URI.</p>
+<p>See <a title="netsa.sql.db_connect" class="reference internal" href="#netsa.sql.db_connect"><tt class="xref docutils literal"><span class="pre">db_connect</span></tt></a> for details on database URIs.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="netsa.sql.db_pool">
+<em class="property">class </em><tt class="descclassname">netsa.sql.</tt><tt class="descname">db_pool</tt><a class="headerlink" href="#netsa.sql.db_pool" title="Permalink to this definition">¶</a></dt>
+<dd><p>A pool of database connections for a single specific connection
+specification and pool configuration.  See <a title="netsa.sql.db_create_pool" class="reference internal" href="#netsa.sql.db_create_pool"><tt class="xref docutils literal"><span class="pre">db_create_pool</span></tt></a>.</p>
+<dl class="method">
+<dt id="netsa.sql.db_pool.get_driver">
+<tt class="descname">get_driver</tt><big>(</big><big>)</big> &rarr; db_driver<a class="headerlink" href="#netsa.sql.db_pool.get_driver" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the <a title="netsa.sql.db_driver" class="reference internal" href="#netsa.sql.db_driver"><tt class="xref docutils literal"><span class="pre">db_driver</span></tt></a> used to open this connection.</dd></dl>
+
+<dl class="method">
+<dt id="netsa.sql.db_pool.connect">
+<tt class="descname">connect</tt><big>(</big><big>)</big> &rarr; db_connection<a class="headerlink" href="#netsa.sql.db_pool.connect" title="Permalink to this definition">¶</a></dt>
+<dd>Returns a <a title="netsa.sql.db_connection" class="reference internal" href="#netsa.sql.db_connection"><tt class="xref docutils literal"><span class="pre">db_connection</span></tt></a> subclass instance from the
+pool, open on the database specified when the pool was
+created.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">netsa.sql.</tt><tt class="descname">db_driver</tt></dt>
+<dd><dl class="method">
+<dt id="netsa.sql.db_driver.create_pool">
+<tt class="descname">create_pool</tt><big>(</big><em>uri</em>, <em>user : str or None</em>, <em>password : str or None</em>, <em>...</em><big>)</big> &rarr; db_pool<a class="headerlink" href="#netsa.sql.db_driver.create_pool" title="Permalink to this definition">¶</a></dt>
+<dd>Returns <tt class="xref docutils literal"><span class="pre">None</span></tt> if this <a title="netsa.sql.db_driver" class="reference internal" href="#netsa.sql.db_driver"><tt class="xref docutils literal"><span class="pre">db_driver</span></tt></a> does not support
+pooled connections or cannot handle this database URI, or a
+<a title="netsa.sql.db_pool" class="reference internal" href="#netsa.sql.db_pool"><tt class="xref docutils literal"><span class="pre">db_pool</span></tt></a> subclass instance which can be used to obtain
+connections from a pool.  The <em>user</em> and <em>password</em> parameters
+and any other parameters passed in via this call override any
+values from the URI.</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="why-not-db-api-2-0">
 <h2>Why Not DB API 2.0?<a class="headerlink" href="#why-not-db-api-2-0" title="Permalink to this headline">¶</a></h2>
 <p>If you have experience with Python database APIs, you may be
@@ -424,6 +478,7 @@ put different compatibility versions of the same query together.</p>
 <li><a class="reference external" href="#connections-and-result-sets">Connections and Result Sets</a></li>
 <li><a class="reference external" href="#compiled-queries">Compiled Queries</a></li>
 <li><a class="reference external" href="#implementing-a-new-driver">Implementing a New Driver</a></li>
+<li><a class="reference external" href="#experimental-connection-pooling">Experimental Connection Pooling</a></li>
 <li><a class="reference external" href="#why-not-db-api-2-0">Why Not DB API 2.0?</a></li>
 </ul>
 </li>
