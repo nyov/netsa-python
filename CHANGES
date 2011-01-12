@@ -1,3 +1,9 @@
+Version 1.2 - 2011-01-12
+========================
+
+  - Added support for Oracle in netsa.sql via cx_Oracle
+  - Added support for multi-paragraph help text in netsa.script
+
 Version 1.1 - 2010-10-04
 ========================
 

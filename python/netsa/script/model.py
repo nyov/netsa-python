@@ -70,6 +70,12 @@ def process_text(text):
         return text
     return re.sub(r'\s+', ' ', textwrap.dedent(text)).strip()
 
+def process_long_text(text):
+    if text == None:
+        return text
+    text = textwrap.dedent(text).strip()
+    return [re.sub(r'\s+', ' ', s) for s in re.split(r'\n\n+', text)]
+
 class Script(object):
     """
     A :class:`Script` object represents either "a" script or "the"
@@ -139,7 +145,7 @@ class Script(object):
         simple details of its behavior and required inputs.
         """
         self._set_single_metadata('description',
-                                  process_text(script_description))
+                                  process_long_text(script_description))
     def set_version(self, script_version):
         """
         Set the version number of this script.  This can take any
@@ -183,7 +189,7 @@ class Script(object):
         netsa.script.params.check_param_kind(kind, kind_args)
         # Clear out any conflicting definition
         self._params = [p for p in self._params if p['name'] != name]
-        self._params.append(dict(name=name, help=process_text(help),
+        self._params.append(dict(name=name, help=process_long_text(help),
                                  required=required, default=default,
                                  default_help=process_text(default_help),
                                  expert=expert, kind=kind,

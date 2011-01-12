@@ -428,11 +428,20 @@ _short_wrapper = textwrap.TextWrapper(
     replace_whitespace=True, width=75)
 
 def _print_long(out, text):
-    out.write(_long_wrapper.fill(text))
+    if isinstance(text, list):
+        out.write("\n\n".join(_long_wrapper.fill(t) for t in text))
+    else:
+        out.write(_long_wrapper.fill(text))
     out.write("\n")
 
 def _print_short(out, text):
-    out.write(_short_wrapper.fill(text))
+    if isinstance(text, list):
+        out.write(_short_wrapper.fill(text[0]))
+        for t in text[1:]:
+            out.write("\n\n")
+            out.write(_long_wrapper.fill(t))
+    else:
+        out.write(_short_wrapper.fill(text))
     out.write("\n")
 
 def _print_usage(out, expert=False):
@@ -448,8 +457,7 @@ def _print_usage(out, expert=False):
     text += " [SWITCHES]"
     if _script._flow_params and not _script._flow_params_require_pull:
         text += " [FILES]"
-    out.write(_short_wrapper.fill(text))
-    out.write("\n")
+    _print_short(out, text)
     if _script._metadata.get('description', None):
         out.write("\n")
         _print_long(out, _script._metadata['description'])
@@ -484,8 +492,9 @@ def _print_usage(out, expert=False):
                 default_text = " Def. %s" % p['default_help']
             elif p['default'] != None:
                 default_text = " Def. %s" % p['default']
-            text = "--%s %s%s%s%s" % (p['name'], required, req_arg, p['help'],
-                                      default_text)
+            text = list(p['help'])
+            text[0] = "--%s %s%s%s" % (p['name'], required, req_arg, text[0])
+            text[-1] = "%s%s" % (text[-1], default_text)
             _print_short(out, text)
     if any_expert:     
         if expert:
@@ -503,8 +512,10 @@ def _print_usage(out, expert=False):
                         default_text = " Def. %s" % p['default_help']
                     elif p['default'] != None:
                         default_text = " Def. %s" % p['default']
-                    text = "--%s %s%s%s" % (p['name'], req_arg, p['help'],
-                                            default_text)
+                    text = list(p['help'])                        
+                    text[0] = "--%s %s%s%s" % (p['name'], required,
+                                               req_arg, text[0])
+                    text[-1] = "%s%s" % (text[-1], default_text)
                     _print_short(out, text)
     if expert == 'netsa-script':
         out.write("\n")

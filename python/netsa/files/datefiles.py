@@ -257,7 +257,6 @@ def datefile_walker(dir, suffix=None,
                 warning("duplicate date (%s) from %s" % \
                     (d, path.join(dir,file)))
                 continue
-            print file
             if snapper and not snapper.date_aligned(d):
                 date_bin = snapper.date_bin(d)
                 warning("misaligned: %s" % file)
