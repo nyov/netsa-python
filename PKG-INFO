@@ -1,0 +1,13 @@
+Metadata-Version: 1.0
+Name: netsa-python
+Version: 1.3
+Summary: NetSA Python
+Home-page: http://tools.netsa.cert.org/netsa-python/index.html
+Author: NetSA Group
+Author-email: netsa-help@cert.org
+License: GPL
+Description: 
+        A grab-bag of Python routines and frameworks that we have found
+        helpful when developing analyses using the SiLK toolkit.
+        
+Platform: UNKNOWN

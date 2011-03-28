@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2010 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -48,64 +46,75 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os.path, sys
-import os
+import sys, pickle
 
-# Make sure netsa-python .py files are in the path, since we need them
-# for this setup script to operate.
-sys.path[:0] = \
-    [os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))]
+from os       import path
+from datetime import datetime
 
-from netsa import dist
+from netsa.data.times import make_datetime
 
-dist.set_name("netsa-python")
-dist.set_version("1.3")
+from netsa.util.sentinel import SentinelLedger, \
+                                LedgerStoreError, LedgerLoadError, \
+                                LedgerNotFoundError, LedgerLoadRecoverable, \
+                                DEBUG
 
-dist.set_title("NetSA Python")
-dist.set_description("""
-    A grab-bag of Python routines and frameworks that we have found
-    helpful when developing analyses using the SiLK toolkit.
-""")
+class FileLedger(SentinelLedger):
+    """
+    A sentinel ledger class which stores and retrieve resource states
+    using a file.
+    """
 
-dist.set_maintainer("NetSA Group <netsa-help@cert.org>")
+    def __init__(self, file=None, **kwargs):
+        SentinelLedger.__init__(self, **kwargs)
+        self.file = file
+        if not self.file:
+            raise ValueError, "file parameter required"
+        self.real_file = None
 
-dist.set_url("http://tools.netsa.cert.org/netsa-python/index.html")
+    def load(self):
+        """
+        Loads the stored state of resources from the associated file.
+        Returns a tuple of the resulting python data structure and a
+        timestamp representing when these states were last updated.
+        """
+        if not path.exists(self.file):
+            raise LedgerNotFoundError, "missing sig file %s" % self.file
+        try:
+            fh = open(self.file, 'rb')
+            (res, self.timestamp) = pickle.load(fh)
+            fh.close()
+            return res
+        except EOFError, e:
+            msg = "problem loading %s : empty" % self.file
+            raise LedgerLoadRecoverable, msg
+        except pickle.UnpicklingError, e:
+            msg = "problem loading %s : corrupted" % self.file
+            raise LedgerLoadRecoverable, msg
+        except IOError, e:
+            msg = "problem loading %s : %s" % (self.file, e)
+            raise LedgerLoadError, msg
 
-dist.set_license("GPL")
+    def store(self, item):
+        """
+        Stores the provided data structure into the associated file,
+        along with a timestamp representing the current time.
+        """
+        try:
+            if DEBUG:
+                print >> sys.stderr, "save to sig file %s" % self.file
+            fh = open(self.file, 'wb')
+            pickle.dump((item, make_datetime(datetime.now())), fh)
+            fh.close()
+        except pickle.PicklingError, e:
+            msg = "problem storing %s : %s" % (self.file, e)
+            raise LedgerStoreError, msg
+        return True
 
-dist.add_package("netsa")
-dist.add_package("netsa.data")
-dist.add_package("netsa.data.test")
-dist.add_package("netsa.dist")
-dist.add_package_data("netsa.dist", "netsa_sphinx_config.py.in")
-dist.add_package_data("netsa.dist", "tools_web")
-dist.add_package("netsa.files")
-dist.add_package("netsa.files.test")
-dist.add_package("netsa.json")
-dist.add_package("netsa.json.simplejson")
-dist.add_package("netsa.logging")
-dist.add_package("netsa.script")
-dist.add_package("netsa.sql")
-dist.add_package("netsa.sql.test")
-dist.add_package("netsa.tools")
-dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
+    def __cachekey__(self):
+        if self.real_file is None:
+            self.real_file = path.realpath(self.file)
+        return self.real_file
 
-dist.add_version_file("src/netsa/VERSION")
+###
 
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
-
-dist.add_extra_files("GPL.txt")
-dist.add_extra_files("CHANGES")
-dist.add_extra_files("sql")
-
-dist.add_unit_test_module("netsa.data.test")
-dist.add_unit_test_module("netsa.files.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
-dist.add_unit_test_module("netsa.sql.test")
-
-dist.execute()
+__all__ = [ 'FileLedger' ]

@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2010 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -48,64 +46,48 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os.path, sys
-import os
+def find_version(source_file, num_levels=3):
+    """
+    Given the path to a Python source file, read in a version number
+    from a file VERSION in the same directory, or look for a setup.py
+    file in up to num_levels directories above the file and attempt to
+    find the version there.
+    """
+    import os.path
+    source_dir = os.path.dirname(source_file)
+    version_file = os.path.join(source_dir, "VERSION")
+    if os.path.exists(version_file):
+        version = open(version_file).read().strip()
+        return version
+    else:
+        import re
+        setup_version_re = re.compile(r"""
+            set_version\s*\(\s*['"]([^'"]+)['"]\s*\)
+        """, re.VERBOSE)
+        for i in xrange(num_levels):
+            setup_path = [source_dir] + [".."] * (i+1) + ["setup.py"]
+            setup_file = os.path.join(*setup_path)
+            if os.path.exists(setup_file):
+                for l in open(setup_file, 'r'):
+                    m = setup_version_re.search(l)
+                    if m:
+                        version = m.group(1)
+                        return version
+    return "UNKNOWN"
 
-# Make sure netsa-python .py files are in the path, since we need them
-# for this setup script to operate.
-sys.path[:0] = \
-    [os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))]
+__version__ = find_version(__file__)
 
-from netsa import dist
+DEBUG = False
+"""
+Set to ``True`` if `netsa` facilities should print out debugging
+output.
+"""
 
-dist.set_name("netsa-python")
-dist.set_version("1.3")
+import sys
 
-dist.set_title("NetSA Python")
-dist.set_description("""
-    A grab-bag of Python routines and frameworks that we have found
-    helpful when developing analyses using the SiLK toolkit.
-""")
+def DEBUG_print(*args):
+    if DEBUG:
+        print >>sys.stderr, ' '.join(str(x) for x in args)
 
-dist.set_maintainer("NetSA Group <netsa-help@cert.org>")
-
-dist.set_url("http://tools.netsa.cert.org/netsa-python/index.html")
-
-dist.set_license("GPL")
-
-dist.add_package("netsa")
-dist.add_package("netsa.data")
-dist.add_package("netsa.data.test")
-dist.add_package("netsa.dist")
-dist.add_package_data("netsa.dist", "netsa_sphinx_config.py.in")
-dist.add_package_data("netsa.dist", "tools_web")
-dist.add_package("netsa.files")
-dist.add_package("netsa.files.test")
-dist.add_package("netsa.json")
-dist.add_package("netsa.json.simplejson")
-dist.add_package("netsa.logging")
-dist.add_package("netsa.script")
-dist.add_package("netsa.sql")
-dist.add_package("netsa.sql.test")
-dist.add_package("netsa.tools")
-dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
-
-dist.add_version_file("src/netsa/VERSION")
-
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
-
-dist.add_extra_files("GPL.txt")
-dist.add_extra_files("CHANGES")
-dist.add_extra_files("sql")
-
-dist.add_unit_test_module("netsa.data.test")
-dist.add_unit_test_module("netsa.files.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
-dist.add_unit_test_module("netsa.sql.test")
-
-dist.execute()
+__all__ = """
+""".split()

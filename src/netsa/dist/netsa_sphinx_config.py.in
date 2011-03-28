@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# %(project_title)s documentation build defaults, created by netsa.dist
 
 # Copyright 2008-2011 by Carnegie Mellon University
 
@@ -48,64 +50,117 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os.path, sys
-import os
+import sys, os
+import netsa.dist
 
-# Make sure netsa-python .py files are in the path, since we need them
-# for this setup script to operate.
-sys.path[:0] = \
-    [os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))]
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.pngmath',
+]
 
-from netsa import dist
+templates_path = []
 
-dist.set_name("netsa-python")
-dist.set_version("1.3")
+source_suffix = '.rst'
 
-dist.set_title("NetSA Python")
-dist.set_description("""
-    A grab-bag of Python routines and frameworks that we have found
-    helpful when developing analyses using the SiLK toolkit.
-""")
+source_encoding = 'utf-8'
 
-dist.set_maintainer("NetSA Group <netsa-help@cert.org>")
+master_doc = 'index'
 
-dist.set_url("http://tools.netsa.cert.org/netsa-python/index.html")
+project = %(project_name)r
+copyright = %(project_copyright)r
 
-dist.set_license("GPL")
+version = %(project_version)r
+release = version
 
-dist.add_package("netsa")
-dist.add_package("netsa.data")
-dist.add_package("netsa.data.test")
-dist.add_package("netsa.dist")
-dist.add_package_data("netsa.dist", "netsa_sphinx_config.py.in")
-dist.add_package_data("netsa.dist", "tools_web")
-dist.add_package("netsa.files")
-dist.add_package("netsa.files.test")
-dist.add_package("netsa.json")
-dist.add_package("netsa.json.simplejson")
-dist.add_package("netsa.logging")
-dist.add_package("netsa.script")
-dist.add_package("netsa.sql")
-dist.add_package("netsa.sql.test")
-dist.add_package("netsa.tools")
-dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
+# language = None
 
-dist.add_version_file("src/netsa/VERSION")
+# today = ''
+# today_fmt = '%%B %%d, %%Y'
 
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
+exclude_patterns = []
 
-dist.add_extra_files("GPL.txt")
-dist.add_extra_files("CHANGES")
-dist.add_extra_files("sql")
+# default_role = None
 
-dist.add_unit_test_module("netsa.data.test")
-dist.add_unit_test_module("netsa.files.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
-dist.add_unit_test_module("netsa.sql.test")
+add_function_parentheses = False
 
-dist.execute()
+add_module_names = True
+
+show_authors = False
+
+pygments_style = 'sphinx'
+
+modindex_common_prefix = []
+
+html_theme = 'default'
+
+html_theme_options = {}
+
+html_theme_path = [netsa.dist.get_theme_path()]
+
+# html_title = None
+
+# html_short_title = None
+
+# html_logo = None
+
+# html_favicon = None
+
+html_static_path = []
+
+# html_last_updated_fmt = '%%b %%d, %%Y'
+
+html_use_smartypants = True
+
+html_sidebars = {}
+
+html_additional_pages = {}
+
+# html_domain_indices = True
+
+# html_use_index = True
+
+# html_split_index = False
+
+# html_show_sourcelink = True
+
+# html_show_sphinx = True
+
+# html_show_copyright = True
+
+# html_use_opensearch = ''
+
+# html_file_suffix = None
+
+htmlhelp_basename = %(project_name)r + "doc"
+
+# latex_paper_size = 'letter'
+
+# latex_font_size = '10pt'
+
+latex_documents = [
+    ('index', %(project_name)r + ".tex", %(project_title)r + " Documentation",
+     u'Carnegie Mellon University', 'manual')
+]
+
+# latex_logo = None
+
+# latex_use_parts = False
+
+# latex_show_pagerefs = False
+
+# latex_show_urls = False
+
+# latex_preamble = ''
+
+# latex_appendices = []
+
+# latex_domain_indices = True
+
+man_pages = []
+
+intersphinx_mapping = {
+    'http://docs.python.org/': None
+}

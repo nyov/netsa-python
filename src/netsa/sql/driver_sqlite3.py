@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2010 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -48,64 +46,67 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os.path, sys
-import os
+import sqlite3
+import netsa.sql
 
-# Make sure netsa-python .py files are in the path, since we need them
-# for this setup script to operate.
-sys.path[:0] = \
-    [os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))]
+class sl3_driver(netsa.sql.db_driver):
+    __slots__ = """
+    """.split()
+    def can_handle(self, uri_scheme):
+        scheme = "nsql-sqlite3"
+        return (uri_scheme == scheme or uri_scheme.startswith(scheme + "-"))
+    def connect(self, uri, user, password):
+        parsed_uri = netsa.sql.db_parse_uri(uri)
+        if not self.can_handle(parsed_uri['scheme']):
+            return None
+        if parsed_uri['host'] and parsed_uri['host'] not in ('', 'localhost'):
+            raise Exception("XXX sqlite3 does not support remote databases")
+        return sl3_connection(
+            self, ['sqlite3'],
+            database=parsed_uri['path'],
+        )
 
-from netsa import dist
+class sl3_connection(netsa.sql.db_connection):
+    __slots__ = """
+        _database
 
-dist.set_name("netsa-python")
-dist.set_version("1.3")
+        _sqlite3_conn
+    """.split()
+    def __init__(self, driver, variants, database):
+        netsa.sql.db_connection.__init__(self, driver, variants)
+        self._database = database
+        self._sqlite3_conn = None
+        self._connect()
+    def _connect(self):
+        self._sqlite3_conn = sqlite3.connect(
+            database=self._database,
+            detect_types=sqlite3.PARSE_DECLTYPES)
+    def clone(self):
+        return sl3_connection(self._driver, self._variants, self._database)
+    def execute(self, query_or_sql, **params):
+        return sl3_result(self, query_or_sql, params)
+    def commit(self):
+        self._sqlite3_conn.commit()
+    def rollback(self):
+        if self._sqlite3_conn:
+            self._sqlite3_conn.rollback()
 
-dist.set_title("NetSA Python")
-dist.set_description("""
-    A grab-bag of Python routines and frameworks that we have found
-    helpful when developing analyses using the SiLK toolkit.
-""")
+class sl3_result(netsa.sql.db_result):
+    __slots__ = """
+        _sqlite3_cursor
+    """.split()
+    def __init__(self, connection, query, params):
+        netsa.sql.db_result.__init__(self, connection, query, params)
+        self._sqlite3_cursor = self._connection._sqlite3_conn.cursor()
+        variants = self._connection.get_variants()
+        (query, params) = \
+            self._query.get_variant_qmark_params(variants, params)
+        self._sqlite3_cursor.execute(query, params)
+    def __iter__(self):
+        while True:
+            r = self._sqlite3_cursor.fetchone()
+            if r == None:
+                return
+            yield r
 
-dist.set_maintainer("NetSA Group <netsa-help@cert.org>")
-
-dist.set_url("http://tools.netsa.cert.org/netsa-python/index.html")
-
-dist.set_license("GPL")
-
-dist.add_package("netsa")
-dist.add_package("netsa.data")
-dist.add_package("netsa.data.test")
-dist.add_package("netsa.dist")
-dist.add_package_data("netsa.dist", "netsa_sphinx_config.py.in")
-dist.add_package_data("netsa.dist", "tools_web")
-dist.add_package("netsa.files")
-dist.add_package("netsa.files.test")
-dist.add_package("netsa.json")
-dist.add_package("netsa.json.simplejson")
-dist.add_package("netsa.logging")
-dist.add_package("netsa.script")
-dist.add_package("netsa.sql")
-dist.add_package("netsa.sql.test")
-dist.add_package("netsa.tools")
-dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
-
-dist.add_version_file("src/netsa/VERSION")
-
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
-
-dist.add_extra_files("GPL.txt")
-dist.add_extra_files("CHANGES")
-dist.add_extra_files("sql")
-
-dist.add_unit_test_module("netsa.data.test")
-dist.add_unit_test_module("netsa.files.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
-dist.add_unit_test_module("netsa.sql.test")
-
-dist.execute()
+netsa.sql.register_driver(sl3_driver())

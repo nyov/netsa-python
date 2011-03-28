@@ -27,6 +27,8 @@
 
     .. autofunction:: set_version(script_version : str)
 
+    .. autofunction:: set_package_name(script_package_name : str)
+
     .. autofunction:: set_contact(script_contact : str)
 
     .. autofunction:: set_authors(script_authors : str list)
@@ -159,6 +161,8 @@
     .. autofunction:: get_temp_dir_file_name([file_name : str]) -> str
 
     .. autofunction:: get_temp_dir_file([file_name : str, append=False]) -> file
+
+    .. autofunction:: get_temp_dir_pipe_name([pipe_name : str]) -> str
 
     Script Execution
     ----------------

@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2010 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -48,64 +46,53 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os.path, sys
-import os
+import unittest
 
-# Make sure netsa-python .py files are in the path, since we need them
-# for this setup script to operate.
-sys.path[:0] = \
-    [os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))]
+import os, stat
 
-from netsa import dist
+from os import path
 
-dist.set_name("netsa-python")
-dist.set_version("1.3")
+from netsa.files import LocalTmpDir
 
-dist.set_title("NetSA Python")
-dist.set_description("""
-    A grab-bag of Python routines and frameworks that we have found
-    helpful when developing analyses using the SiLK toolkit.
-""")
+def _is_fifo(f):
+    return stat.S_ISFIFO(stat.S_IFMT(os.stat(f)[stat.ST_MODE]))
 
-dist.set_maintainer("NetSA Group <netsa-help@cert.org>")
+class LocalTmpDirTest(unittest.TestCase):
 
-dist.set_url("http://tools.netsa.cert.org/netsa-python/index.html")
+    def assert_locality(self, basedir=None):
+        td = LocalTmpDir(dir=basedir)
+        self.assert_(path.isdir(td.name))
+        (d, n) = path.split(td.name)
+        self.assert_(d == basedir)
+        fn = td.tmp_filename()
+        (d, n) = path.split(fn)
+        self.assert_(d == td.name)
+        self.assert_(not path.exists(fn))
+        fh = td.tmp_file()
+        (d, n) = path.split(fh.name)
+        self.assert_(d == td.name)
+        fn = fh.name
+        self.assert_(path.isfile(fn))
+        fh = None
+        self.assert_(not path.exists(fn))
+        fp = td.tmp_pipe()
+        (d, n) = path.split(fp)
+        self.assert_(d == td.name)
+        self.assert_(_is_fifo(fp))
+        return td
 
-dist.set_license("GPL")
+    def test_basic(self):
+        """basic creation, deletion"""
+        for d in ('/tmp', '/var/tmp'):
+            td = self.assert_locality(d)
+            name = td.name
+            (bd, n) = path.split(name)
+            self.assert_(path.exists(name))
+            self.assert_(bd == d)
+            td = None
+            self.assert_(not path.exists(name))
 
-dist.add_package("netsa")
-dist.add_package("netsa.data")
-dist.add_package("netsa.data.test")
-dist.add_package("netsa.dist")
-dist.add_package_data("netsa.dist", "netsa_sphinx_config.py.in")
-dist.add_package_data("netsa.dist", "tools_web")
-dist.add_package("netsa.files")
-dist.add_package("netsa.files.test")
-dist.add_package("netsa.json")
-dist.add_package("netsa.json.simplejson")
-dist.add_package("netsa.logging")
-dist.add_package("netsa.script")
-dist.add_package("netsa.sql")
-dist.add_package("netsa.sql.test")
-dist.add_package("netsa.tools")
-dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
+if __name__ == "__main__":
+    unittest.main()   
 
-dist.add_version_file("src/netsa/VERSION")
-
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
-
-dist.add_extra_files("GPL.txt")
-dist.add_extra_files("CHANGES")
-dist.add_extra_files("sql")
-
-dist.add_unit_test_module("netsa.data.test")
-dist.add_unit_test_module("netsa.files.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
-dist.add_unit_test_module("netsa.sql.test")
-
-dist.execute()
+__all__ = ['LocalTmpDirTest']

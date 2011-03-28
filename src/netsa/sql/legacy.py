@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2010 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -48,64 +46,77 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os.path, sys
-import os
+import re
 
-# Make sure netsa-python .py files are in the path, since we need them
-# for this setup script to operate.
-sys.path[:0] = \
-    [os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))]
+drivers = {}
 
-from netsa import dist
+def register_driver(scheme, connect_fn):
+    """
+    DEPRECATED
 
-dist.set_name("netsa-python")
-dist.set_version("1.3")
+    Internal function: Register a driver for the given URI scheme to
+    use the given connect function.  connect_fn will be called with a
+    dictionary resulting from netsa.sql.parse_uri
+    """
+    drivers[scheme] = connect_fn
 
-dist.set_title("NetSA Python")
-dist.set_description("""
-    A grab-bag of Python routines and frameworks that we have found
-    helpful when developing analyses using the SiLK toolkit.
-""")
+def get_driver(scheme):
+    """
+    DEPRECATED
 
-dist.set_maintainer("NetSA Group <netsa-help@cert.org>")
+    Internal function: Returns the connection function currently
+    registered for the given URI scheme.
+    """
+    return drivers[scheme]
 
-dist.set_url("http://tools.netsa.cert.org/netsa-python/index.html")
+connect_string_re = re.compile(r"""
+    ^
+    (?P<scheme> [^:/]+ ) ://
+    ( (?P<username> [^:/@]+ ) (?: : (?P<password> [^:/@]+ ) )? @ )?
+    (?P<host> [^:/]+ ) (?: : (?P<port> \d+ ) )? /
+    (?P<dbname> [^/]+ )
+    (?: / (?P<additional> .* ) )?
+    $
+""", re.VERBOSE)
 
-dist.set_license("GPL")
+def parse_uri(connect_string):
+    """
+    DEPRECATED
 
-dist.add_package("netsa")
-dist.add_package("netsa.data")
-dist.add_package("netsa.data.test")
-dist.add_package("netsa.dist")
-dist.add_package_data("netsa.dist", "netsa_sphinx_config.py.in")
-dist.add_package_data("netsa.dist", "tools_web")
-dist.add_package("netsa.files")
-dist.add_package("netsa.files.test")
-dist.add_package("netsa.json")
-dist.add_package("netsa.json.simplejson")
-dist.add_package("netsa.logging")
-dist.add_package("netsa.script")
-dist.add_package("netsa.sql")
-dist.add_package("netsa.sql.test")
-dist.add_package("netsa.tools")
-dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
+    Parses a URI of the following form, and returns a dictionary of
+    the resulting key, value pairs::
 
-dist.add_version_file("src/netsa/VERSION")
+        <scheme>://[<username>[:<password>]@]<host>[:<port>]
+            /<dbname>[/<additional>]
 
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
+    The meaning of portions of this URI may vary from database to
+    database, particularly the <additional> section, which has no
+    pre-defined semantics.
+    """
+    m = connect_string_re.match(connect_string)
+    if not m:
+        return None
+    return dict(m.groupdict())
 
-dist.add_extra_files("GPL.txt")
-dist.add_extra_files("CHANGES")
-dist.add_extra_files("sql")
+def connect_uri(connect_string):
+    """
+    *Deprecated.*
 
-dist.add_unit_test_module("netsa.data.test")
-dist.add_unit_test_module("netsa.files.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
-dist.add_unit_test_module("netsa.sql.test")
+    Opens a database connection to the database identified by the
+    provided URI.  See netsa.sql.legacy.parse_uri for details on the
+    URI syntax.
+    """
+    db_info = parse_uri(connect_string)
+    return get_driver(db_info['scheme'])(db_info)
 
-dist.execute()
+try:
+    import netsa.sql.legacy_driver_psycopg2
+except ImportError:
+    pass
+
+__all__ = """
+    register_driver
+    get_driver
+    parse_uri
+    connect_uri
+""".split()

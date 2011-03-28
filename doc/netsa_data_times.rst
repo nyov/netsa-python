@@ -1,11 +1,15 @@
 :mod:`netsa.data.times` --- Time and Date Manipulation
 ======================================================
 
-.. automodule:: netsa.times
+.. automodule:: netsa.data.times
 
     .. autofunction:: make_datetime(v : num or str or datetime or mxDateTime, [utc_only=True]) -> datetime
     
     .. autofunction:: bin_datetime(dt : timedelta, t : datetime, [z=UNIX_EPOCH : datetime]) -> datetime
+
+    .. autofunction:: make_timedelta(v : timedelta or str) -> timedelta
+
+    .. autofunction:: divmod_timedelta(n : timedelta, d : timedelta) -> int, timedelta
 
     Date Snappers
     -------------

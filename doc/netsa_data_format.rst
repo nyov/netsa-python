@@ -35,3 +35,4 @@
 
     .. autofunction:: datetime_iso_basic(value : datetime, [precision=DATETIME_SECOND]) -> str
 
+    .. autofunction:: timedelta_iso(value : timedelta) -> str

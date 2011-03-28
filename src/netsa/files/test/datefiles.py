@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2010 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -48,64 +46,57 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os.path, sys
-import os
+import unittest
 
-# Make sure netsa-python .py files are in the path, since we need them
-# for this setup script to operate.
-sys.path[:0] = \
-    [os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))]
+from os       import path
+from datetime import datetime
 
-from netsa import dist
+from netsa.files.datefiles import *
 
-dist.set_name("netsa-python")
-dist.set_version("1.3")
+verbose = False
 
-dist.set_title("NetSA Python")
-dist.set_description("""
-    A grab-bag of Python routines and frameworks that we have found
-    helpful when developing analyses using the SiLK toolkit.
-""")
+prefix    = 'whee'
+extension = 'txt'
 
-dist.set_maintainer("NetSA Group <netsa-help@cert.org>")
+bogus = 'whee.2008-02-33:01:01:01.txt'
 
-dist.set_url("http://tools.netsa.cert.org/netsa-python/index.html")
+def permute():
+    for prefix in ('', 'whee', '/hey/howdy/bubba'):
+        for ext in ('', 'txt'):
+            for d in (('2008',), ('2008', '07'), ('2008', '07', '11')):
+                for sep in ('-', '.'):
+                    dstr = sep.join(d)
+                    if prefix:
+                        dstr = "%s.%s" % (prefix, dstr)
+                    if ext:
+                        dstr = "%s.%s" % (dstr, ext)
+                    yield dstr
+        for sep in ('-', '.'):
+            d = sep.join(['2008', '07', '11'])
+            for t in (('10',), ('10', '11'), ('10', '11', '12')):
+                tstr = ':'.join(t)
+                dstr = ':'.join([d, tstr])
+                yield dstr
 
-dist.set_license("GPL")
 
-dist.add_package("netsa")
-dist.add_package("netsa.data")
-dist.add_package("netsa.data.test")
-dist.add_package("netsa.dist")
-dist.add_package_data("netsa.dist", "netsa_sphinx_config.py.in")
-dist.add_package_data("netsa.dist", "tools_web")
-dist.add_package("netsa.files")
-dist.add_package("netsa.files.test")
-dist.add_package("netsa.json")
-dist.add_package("netsa.json.simplejson")
-dist.add_package("netsa.logging")
-dist.add_package("netsa.script")
-dist.add_package("netsa.sql")
-dist.add_package("netsa.sql.test")
-dist.add_package("netsa.tools")
-dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
+class DateFileTest(unittest.TestCase):
 
-dist.add_version_file("src/netsa/VERSION")
+    def test_split(self):
+        for file in permute():
+            if verbose:
+                print >> sys.stderr, file
+            (d, f) = path.split(file)
+            (dir, chop) = split_on_date(file)
+            if d:
+                self.assertEquals(d, dir)
+            d = date_from_file(file)
+            self.assert_(isinstance(d, datetime))
+        if verbose:
+            print >> sys.stderr, bogus
+        self.assertRaises(DateFileParseError, date_from_file, bogus)
 
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
 
-dist.add_extra_files("GPL.txt")
-dist.add_extra_files("CHANGES")
-dist.add_extra_files("sql")
+if __name__ == "__main__":
+    unittest.main()
 
-dist.add_unit_test_module("netsa.data.test")
-dist.add_unit_test_module("netsa.files.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
-dist.add_unit_test_module("netsa.sql.test")
-
-dist.execute()
+__all__ = ['DateFileTest']

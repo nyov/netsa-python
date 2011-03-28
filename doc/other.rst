@@ -9,3 +9,4 @@ Miscellaneous Facilities
     netsa_json.rst
     netsa_tools_service.rst
     netsa_util_clitest.rst
+    netsa_util_compat.rst
