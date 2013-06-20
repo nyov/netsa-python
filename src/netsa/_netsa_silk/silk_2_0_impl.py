@@ -1,11 +1,11 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2012 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
-# Use of the netsa_silk support library and related source code is
-# subject to the terms of the following licenses:
+# Use of the Network Situational Awareness Python support library and
+# related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -150,3 +150,7 @@ def _IPWildcard(v):
     else:
         return _IPWildcard_old(v)
 IPWildcard = _IPWildcard
+# IPv6Addr - provide a no-op class if needed
+if not has_IPv6Addr():
+    def IPv6Addr(x):
+        raise NotImplementedError("netsa_silk.IPv6Addr")

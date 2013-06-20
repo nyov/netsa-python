@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 1.4.1 - 2012-11-09
+--------------------------
+
+ * Fail-on-use dummy IPv6Addr added to netsa_silk, so that the symbol
+   may still be imported even when IPv6 support is not provided.
+
+ * Minor bug fixes to prevent setup.py from requiring sphinx, and to
+   improve documentation generation on projects with different needs.
+
 Version 1.4 - 2011-09-30
 ------------------------
 

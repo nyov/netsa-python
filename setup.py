@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2012 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -59,8 +59,8 @@ sys.path[:0] = \
 from netsa import dist
 
 dist.set_name("netsa-python")
-dist.set_version("1.4")
-dist.set_copyright("2008-2011, Carnegie Mellon University")
+dist.set_version("1.4.1")
+dist.set_copyright("2008-2012, Carnegie Mellon University")
 
 dist.set_title("NetSA Python")
 dist.set_description("""

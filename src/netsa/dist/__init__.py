@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2012 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -61,6 +61,15 @@ from distutils import dir_util, log
 from distutils.dir_util import remove_tree
 
 from glob import glob
+
+have_sphinx = False
+try:
+    import sphinx
+    if sphinx.__version__ < "1.0":
+        raise ImportError()
+    have_sphinx = True
+except ImportError:
+    pass
 
 ### Overridden Distribution Class
 
@@ -191,30 +200,33 @@ class netsa_clean(clean):
                     log.info("removing %r", filename)
                     if not self.dry_run:
                         os.unlink(filename)
-            html_dir = self.get_finalized_command('gen_doc_html').gen_doc_html
-            if os.path.exists(html_dir):
-                remove_tree(html_dir, dry_run=self.dry_run)
-            pdf_file = self.get_finalized_command('gen_doc_pdf').gen_doc_pdf
-            if os.path.exists(pdf_file):
-                log.info("removing %r", pdf_file)
-                if not self.dry_run:
-                    os.unlink(pdf_file)
-        latex_dir = self.get_finalized_command('gen_doc_pdf').gen_doc_latex
-        extra_dir = self.get_finalized_command('gen_doc_pdf').gen_doc_extra
-        web_dir = self.get_finalized_command('gen_doc_tools_web').gen_doc_web
-        gen_man_dir = self.get_finalized_command('gen_doc_man').gen_doc_man
-        man_base = os.path.join(self.distribution.source_dir,
-                                self.distribution.netsa_doc_dir, "man")
-        if os.path.exists(latex_dir):
-            remove_tree(latex_dir, dry_run=self.dry_run)
-        if os.path.exists(extra_dir):
-            remove_tree(extra_dir, dry_run=self.dry_run)
-        if os.path.exists(web_dir):
-            remove_tree(web_dir, dry_run=self.dry_run)
-        if os.path.exists(gen_man_dir):
-            remove_tree(gen_man_dir, dry_run=self.dry_run)
-        if os.path.exists(man_base):
-            remove_tree(man_base, dry_run=self.dry_run)
+            if self.distribution.netsa_doc_dir:
+             html_dir = self.get_finalized_command('gen_doc_html').gen_doc_html
+             if os.path.exists(html_dir):
+                 remove_tree(html_dir, dry_run=self.dry_run)
+             pdf_file = self.get_finalized_command('gen_doc_pdf').gen_doc_pdf
+             if os.path.exists(pdf_file):
+                 log.info("removing %r", pdf_file)
+                 if not self.dry_run:
+                     os.unlink(pdf_file)
+        if self.distribution.netsa_doc_dir:
+            latex_dir = self.get_finalized_command('gen_doc_pdf').gen_doc_latex
+            extra_dir = self.get_finalized_command('gen_doc_pdf').gen_doc_extra
+            web_dir = self.get_finalized_command(
+                'gen_doc_tools_web').gen_doc_web
+            gen_man_dir = self.get_finalized_command('gen_doc_man').gen_doc_man
+            man_base = os.path.join(self.distribution.source_dir,
+                                    self.distribution.netsa_doc_dir, "man")
+            if os.path.exists(latex_dir):
+                remove_tree(latex_dir, dry_run=self.dry_run)
+            if os.path.exists(extra_dir):
+                remove_tree(extra_dir, dry_run=self.dry_run)
+            if os.path.exists(web_dir):
+                remove_tree(web_dir, dry_run=self.dry_run)
+            if os.path.exists(gen_man_dir):
+                remove_tree(gen_man_dir, dry_run=self.dry_run)
+            if os.path.exists(man_base):
+                remove_tree(man_base, dry_run=self.dry_run)
         clean.run(self)
 
 
@@ -236,16 +248,7 @@ class netsa_install_data(install_data):
                     (f[0], [os.path.join(self.distribution.source_dir, fn)
                             for fn in f[1]]))
         # Can we generate man pages?
-        try:
-            import sphinx
-            if sphinx.__version__ < "1.0":
-                raise ImportError()
-            try:
-                self.run_command('gen_doc_man')
-            except:
-                pass
-        except ImportError:
-            pass
+        self.run_command('gen_doc_man')
         man_files = set()
         man_base = os.path.join(self.distribution.source_dir,
                                 self.distribution.netsa_doc_dir, "man")
@@ -456,9 +459,10 @@ class netsa_gen_doc_html(Command):
     def finalize_options(self):
         build_base = self.get_finalized_command('build').build_base
         if self.gen_doc_html is None:
-            self.gen_doc_html = os.path.join(self.distribution.source_dir,
-                                             self.distribution.netsa_doc_dir,
-                                             'html')
+            if self.distribution.netsa_doc_dir is not None:
+              self.gen_doc_html = os.path.join(self.distribution.source_dir,
+                                               self.distribution.netsa_doc_dir,
+                                               'html')
         if self.gen_doc_extra is None:
             self.gen_doc_extra = os.path.join(build_base, 'gen.doc.extra')
     def run(self):
@@ -603,36 +607,36 @@ class netsa_gen_doc_man(Command):
             self.mkpath(self.gen_doc_extra)
             self.mkpath(self.gen_doc_man)
             gen_doc_config(self.distribution, self.gen_doc_extra)
-            old_pythonpath = None
-            try:
-                if 'PYTHONPATH' in os.environ:
-                    old_pythonpath = os.environ['PYTHONPATH']
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ":" + build_lib +
-                        ":" + old_pythonpath)
-                else:
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ":" + build_lib)
-                cmd = command("sphinx-build",
-                              "-b", "man",
-                              "-d", self.gen_doc_extra,
-                              "-c", os.path.join(
-                                  self.distribution.source_dir,
-                                  self.distribution.netsa_doc_conf_dir),
-                              os.path.join(self.distribution.source_dir,
-                                           self.distribution.netsa_doc_dir),
-                              self.gen_doc_man)
-                log.info("generating man pages with Sphinx")
-                try:
-                    run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
-                except Exception, ex:
-                    log.error(str(ex))
-                    sys.exit(-1)
-            finally:
-                if old_pythonpath:
-                    os.environ['PYTHONPATH'] = old_pythonpath
-                else:
-                    del os.environ['PYTHONPATH']
+            if have_sphinx:
+              old_pythonpath = None
+              try:
+                  if 'PYTHONPATH' in os.environ:
+                      old_pythonpath = os.environ['PYTHONPATH']
+                      os.environ['PYTHONPATH'] = (
+                          self.gen_doc_extra + ":" + build_lib +
+                          ":" + old_pythonpath)
+                  else:
+                      os.environ['PYTHONPATH'] = (
+                          self.gen_doc_extra + ":" + build_lib)
+                  cmd = command("sphinx-build",
+                                "-b", "man",
+                                "-d", self.gen_doc_extra,
+                                "-c", os.path.join(
+                                    self.distribution.source_dir,
+                                    self.distribution.netsa_doc_conf_dir),
+                                os.path.join(self.distribution.source_dir,
+                                             self.distribution.netsa_doc_dir),
+                                self.gen_doc_man)
+                  log.info("generating man pages with Sphinx")
+                  try:
+                      run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
+                  except Exception, ex:
+                      log.error(str(ex))
+              finally:
+                  if old_pythonpath:
+                      os.environ['PYTHONPATH'] = old_pythonpath
+                  else:
+                      del os.environ['PYTHONPATH']
             for man_page in os.listdir(self.gen_doc_man):
                 section = man_page.split('.')[-1]
                 man_dir = os.path.join(self.distribution.netsa_doc_dir,
