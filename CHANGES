@@ -1,6 +1,21 @@
 Changes
 =======
 
+Version 1.4.3 - 2013-02-18
+--------------------------
+
+ * Added server-side cursor support to netsa.sql's psycopg2 driver, so
+   that results are streamed back instead of fetched all together.
+
+ * Fixed an exception caused by using num_prefix on values <= 1e-21.
+
+ * Remove netsa_silk support version SiLK versions older than SiLK 3.
+
+ * Provide unnamed arguments to scripts via
+   netsa.script.get_extra_args().
+
+ * Better support for finding non-standard Sphinx installs.
+
 Version 1.4.2 - 2012-12-07
 --------------------------
 

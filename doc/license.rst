@@ -4,7 +4,7 @@ Licenses
 License for netsa-python
 ------------------------
 
-Copyright 2008-2010 by Carnegie Mellon University
+Copyright 2008-2013 by Carnegie Mellon University
 
 Use of the Network Situational Awareness Python support library and
 related source code is subject to the terms of the following licenses:

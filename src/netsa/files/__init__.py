@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -559,13 +559,13 @@ class DirLocker(object):
                       "please see netsa.files.acquire_pidfile_lock",
                       DeprecationWarning)
         if dir is None:
-            if path.isdir(DEFAULT_LOCK_DIR):
+            if os.path.isdir(DEFAULT_LOCK_DIR):
                 dir = DEFAULT_LOCK_DIR
             else:
                 dir = gettempdir()
         self.name     = name
-        self.dir      = path.join(dir, name)
-        self.pidfile  = path.join(dir, '%s.pid' % name)
+        self.dir      = os.path.join(dir, name)
+        self.pidfile  = os.path.join(dir, '%s.pid' % name)
         self.debug    = debug
         blocked = True
         for x in (xrange(LOCK_ATTEMPTS)):
@@ -574,7 +574,7 @@ class DirLocker(object):
                 blocked = False
                 break
             except DirLockBlock:
-                if not path.exists(self.pidfile):
+                if not os.path.exists(self.pidfile):
                     time.sleep(LOCK_WAIT_TIME)
         try:
             if self.debug:

@@ -12,6 +12,9 @@ included in netsa-python is used.  If PySiLK is installed, then the
 high-performance C version of this functionality that is included in
 PySiLK is used.
 
+This document describes version 1.0 of the :mod:`netsa_silk` module
+API.
+
 .. _netsa-python: http://tools.netsa.cert.org/netsa-python/index.html
 .. _PySiLK: http://tools.netsa.cert.org/silk/pysilk-ref.html
 

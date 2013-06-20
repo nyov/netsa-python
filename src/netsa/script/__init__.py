@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -312,6 +312,7 @@ import model
 
 _script = model.Script(os.path.abspath(sys.argv[0]))
 _script_verbosity = 0
+_script_extra_args = []
 _script_param_values = {}
 _script_outputs = {}
 
@@ -537,6 +538,12 @@ def _print_metadata(out, verbose):
     out.write(model.unparse_script_metadata(_script,
                                             verbose=(verbose or netsa.DEBUG)))
     out.write("\n")
+
+def get_extra_args():
+    """
+    Returns any extra un-named arguments from the command-line.
+    """
+    return _script_extra_args
 
 def get_param(name):
     """
@@ -1628,7 +1635,10 @@ def execute(func):
             if start_date > end_date:
                 _print_failure(sys.stderr, "end-date of %s is earlier than\n"
                                "        start-date of %s" % (edate, sdate))
-        
+    
+    # Store any unhandled arguments.
+    global _script_extra_args
+    _script_extra_args = args
     
     # If argument parsing was correct, execute main function.
     try:

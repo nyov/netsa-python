@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -577,7 +577,7 @@ class GolemInputs(GolemView):
                                 error = GolemScriptError(
                                     "incomplete join '%s.%s' to"
                                     " '%s.%s': %s" \
-                                    % (gin.name, ok, self.name, sk, v))
+                                    % (gin.name, ok, self.golem.name, sk, v))
                                 raise error
                         nv = tuple(filter(lambda x: x not in offer, ov))
                         entry = (ok, (nv,) + ol[1:])
@@ -1331,7 +1331,7 @@ class GolemFileResource(GolemResource):
             if size is None:
                 continue
             if size == 0 and zap_empty and os.path.exists(f):
-                os.path.remove(f)
+                os.remove(f)
                 continue
 
     def copy_query_result(self, src_tag, tgt_tag, tags):
@@ -2442,14 +2442,9 @@ def process(gview=None):
             error = GolemScriptError(
                 "process() invoked outside of main()")
             raise error
-    try:
-        overwrite_outputs   = gview.overwrite_outputs
-        skip_complete       = gview.skip_complete
-        skip_missing_inputs = gview.skip_missing_inputs
-    except AttributeError:
-        overwrite_outputs   = _ctx.overwrite_outputs()
-        skip_complete       = not _ctx.overwrite_outputs()
-        skip_missing_inputs = _ctx.skip_missing_inputs()
+    overwrite_outputs   = _ctx.overwrite_outputs()
+    skip_complete       = not _ctx.overwrite_outputs()
+    skip_missing_inputs = _ctx.skip_missing_inputs()
 
     return GolemProcess(gview,
         overwrite_outputs   = overwrite_outputs,
@@ -2476,7 +2471,7 @@ def generate_query_result(tgt_file, gproc=None):
         raise error
     if os.path.exists(tgt_file):
         if gproc.overwrite_outputs:
-            os.remove(f)
+            os.remove(tgt_file)
         else:
             error = GolemOutputExists("output exists %s" % repr(tgt_file))
             raise error
@@ -2639,7 +2634,7 @@ def execute(func):
                 queries.append(x)
                 selects.remove(x[0])
         if selects:
-            pname = cls.get_pname('output-select')
+            pname = _ctx.get_pname('output-select')
             outs = ','.join(selects)
             error = ParamError(pname, outs, "invalid output select")
             _print_failure(sys.stderr, error)

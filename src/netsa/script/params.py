@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -127,7 +127,7 @@ def check_param_date_args(kind_args):
     if kind_args:
         error = TypeError("date param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_label_args(kind_args):
@@ -164,70 +164,70 @@ def check_param_dir_args(kind_args):
     if kind_args:
         error = TypeError("dir param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_path_args(kind_args):
     if kind_args:
         error = TypeError("path param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_output_file_args(kind_args):
     if kind_args:
         error = TypeError("output file param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_output_dir_args(kind_args):
     if kind_args:
         error = TypeError("output dir param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_flag_args(kind_args):
     if kind_args:
         error = TypeError("flag param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_flow_class_args(kind_args):
     if kind_args:
         error = TypeError("flow class param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_flow_type_args(kind_args):
     if kind_args:
         error = TypeError("flow type param got unexpected keyword arguments: "
                           "%s" % (", ".join(repr(x)
-                                            for x in kind_arg_names)))
+                                            for x in kind_args)))
         raise error
 
 def check_param_flow_flowtypes_args(kind_args):
     if kind_args:
         error = TypeError("flow flowtypes param got unexpected keyword "
                           "arguments: %s" %
-                          (", ".join(repr(x) for x in kind_arg_names)))
+                          (", ".join(repr(x) for x in kind_args)))
         raise error
 
 def check_param_flow_sensors_args(kind_args):
     if kind_args:
         error = TypeError("flow sensors param got unexpected keyword "
                           "arguments: %s" %
-                          (", ".join(repr(x) for x in kind_arg_names)))
+                          (", ".join(repr(x) for x in kind_args)))
         raise error
 
 def check_param_flow_date_args(kind_args):
     if kind_args:
         error = TypeError("flow date param got unexpected keyword "
                           "arguments: %s" %
-                          (", ".join(repr(x) for x in kind_arg_names)))
+                          (", ".join(repr(x) for x in kind_args)))
         raise error
 
 ########################################################################
@@ -312,7 +312,7 @@ def parse_value(param, value):
     elif param['kind'] == KIND_OUTPUT_DIR:
         return parse_param_output_dir_value(param, value)
     else:
-        error = Error("Unknown param kind: %s" % repr(param['kind']))
+        error = ValueError("Unknown param kind: %s" % repr(param['kind']))
         raise error
 
 def parse_param_text_value(param, value):

@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -46,13 +46,7 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-try:
-    import silk
-    if silk.silk_version() >= '3':
-        raise ImportError()
-    from netsa._netsa_silk.silk_2_0_impl import *
-except ImportError:
-    from netsa._netsa_silk.python_impl import *
+from netsa._netsa_silk.python_impl import *
 
 __all__ = """
     has_IPv6Addr
@@ -62,4 +56,7 @@ __all__ = """
     TCPFlags
 
     TCP_FIN TCP_SYN TCP_RST TCP_PSH TCP_ACK TCP_URG TCP_ECE TCP_CWR
+
+    __version__
+    __impl_version__
 """.split()

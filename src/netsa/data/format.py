@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -246,7 +246,7 @@ def num_prefix(value, units="", sig_fig=3, use_binary=False, thousands_sep=""):
         while exp_value.adjusted() < 0:
             (exp, exp_value) = (exp + 1, exp_value * 1000)
         if exp >= len(prefixes):
-            result = (_numto_sci_string(ctx.create_decimal(value), sig_fig)
+            result = (_num_to_sci_string(ctx.create_decimal(value), sig_fig)
                       + units)
         else:
             exp_value = exp_value.quantize(quant)

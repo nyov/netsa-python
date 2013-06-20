@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -71,7 +71,7 @@ class IPSetTest(unittest.TestCase):
     def test_cons_2(self):
         self.assertEqual(ip_set([]), ip_set())
 
-    def test_cons_2(self):
+    def test_cons_7(self):
         self.assertEqual(ip_set(['1.2.3.4']), ip_set([IPv4Addr('1.2.3.4')]))
 
     def test_cons_3(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -90,7 +90,7 @@ class Script(object):
                  '_flow_params', '_flow_params_require_pull',
                  '_outputs')
     def __init__(self,
-                 script_path=None, params={}, metadata={},
+                 script_path=None, params=[], metadata={},
                  flow_params=False,
                  flow_params_require_pull=False,
                  outputs={}):
@@ -714,8 +714,8 @@ def parse_script_metadata(metadata_text):
                     'netsa_script_flow_params_require_pull'],
                 outputs=script_metadata['netsa_script_outputs'])
         except KeyError:
-            script_error = ScriptError("Cannot parse malformed script "
-                                       "metadata")
+            script_error = netsa.script.ScriptError(
+                "Cannot parse malformed script metadata")
             raise script_error
         script_type = script_metadata.get('netsa_script_type', None)
         if script_type is None or script_type == 'Script':
@@ -724,11 +724,12 @@ def parse_script_metadata(metadata_text):
             from netsa.script.golem.model import Golem
             return Golem._make_from_meta(**kwargs)
         else:
-            script_error = ScriptError(
+            script_error = netsa.script.ScriptError(
                 "Unknown script type %s" % repr(script_type))
     else:
-        script_error = ScriptError("Cannot parse script metadata for "
-                                   "unknown version %s" % repr(version))
+        script_error = netsa.script.ScriptError(
+            "Cannot parse script metadata for unknown version %s" %
+            repr(version))
         raise script_error
 
 def _script_to_meta(script, version=1, verbose=False):
@@ -749,8 +750,9 @@ def _script_to_meta(script, version=1, verbose=False):
             'netsa_script_outputs': script._outputs,
         }
     else:
-        script_error = ScriptError("Cannot unparse script metadata for "
-                                   "unknown version %s" % repr(version))
+        script_error = netsa.script.ScriptError(
+            "Cannot unparse script metadata for unknown version %s" %
+            repr(version))
         raise script_error
     return script_metadata
 
@@ -779,10 +781,11 @@ class Job(object):
             self._job_metadata = job_metadata
         else:
             if not job_id:
-                script_error = ScriptError(
+                script_error = netsa.script.ScriptError(
                     "No job ID or metadata provided")
                 raise script_error
-            self._job_metadata = fetch_job_metadata(job_id)
+            raise netsa.script.ScriptError("Not implemented")
+            # self._job_metadata = fetch_job_metadata(job_id)
     def update_direct(self): pass
     def update_remote(self, new_metadata):
         "Update this job with new metadata fetched from a remote source."

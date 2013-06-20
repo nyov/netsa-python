@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -145,6 +145,10 @@ class FormatTest(unittest.TestCase):
         "num_prefix(0.001, 's')"
         self.assertEqual('1.00ms',
                          num_prefix(0.001, 's'))
+    def test_num_prefix_unit_very_small(self):
+        "num_prefix(1e-21, 's')"
+        self.assertEqual('1.00e-21s',
+                         num_prefix(1e-21, 's'))
     def test_num_prefix_unit_small_bin(self):
         "num_prefix(0.001, 's', use_binary=True)"
         self.assertEqual('1.00ms',

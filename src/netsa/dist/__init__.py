@@ -1,4 +1,4 @@
-# Copyright 2008-2012 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -62,14 +62,41 @@ from distutils.dir_util import remove_tree
 
 from glob import glob
 
+### Sphinx support
+
 have_sphinx = False
 try:
-    import sphinx
-    if sphinx.__version__ < "1.0":
-        raise ImportError()
-    have_sphinx = True
+    import pkg_resources
+    try:
+        dist = pkg_resources.get_distribution('Sphinx >= 1.0')
+        _sphinx_build = dist.load_entry_point('console_scripts', 'sphinx-build')
+        have_sphinx = True
+    except pkg_resources.DistributionNotFound:
+        pass
 except ImportError:
     pass
+
+def sphinx_build(paths, *args):
+    if not have_sphinx:
+        return
+    old_path = list(sys.path)
+    try:
+        sys.path = list(paths) + sys.path
+        _sphinx_build(['sphinx-build'] + list(args))
+    finally:
+        sys.path = old_path
+
+def check_man_pages(paths):
+    old_path = list(sys.path)
+    try:
+        try:
+            sys.path = list(paths) + sys.path
+            from conf import man_pages
+            return man_pages
+        except ImportError:
+            return False
+    finally:
+        sys.path = old_path
 
 ### Overridden Distribution Class
 
@@ -477,36 +504,21 @@ class netsa_gen_doc_html(Command):
     def run(self):
         self.run_command('build')
         build_lib = self.get_finalized_command('build').build_lib
-        if self.distribution.netsa_doc_dir:
+        if self.distribution.netsa_doc_dir and have_sphinx:
             self.mkpath(self.gen_doc_extra)
             gen_doc_config(self.distribution, self.gen_doc_extra)
-            old_pythonpath = None
-            try:
-                if 'PYTHONPATH' in os.environ:
-                    old_pythonpath = os.environ['PYTHONPATH']
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ':' + build_lib +
-                        ':' + old_pythonpath)
-                else:
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ":" + build_lib)
-                cmd = command("sphinx-build",
-                              "-b", "html",
-                              "-d", self.gen_doc_extra,
-                              "-c", os.path.join(
-                                  self.distribution.source_dir,
-                                  self.distribution.netsa_doc_conf_dir),
-                              os.path.join(self.distribution.source_dir,
-                                           self.distribution.netsa_doc_dir),
-                              self.gen_doc_html)
-                log.info("generating HTML documentation with Sphinx")
-                log.debug("PYTHONPATH=%s %s", os.environ['PYTHONPATH'], cmd)
-                run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
-            finally:
-                if old_pythonpath:
-                    os.environ['PYTHONPATH'] = old_pythonpath
-                else:
-                    del os.environ['PYTHONPATH']
+            doc_conf_dir = os.path.join(self.distribution.source_dir,
+                                        self.distribution.netsa_doc_conf_dir)
+            log.info("generating HTML documentation with Sphinx")
+            sphinx_build(
+                [doc_conf_dir, self.gen_doc_extra, build_lib],
+                "-q",
+                "-b", "html",
+                "-d", self.gen_doc_extra,
+                "-c", doc_conf_dir,
+                os.path.join(self.distribution.source_dir,
+                             self.distribution.netsa_doc_dir),
+                self.gen_doc_html)
     def get_source_files(self):
         if self.distribution.netsa_doc_dir:
             return distutils.filelist.findall(
@@ -558,38 +570,23 @@ class netsa_gen_doc_tools_web(Command):
     def run(self):
         self.run_command('build')
         build_lib = self.get_finalized_command('build').build_lib
-        if self.distribution.netsa_doc_dir:
+        if self.distribution.netsa_doc_dir and have_sphinx:
             self.mkpath(self.gen_doc_extra)
             gen_doc_config(self.distribution, self.gen_doc_extra)
-            old_pythonpath = None
-            try:
-                if 'PYTHONPATH' in os.environ:
-                    old_pythonpath = os.environ['PYTHONPATH']
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ':' + build_lib +
-                        ':' + old_pythonpath)
-                else:
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ":" + build_lib)
-                cmd = command("sphinx-build",
-                              "-b", "html",
-                              "-D", "html_theme=tools_web",
-                              "-D", "html_style=tools.css",
-                              "-d", self.gen_doc_extra,
-                              "-c", os.path.join(
-                                  self.distribution.source_dir,
-                                  self.distribution.netsa_doc_conf_dir),
-                              os.path.join(self.distribution.source_dir,
-                                           self.distribution.netsa_doc_dir),
-                              os.path.join(self.gen_doc_web, self.base_name))
-                log.info("generating tools site HTML documentation with Sphinx")
-                log.debug("PYTHONPATH=%s %s", os.environ['PYTHONPATH'], cmd)
-                run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
-            finally:
-                if old_pythonpath:
-                    os.environ['PYTHONPATH'] = old_pythonpath
-                else:
-                    del os.environ['PYTHONPATH']
+            doc_conf_dir = os.path.join(self.distribution.source_dir,
+                                        self.distribution.netsa_doc_conf_dir)
+            log.info("generating tools site HTML documentation with Sphinx")
+            sphinx_build(
+                [doc_conf_dir, self.gen_doc_extra, build_lib],
+                "-q",
+                "-b", "html",
+                "-D", "html_theme=tools_web",
+                "-D", "html_style=tools.css",
+                "-d", self.gen_doc_extra,
+                "-c", doc_conf_dir,
+                os.path.join(self.distribution.source_dir,
+                             self.distribution.netsa_doc_dir),
+                os.path.join(self.gen_doc_web, self.base_name))
             log.info("converting UTF-8 to ISO-8859-1")
             convert_html_to_8859_1(os.path.join(self.gen_doc_web,
                                                 self.base_name))
@@ -616,43 +613,32 @@ class netsa_gen_doc_man(Command):
             self.mkpath(self.gen_doc_extra)
             self.mkpath(self.gen_doc_man)
             gen_doc_config(self.distribution, self.gen_doc_extra)
-            if have_sphinx:
-              old_pythonpath = None
-              try:
-                  if 'PYTHONPATH' in os.environ:
-                      old_pythonpath = os.environ['PYTHONPATH']
-                      os.environ['PYTHONPATH'] = (
-                          self.gen_doc_extra + ":" + build_lib +
-                          ":" + old_pythonpath)
-                  else:
-                      os.environ['PYTHONPATH'] = (
-                          self.gen_doc_extra + ":" + build_lib)
-                  cmd = command("sphinx-build",
-                                "-b", "man",
-                                "-d", self.gen_doc_extra,
-                                "-c", os.path.join(
-                                    self.distribution.source_dir,
-                                    self.distribution.netsa_doc_conf_dir),
-                                os.path.join(self.distribution.source_dir,
-                                             self.distribution.netsa_doc_dir),
-                                self.gen_doc_man)
-                  log.info("generating man pages with Sphinx")
-                  try:
-                      run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
-                  except Exception, ex:
-                      log.error(str(ex))
-              finally:
-                  if old_pythonpath:
-                      os.environ['PYTHONPATH'] = old_pythonpath
-                  else:
-                      del os.environ['PYTHONPATH']
-            for man_page in os.listdir(self.gen_doc_man):
-                section = man_page.split('.')[-1]
-                man_dir = os.path.join(self.distribution.netsa_doc_dir,
-                                       "man", "man%s" % section)
-                self.mkpath(man_dir)
-                self.copy_file(os.path.join(self.gen_doc_man, man_page),
-                               os.path.join(man_dir, man_page))
+            doc_conf_dir = os.path.join(self.distribution.source_dir,
+                                        self.distribution.netsa_doc_conf_dir)
+            if not check_man_pages([doc_conf_dir, self.gen_doc_extra,
+                                    build_lib]):
+                log.info("skipping man pages (none defined)")
+            else:
+                if have_sphinx:
+                    log.info("generating man pages with Sphinx")
+                    sphinx_build(
+                        [doc_conf_dir, self.gen_doc_extra, build_lib],
+                        "-q",
+                        "-b", "man",
+                        "-d", self.gen_doc_extra,
+                        "-c", doc_conf_dir,
+                        os.path.join(self.distribution.source_dir,
+                                     self.distribution.netsa_doc_dir),
+                        self.gen_doc_man)
+                else:
+                    log.info("using pre-generated man pages")
+                for man_page in os.listdir(self.gen_doc_man):
+                    section = man_page.split('.')[-1]
+                    man_dir = os.path.join(self.distribution.netsa_doc_dir,
+                                           "man", "man%s" % section)
+                    self.mkpath(man_dir)
+                    self.copy_file(os.path.join(self.gen_doc_man, man_page),
+                                   os.path.join(man_dir, man_page))
     def get_source_files(self):
         if self.distribution.netsa_doc_dir:
             return distutils.filelist.findall(
@@ -693,40 +679,21 @@ class netsa_gen_doc_pdf(Command):
     def run(self):
         self.run_command('build')
         build_lib = self.get_finalized_command('build').build_lib
-        if self.distribution.netsa_doc_dir:
+        if self.distribution.netsa_doc_dir and have_sphinx:
             self.mkpath(self.gen_doc_extra)
             gen_doc_config(self.distribution, self.gen_doc_extra)
-            old_pythonpath = None
-            try:
-                if 'PYTHONPATH' in os.environ:
-                    old_pythonpath = os.environ['PYTHONPATH']
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ':' + build_lib +
-                        ':' + old_pythonpath)
-                else:
-                    os.environ['PYTHONPATH'] = (
-                        self.gen_doc_extra + ":" + build_lib)
-                cmd = command("sphinx-build",
-                              "-b", "latex",
-                              "-d", self.gen_doc_extra,
-                              "-c", os.path.join(
-                                  self.distribution.source_dir,
-                                  self.distribution.netsa_doc_conf_dir),
-                              os.path.join(self.distribution.source_dir,
-                                           self.distribution.netsa_doc_dir),
-                              self.gen_doc_latex)
-                log.info("generating PDF documentation with Sphinx")
-                log.debug("PYTHONPATH=%s %s", os.environ['PYTHONPATH'], cmd)
-                try:
-                    run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
-                except Exception, ex:
-                    log.error(str(ex))
-                    sys.exit(-1)
-            finally:
-                if old_pythonpath:
-                    os.environ['PYTHONPATH'] = old_pythonpath
-                else:
-                    del os.environ['PYTHONPATH']
+            doc_conf_dir = os.path.join(self.distribution.source_dir,
+                                        self.distribution.netsa_doc_conf_dir)
+            log.info("generating PDF documentation with Sphinx")
+            sphinx_build(
+                [doc_conf_dir, self.gen_doc_extra, build_lib],
+                "-q",
+                "-b", "latex",
+                "-d", self.gen_doc_extra,
+                "-c", doc_conf_dir,
+                os.path.join(self.distribution.source_dir,
+                             self.distribution.netsa_doc_dir),
+                self.gen_doc_latex)
             latex_name = ("%s.tex" % self.distribution.get_name())
             index_name = ("%s.idx" % self.distribution.get_name())
             pdf_name = ("%s.pdf" % self.distribution.get_name())
@@ -1305,8 +1272,6 @@ def execute():
     except:
         pass
 
-from legacy import *
-
 __all__ = """
 
     set_name
@@ -1337,4 +1302,4 @@ __all__ = """
 
     add_dist_func
 
-""".split() + legacy.__all__
+""".split()

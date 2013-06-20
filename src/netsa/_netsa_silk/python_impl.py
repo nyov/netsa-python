@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -198,7 +198,7 @@ def _parse_ipv6(addr):
         raise type_error
 
 class IPAddr(object):
-    __slots__ = ['_addr']
+    __slots__ = []
     def __new__(cls, addr):
         if cls == IPAddr:
             if isinstance(addr, IPAddr):
@@ -217,18 +217,36 @@ class IPAddr(object):
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, str(self))
     def __hash__(self):
-        return hash(self._addr)
+        raise NotImplementedError("IPAddr.__hash__")
     def __nonzero__(self):
-        return bool(self._addr)
+        raise NotImplementedError("IPAddr.__nonzero__")
     def __int__(self):
-        return self._addr
+        raise NotImplementedError("IPAddr.__int__")
+    def __cmp__(self, other):
+        raise NotImplementedError("IPAddr.__cmp__")
+    def is_ipv6(self):
+        raise NotImplementedError("IPAddr.is_ipv6")
+    def to_ipv4(self):
+        raise NotImplementedError("IPAddr.to_ipv4")
+    def to_ipv6(self):
+        raise NotImplementedError("IPAddr.to_ipv6")
+    def __str__(self):
+        raise NotImplementedError("IPAddr.__str__")
+    def padded(self):
+        raise NotImplementedError("IPAddr.padded")
+    def octets(self):
+        raise NotImplementedError("IPAddr.octets")
+    def mask(self, mask):
+        raise NotImplementedError("IPAddr.mask")
+    def mask_prefix(self, len):
+        raise NotImplementedError("IPAddr.mask_prefix")
 
 def _str_dotted_quad(v):
     v = v & 0xFFFFFFFF
     return ("%d.%d.%d.%d" % tuple((v >> (8*(3-i))) & 0xFF for i in xrange(4)))
 
 class IPv4Addr(IPAddr):
-    __slots__ = []
+    __slots__ = ['_addr']
     def __init__(self, addr):
         if isinstance(addr, IPAddr):
             a = addr.to_ipv4()
@@ -239,6 +257,12 @@ class IPv4Addr(IPAddr):
             self._addr = a._addr
         else:
             self._addr = _parse_ipv4(addr)
+    def __hash__(self):
+        return hash(self._addr)
+    def __nonzero__(self):
+        return bool(self._addr)
+    def __int__(self):
+        return self._addr
     def __cmp__(self, other):
         if not isinstance(other, IPAddr):
             return cmp(self.__class__, other.__class__)
@@ -264,13 +288,19 @@ class IPv4Addr(IPAddr):
         return IPv4Addr(self._addr & (IPv4_MAX << (32-len)) & IPv4_MAX)
 
 class IPv6Addr(IPAddr):
-    __slots__ = []
+    __slots__ = ['_addr']
     def __init__(self, addr):
         if isinstance(addr, IPAddr):
             addr = addr.to_ipv6()
             self._addr = addr._addr
         else:
             self._addr = _parse_ipv6(addr)
+    def __hash__(self):
+        return hash(self._addr)
+    def __nonzero__(self):
+        return bool(self._addr)
+    def __int__(self):
+        return self._addr
     def __cmp__(self, other):
         if not isinstance(other, IPAddr):
             return cmp(self.__class__, other.__class__)
@@ -392,123 +422,124 @@ class ip_set(object):
         self._contains_ipv6 = False
         if iterable:
             self.update(iterable)
-    def cardinality(s):
-        return len(s._content)
-    def __len__(s):
-        return s.cardinality()
-    def __contains__(s, addr):
-        return _ip_conv(addr) in s._content
-    def __iter__(s):
-        if s._contains_ipv6:
-            for addr in s._content:
+    def cardinality(self):
+        return len(self._content)
+    def __len__(self):
+        return self.cardinality()
+    def __contains__(self, addr):
+        return _ip_conv(addr) in self._content
+    def __iter__(self):
+        if self._contains_ipv6:
+            for addr in self._content:
                 yield addr
         else:
-            for addr in s._content:
+            for addr in self._content:
                 yield addr.to_ipv4()
-    def __eq__(s1, s2):
+    def __eq__(self, s2):
         if not isinstance(s2, ip_set):
             return False
-        return (s1._content == s2._content)
-    def __ne__(s1, s2):
+        return (self._content == s2._content)
+    def __ne__(self, s2):
         if not isinstance(s2, ip_set):
             return True
-        return (s1._content != s2._content)
-    def isdisjoint(s, iterable):
-        return s._content.isdisjoint(_ip_iter(iterable))
-    def issubset(s, iterable):
-        return s._content.issubset(_ip_iter(iterable))
-    def __le__(s1, s2):
+        return (self._content != s2._content)
+    def isdisjoint(self, iterable):
+        return self._content.isdisjoint(_ip_iter(iterable))
+    def issubset(self, iterable):
+        return self._content.issubset(_ip_iter(iterable))
+    def __le__(self, s2):
         if not isinstance(s2, ip_set):
             raise TypeError("can only compare to an ip_set")
-        return s1._content <= s2._content
-    def __lt__(s1, s2):
+        return self._content <= s2._content
+    def __lt__(self, s2):
         if not isinstance(s2, ip_set):
             raise TypeError("can only compare to an ip_set")
-        return s1._content < s2._content
-    def issuperset(s, iterable):
-        return s._content.issuperset(_ip_iter(iterable))
-    def __ge__(s1, s2):
+        return self._content < s2._content
+    def issuperset(self, iterable):
+        return self._content.issuperset(_ip_iter(iterable))
+    def __ge__(self, s2):
         if not isinstance(s2, ip_set):
             raise TypeError("can only compare to an ip_set")
-        return s1._content >= s2._content
-    def __gt__(s1, s2):
+        return self._content >= s2._content
+    def __gt__(self, s2):
         if not isinstance(s2, ip_set):
             raise TypeError("can only compare to an ip_set")
-        return s1._content > s2._content
-    def union(s, *iterables):
-        result = s.copy()
+        return self._content > s2._content
+    def union(self, *iterables):
+        result = self.copy()
         result.update(*iterables)
         return result
-    def __or__(s1, s2):
+    def __or__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented
-        return s1.union(s2)
-    def intersection(s, *iterables):
-        result = s.copy()
+        return self.union(s2)
+    def intersection(self, *iterables):
+        result = self.copy()
         result.intersection_update(*iterables)
         return result
-    def __and__(s1, s2):
+    def __and__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented
-        return s1.intersection(s2)
-    def difference(s, *iterables):
-        result = s.copy()
+        return self.intersection(s2)
+    def difference(self, *iterables):
+        result = self.copy()
         result.difference_update(*iterables)
         return result
-    def __sub__(s1, s2):
+    def __sub__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented        
-        return s1.difference(s2)
-    def symmetric_difference(s, iterable):
-        result = s.copy()
+        return self.difference(s2)
+    def symmetric_difference(self, iterable):
+        result = self.copy()
         result.symmetric_difference_update(iterable)
         return result
-    def __xor__(s1, s2):
+    def __xor__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented        
-        return s1.symmetric_difference(s2)
-    def copy(s):
-        return s.__class__(s)
-    def update(s, *iterables):
-        s._content.update(_ip_iters_check(iterables, s))
-    def __ior__(s1, s2):
+        return self.symmetric_difference(s2)
+    def copy(self):
+        return self.__class__(self)
+    def update(self, *iterables):
+        self._content.update(_ip_iters_check(iterables, self))
+    def __ior__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented
-        s1.update(s2)
-        return s1
-    def intersection_update(s, *iterables):
-        s._content.intersection_update(_ip_iters(iterables))
-    def __iand__(s1, s2):
+        self.update(s2)
+        return self
+    def intersection_update(self, *iterables):
+        self._content.intersection_update(_ip_iters(iterables))
+    def __iand__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented
-        s1.intersection_update(s2)
-        return s1
-    def difference_update(s, *iterables):
-        s._content.difference_update(_ip_iters(iterables))
-    def __isub__(s1, s2):
+        self.intersection_update(s2)
+        return self
+    def difference_update(self, *iterables):
+        self._content.difference_update(_ip_iters(iterables))
+    def __isub__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented
-        s1.difference_update(s2)
-        return s1
-    def symmetric_difference_update(s, iterable):
-        s._content.symmetric_difference_update(_ip_iters_check([iterable], s))
-    def __ixor__(s1, s2):
+        self.difference_update(s2)
+        return self
+    def symmetric_difference_update(self, iterable):
+        self._content.symmetric_difference_update(
+            _ip_iters_check([iterable], self))
+    def __ixor__(self, s2):
         if not isinstance(s2, ip_set): return NotImplemented
-        s1.symmetric_difference_update(s2)
-        return s1
-    def add(s, addr):
+        self.symmetric_difference_update(s2)
+        return self
+    def add(self, addr):
         addr = _ip_conv(addr)
         if addr._addr < 0xFFFF00000000 or addr._addr > 0xFFFFFFFFFFFF:
-            s._contains_ipv6 = True
-        s._content.add(addr)
-    def remove(s, addr):
+            self._contains_ipv6 = True
+        self._content.add(addr)
+    def remove(self, addr):
         addr = _ip_conv(addr)
-        s._content.remove(addr)
-    def discard(s, addr):
+        self._content.remove(addr)
+    def discard(self, addr):
         addr = _ip_conv(addr)
-        s._content.discard(addr)
-    def pop(s):
-        addr = s._content.pop()
-        if s._contains_ipv6:
+        self._content.discard(addr)
+    def pop(self):
+        addr = self._content.pop()
+        if self._contains_ipv6:
             return addr.to_ipv4()
         else:
             return addr
-    def clear(s):
-        s._contains_ipv6 = False
-        s._content.clear()
+    def clear(self):
+        self._contains_ipv6 = False
+        self._content.clear()
     def _range_iter(self):
         sorted_ips = sorted(self)
         while sorted_ips:
@@ -521,11 +552,11 @@ class ip_set(object):
             else:
                 yield (IPv4Addr(range_min & IPv4_MAX),
                        IPv4Addr(range_max & IPv4_MAX))
-    def cidr_iter(s):
-        for (range_min, range_max) in s._range_iter():
+    def cidr_iter(self):
+        for (range_min, range_max) in self._range_iter():
             range_min = range_min._addr
             range_max = range_max._addr
-            if s._contains_ipv6:
+            if self._contains_ipv6:
                 bit, bits = 1, 128
                 make_ip = IPv6Addr
             else:
@@ -889,9 +920,9 @@ class TCPFlags(object):
             self._value = _parse_tcpflags(value)
         elif isinstance(value, (int, long)):
             if value < 0 or value > 0xFF:
-                overflow_error = OverflowError(
+                value_error = ValueError(
                     "Illegal TCP flag value: %r" % value)
-                raise overflow_error
+                raise value_error
             self._value = value
         elif isinstance(value, TCPFlags):
             self._value = value._value
@@ -1013,6 +1044,13 @@ TCP_URG = TCPFlags('U')
 TCP_ECE = TCPFlags('E')
 TCP_CWR = TCPFlags('C')
 
+# This is the netsa_silk API version
+__version__ = "1.0"
+
+# This is the version of the implementation
+import netsa
+__impl_version__ = "netsa-python " + netsa.__version__
+
 __all__ = """
     has_IPv6Addr
     IPAddr IPv4Addr IPv6Addr
@@ -1021,4 +1059,7 @@ __all__ = """
     TCPFlags
 
     TCP_FIN TCP_SYN TCP_RST TCP_PSH TCP_ACK TCP_URG TCP_ECE TCP_CWR
+
+    __version__
+    __impl_version__
 """.split()

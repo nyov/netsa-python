@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -48,6 +48,10 @@
 
 import psycopg2
 import netsa.sql
+import threading
+
+# Number of rows to fetch per cursor iteration
+_CURSOR_SIZE = 4096
 
 class ppg_driver(netsa.sql.db_driver):
     __slots__ = """
@@ -81,6 +85,8 @@ class ppg_connection(netsa.sql.db_connection):
         _password
         _sslmode
         _psycopg2_conn
+        _cursor_counter
+        _cursor_counter_lock
     """.split()
     def __init__(self, driver, variants, database, host, port, user,
                  password, sslmode):
@@ -92,6 +98,8 @@ class ppg_connection(netsa.sql.db_connection):
         self._password = password
         self._sslmode = sslmode
         self._psycopg2_conn = None
+        self._cursor_counter = 0
+        self._cursor_counter_lock = threading.Lock()
         self._connect()
     def _connect(self):
         kwargs = {}
@@ -120,10 +128,17 @@ class ppg_connection(netsa.sql.db_connection):
     def rollback(self):
         if self._psycopg2_conn:
             self._psycopg2_conn.rollback()
+    def _next_cursor_name(self):
+        self._cursor_counter_lock.acquire()
+        n = self._cursor_counter
+        self._cursor_counter += 1
+        self._cursor_counter_lock.release()
+        return "_netsa_sql_cursor_%d" % n
 
 class ppg_result(netsa.sql.db_result):
     __slots__ = """
         _psycopg2_cursor
+        _pg_cursor_name
     """.split()
     def __init__(self, connection, query, params):
         netsa.sql.db_result.__init__(self, connection, query, params)
@@ -131,12 +146,47 @@ class ppg_result(netsa.sql.db_result):
         variants = self._connection.get_variants()
         (query, params) = \
             self._query.get_variant_pyformat_params(variants, params)
-        self._psycopg2_cursor.execute(query, params)
+        # Does it look like a query?
+        if (query.lstrip()[:6].lower() == 'select' or
+                query.lstrip()[:4].lower() == 'with'):
+            # Yes, let's use a server-side cursor on it.
+            self._pg_cursor_name = self._connection._next_cursor_name()
+            query = ("declare %s no scroll cursor for %s" %
+                     (self._pg_cursor_name, query))
+            self._psycopg2_cursor.execute(query, params)
+            # If the cursor isn't fetched from, the query will not
+            # begin to execute at all, which means side effects won't
+            # happen.
+            self._psycopg2_cursor.execute(
+                "fetch forward %d from %s" %
+                (_CURSOR_SIZE, self._pg_cursor_name))
+        else:
+            # No, run the query as-is.
+            self._pg_cursor_name = None
+            self._psycopg2_cursor.execute(query, params)
     def __iter__(self):
-        while True:
-            r = self._psycopg2_cursor.fetchone()
-            if r == None:
-                return
-            yield r
+        if self._pg_cursor_name == None:
+            # Non-cursored query, process it directly
+            while True:
+                r = self._psycopg2_cursor.fetchone()
+                if r == None:
+                    return
+                yield r
+        else:
+            # New cursored query, process it in chunks
+            try:
+                while self._psycopg2_cursor.rowcount:
+                    for r in self._psycopg2_cursor.fetchall():
+                        yield r
+                    self._psycopg2_cursor.execute(
+                        "fetch forward %d from %s" %
+                        (_CURSOR_SIZE, self._pg_cursor_name))
+                # Work around try: finally: not allowed in generators in 2.4
+            except:
+                self._psycopg2_cursor.execute(
+                    "close %s" % self._pg_cursor_name)
+                raise
+            self._psycopg2_cursor.execute(
+                "close %s" % self._pg_cursor_name)
 
 netsa.sql.register_driver(ppg_driver())

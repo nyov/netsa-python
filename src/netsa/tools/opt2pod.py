@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -46,7 +46,7 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os, sys, re, time
+import optparse, os, sys, re, time
 from optparse   import OptionParser, OptionGroup, SUPPRESS_HELP
 from tempfile   import NamedTemporaryFile
 from subprocess import Popen, PIPE

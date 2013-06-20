@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -201,8 +201,8 @@ class TCPFlagsTest(unittest.TestCase):
         TCPFlags(TCPFlags(''))
 
     def test_silk_TCPFlagsBadValues(self):
-        self.assertRaises(OverflowError, TCPFlags, -1)
-        self.assertRaises(OverflowError, TCPFlags, 256)
+        self.assertRaises(ValueError, TCPFlags, -1)
+        self.assertRaises(ValueError, TCPFlags, 256)
         self.assertRaises(ValueError, TCPFlags, 'x')
         self.assertRaises(ValueError, TCPFlags, 'fsrpuecax')
 

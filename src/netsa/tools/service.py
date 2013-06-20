@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -45,6 +45,9 @@
 # Government purposes only pursuant to the copyright license under the 
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
+
+import warnings
+from netsa.files import acquire_pidfile_lock
 
 def check_pidfile(path, unlink=True):
     """

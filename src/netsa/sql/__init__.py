@@ -1,4 +1,4 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -244,12 +244,6 @@ class db_result(object):
         """
         raise NotImplementedError("db_result.__iter__")
 
-def register_decoder(type_name, decode_func, **variants):
-    pass
-
-def unregister_decoder(type_name):
-    pass
-
 _drivers = []
 _drivers_lock = threading.RLock()
 _drivers_init_done = False
@@ -309,20 +303,6 @@ def get_drivers():
         return list(_drivers)
     finally:
         _drivers_lock.release()
-
-def get_encoders():
-    _encoders_lock.acquire()
-    try:
-        return dict(_encoders)
-    finally:
-        _encoders_lock.release()
-
-def get_decoders():
-    _decoders_lock.acquire()
-    try:
-        return dict(_decoders)
-    finally:
-        _decoders_lock.release()
 
 def db_connect(uri, user=None, password=None):
     """

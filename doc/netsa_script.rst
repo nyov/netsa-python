@@ -85,6 +85,8 @@
 
     .. autofunction:: get_param(name : str) -> value
 
+    .. autofunction:: get_extra_args() -> str list
+
 
     .. _netsa-script-verbosity-functions:
 

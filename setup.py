@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright 2008-2012 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -59,8 +59,8 @@ sys.path[:0] = \
 from netsa import dist
 
 dist.set_name("netsa-python")
-dist.set_version("1.4.2")
-dist.set_copyright("2008-2012, Carnegie Mellon University")
+dist.set_version("1.4.3")
+dist.set_copyright("2008-2013, Carnegie Mellon University")
 
 dist.set_title("NetSA Python")
 dist.set_description("""
@@ -93,11 +93,6 @@ dist.add_package("netsa.sql")
 dist.add_package("netsa.sql.test")
 dist.add_package("netsa.tools")
 dist.add_package("netsa.util")
-dist.add_package("netsa.util.sentinel")
-dist.add_package("netsa.util.sentinel.audit")
-dist.add_package("netsa.util.sentinel.ledger")
-dist.add_package("netsa.util.sentinel.sig")
-dist.add_package("netsa.util.sentinel.test")
 dist.add_package("netsa.util.test")
 dist.add_package("netsa._netsa_silk")
 dist.add_package("netsa._netsa_silk.test")
@@ -110,13 +105,13 @@ dist.add_install_data("share/netsa-python/sql", "sql/create-sa_meta-0.9.sql")
 
 dist.add_extra_files("GPL.txt")
 dist.add_extra_files("CHANGES")
+dist.add_extra_files("netsa-python.spec")
 dist.add_extra_files("sql")
 
 dist.add_unit_test_module("netsa.data.test")
 dist.add_unit_test_module("netsa.files.test")
 dist.add_unit_test_module("netsa.json.test")
 dist.add_unit_test_module("netsa.logging.test")
-dist.add_unit_test_module("netsa.util.sentinel.test")
 dist.add_unit_test_module("netsa.util.test")
 dist.add_unit_test_module("netsa.sql.test")
 dist.add_unit_test_module("netsa._netsa_silk.test")

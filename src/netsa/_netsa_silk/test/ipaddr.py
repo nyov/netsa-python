@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -121,12 +121,12 @@ class IPAddrTest(unittest.TestCase):
             int(IPAddr("10.10.10.10")),
             0x0A0A0A0A)
 
-    def test_v4_int_4(self):
+    def test_v4_int_5(self):
         self.assertEqual(
             int(IPAddr("1234567890")),
             1234567890)
 
-    def test_v4_int_4(self):
+    def test_v4_int_6(self):
         self.assertEqual(
             int(IPAddr("167772160")),
             167772160)
@@ -511,7 +511,7 @@ class IPAddrTest(unittest.TestCase):
     def test_v4_cmp_2(self):
         self.assertEqual(cmp(IPv4Addr(0), IPv4Addr(128)), -1)
 
-    def test_v4_cmp_1(self):
+    def test_v4_cmp_3(self):
         self.assertEqual(cmp(IPv4Addr(128), IPv4Addr(0)), 1)
 
     def test_v6_eq(self):

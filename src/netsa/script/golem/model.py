@@ -1,4 +1,4 @@
-# Copyright 2008-2011 by Carnegie Mellon University
+# Copyright 2008-2013 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -128,7 +128,7 @@ class Golem(Script):
         if 'golem_inputs' in mdata:
             inputs = []
             for meta, spec in mdata.pop('golem_inputs'):
-                inputs.append((cls.make_from_meta(**meta), spec))
+                inputs.append((cls._make_from_meta(**meta), spec))
             kwargs['golem_inputs'] = inputs
         if 'golem_tags' in mdata:
             kwargs['tags'] = mdata.pop('golem_tags')
@@ -182,7 +182,7 @@ class Golem(Script):
         if self.golem_inputs:
             inputs = []
             for jin, spec in self.golem_inputs:
-                jmeta = model._script_as_meta(jin)
+                jmeta = model._script_to_meta(jin)
                 inputs.append([jmeta, spec])
             meta['golem_inputs'] = inputs
         return meta

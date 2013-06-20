@@ -1,4 +1,4 @@
-#  Copyright (C) 2010 by Carnegie Mellon University.
+#  Copyright (C) 2008-2013 by Carnegie Mellon University.
 #  
 #  @OPENSOURCE_HEADER_START@
 #  Use of the Network Situational Awareness Python support library and
@@ -77,6 +77,7 @@ A usage example:
 """
 
 from __future__ import division
+import errno
 import os
 import sys
 import tempfile
@@ -258,7 +259,7 @@ class Environment(object):
         Sets the value of *env_name* in the environment to
         *env_val*. *env_val* must be a string.
         """
-        if not isinstance(env_val, BaseString):
+        if not isinstance(env_val, basestring):
             raise TestingException(
                 "env_val argument to set_env must be a string")
         self._envars[env_name] = env_val
