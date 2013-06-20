@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -46,5 +46,11 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
+import warnings
+warnings.filterwarnings('ignore', '', DeprecationWarning, r'netsa\.files')
+
 from netsa.files.test.datefiles import *
+from netsa.files.test.pidlocks import *
+from netsa.files.test.relpath import *
+from netsa.files.test.temp import *
 from netsa.files.test.tmpdir import *

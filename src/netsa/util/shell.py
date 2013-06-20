@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -319,7 +319,7 @@ class Task_group(object):
     __slots__ = ['_name', '_tasks', '_running_tasks', '_failed', '_cond_var']
     def __init__(self, name=None):
         self._name = name
-        self._tasks = set([])
+        self._tasks = []
         self._running_tasks = set([])
         self._failed = False
         self._cond_var = threading.Condition()
@@ -343,7 +343,7 @@ class Task_group(object):
     def add_task(self, task):
         self._cond_var.acquire()
         try:
-            self._tasks.add(task)
+            self._tasks.append(task)
             self._running_tasks.add(task)
             # Are we already aborted?
             if self._failed:
@@ -402,7 +402,7 @@ class Task_process(Task):
     __slots__ = ['_exit_status', '_ignore_exits', '_pid',
                  '_stderr_text', '_aborted']
     def __init__(self, args, fin, fout, ferr, fout_append, ferr_append,
-                 ignore_exits):
+                 ignore_exits, fout_to_ferr):
         Task.__init__(self, format_args(args),
                       fin, fout, ferr, fout_append, ferr_append)
         self._cond_var.acquire()
@@ -439,9 +439,14 @@ class Task_process(Task):
                         if netsa.DEBUG:
                             print >>sys.stderr, "Starting [%d] %s" % \
                                 (os.getpid(), self.get_name())
+                        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
                         (in_fd, in_file) = open_stream(fin, 'r')
-                        (out_fd, out_file) = \
-                            open_stream(fout, fout_append and 'a' or 'w')
+                        if not (fout_to_ferr and ferr):
+                            (out_fd, out_file) = \
+                                open_stream(fout, fout_append and 'a' or 'w')
+                        else:
+                            (out_fd, out_file) = \
+                                open_stream(ferr, ferr_append and 'a' or 'w')
                         # Set up stdin, stdout, stderr
                         if in_fd is not None:
                             os.dup2(in_fd, 0)
@@ -652,9 +657,12 @@ def fork_child(task_group, command, stdin, stdout, stdout_append,
     ignore_exits = False
     if ignore_status: ignore_exits = ignore_status
     if ignore: ignore_exits = True
+    stdout_to_stderr = command.get_options(defaults) \
+        .get('stdout_to_stderr', False)
     # Fork an individual child in a pipeline
     task = Task_process(args, stdin, stdout, stderr,
-                        stdout_append, stderr_append, ignore_exits)
+                        stdout_append, stderr_append, ignore_exits,
+                        stdout_to_stderr)
     task.add_task_group(task_group)
     return task
 
@@ -1174,7 +1182,7 @@ def run_parallel(*args, **options):
                     p_exits.append(None)
                 else:
                     p_exits.append(statuses.pop(0))
-                    all_exits.append(p_exits)
+            all_exits.append(p_exits)
         return all_exits
 
     task_group = Task_group()

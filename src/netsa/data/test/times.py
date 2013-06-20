@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -51,7 +51,7 @@ import unittest
 from datetime import datetime, timedelta
 
 import netsa.data.times
-from netsa.data.times import make_datetime, bin_datetime
+from netsa.data.times import make_datetime, bin_datetime, make_timedelta
 
 class TimesTest(unittest.TestCase):
 
@@ -303,3 +303,35 @@ class TimesTest(unittest.TestCase):
                          self.dt_20100203T040506_007008),
             self.dt_20100101T000000)
 
+    def test_make_timedelta_1(self):
+        self.assertEqual(make_timedelta(timedelta(0)), timedelta(0))
+
+    def test_make_timedelta_2(self):
+        self.assertEqual(make_timedelta(timedelta(2427)), timedelta(2427))
+
+    def test_make_timedelta_3(self):
+        self.assertEqual(make_timedelta('P1Y'), timedelta(days=365))
+
+    def test_make_timedelta_4(self):
+        self.assertEqual(make_timedelta('P1M'), timedelta(days=30))
+
+    def test_make_timedelta_5(self):
+        self.assertEqual(make_timedelta('P1D'), timedelta(days=1))
+
+    def test_make_timedelta_6(self):
+        self.assertEqual(make_timedelta('PT1H'), timedelta(hours=1))
+
+    def test_make_timedelta_7(self):
+        self.assertEqual(make_timedelta('PT1M'), timedelta(minutes=1))
+
+    def test_make_timedelta_8(self):
+        self.assertEqual(make_timedelta('PT1S'), timedelta(seconds=1))
+
+    def test_make_timedelta_9(self):
+        self.assertEqual(make_timedelta('PT0.001S'), timedelta(milliseconds=1))
+        
+    def test_make_timedelta_10(self):
+        self.assertEqual(
+            make_timedelta('P1Y1M1DT1H1M1.001S'),
+            timedelta(days=396, hours=1, minutes=1, seconds=1, milliseconds=1))
+        

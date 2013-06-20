@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -46,17 +46,11 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import atexit
-import os
-
-def remove_pidfile(path):
-    try:
-        os.unlink(path)
-    except:
-        pass
-
 def check_pidfile(path, unlink=True):
     """
+    *Deprecated* as of netsa-python v1.4.  Use
+    :func:`netsa.files.acquire_pidfile_lock` instead.
+
     Attempts to create a locking PID file at the requested pathname
     *path*.  If the file does not exist, creates it with the current
     process ID, and sets up an :mod:`atexit` process to remove it.  If
@@ -69,32 +63,11 @@ def check_pidfile(path, unlink=True):
     was left in place (which means someone else is processing and we
     should exit.)
     """
-    try:
-        # Read the current pid from the file.
-        f = open(path, 'r')
-        pid = int(f.read())
-        f.close()
-        # Check if the process is running.
-        is_running = True
-        try:
-            os.kill(pid, 0)
-        except OSError, e:
-            if e.errno == 3: is_running = False
-        if is_running:
-            # Pidfile is there, process is running--don't run!
-            return False
-    except (IOError, ValueError, TypeError):
-        # There's a problem--handle it by assuming the file is bad.
-        pass
-    # File does not exist, or we've decided to replace it
-    f = open(path, 'w')
-    f.write(str(os.getpid()))
-    f.close()
-    if unlink:
-        atexit.register(remove_pidfile, path)
-    # We're in the file now--run!
-    return True
-       
+    warnings.warn("netsa.tools.service.check_pidfile is deprecated, "
+                  "please see netsa.files.acquire_pidfile_lock",
+                  DeprecationWarning)
+    return acquire_pidfile_lock(path)
+
 __all__ = """
 
     check_pidfile

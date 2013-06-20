@@ -1,11 +1,11 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2011 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -47,9 +47,11 @@
 # @OPENSOURCE_HEADER_END@
 
 import logging
+from logging import root, Formatter, StreamHandler
 from logging import *
 import logging.config as config
 import logging.handlers as handlers
+import os
 
 _programName = "python"
 _logFilename = None

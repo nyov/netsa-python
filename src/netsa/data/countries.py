@@ -7,7 +7,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -366,6 +366,8 @@ for line in _country_info.split("\n"):
         column.strip() for column in line.split("|")]
     tlds = [tld.strip() for tld in tlds.split()]
     num = int(num)
+    if not alpha2: alpha2 = None
+    if not alpha3: alpha3 = None
     _country_list.append(num)
     if subregion:
         subregion = int(subregion)
@@ -540,7 +542,7 @@ def get_country_alpha3(code):
 def get_country_tlds(code):
     """
     Given a country code as a string or integer, returns a list of
-    zero or moreDNS top-level domains for that country.
+    zero or more DNS top-level domains for that country.
 
     Raises :exc:`KeyError` if the country code is unrecognized.
     """
@@ -611,8 +613,11 @@ def iter_region_subregions(code):
 
     Raises :exc:`KeyError` if the region code is unrecognized.
     """
-    for subcode in _region_subregions[get_region_numeric(code)]:
-        yield subcode
+    get_region_numeric(code)
+    def gen():
+        for subcode in _region_subregions[get_region_numeric(code)]:
+            yield subcode
+    return gen()
 
 def iter_region_countries(code):
     """
@@ -620,8 +625,11 @@ def iter_region_countries(code):
     yields as integers all ISO 3166-1 numeric country codes that are
     part of that region.
     """
-    for country_code in _region_countries[get_region_numeric(code)]:
-        yield country_code
+    get_region_numeric(code)
+    def gen():
+        for country_code in _region_countries[get_region_numeric(code)]:
+            yield country_code
+    return gen()
 
 __all__ = """
 

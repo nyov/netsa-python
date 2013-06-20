@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -60,7 +60,7 @@ import sys
 import netsa.json
 from netsa.script import ScriptError
 from netsa.script import model
-from netsa.util.shell import run_collect, command
+from netsa.util   import shell
 
 _script_errors = {}
 
@@ -76,28 +76,44 @@ def fetch_script_details(script_path):
     file, or if the executable file does not produce proper metadata.
     """
     # Check first if the script file exists.
-    if not os.path.isfile(script_path):
+    if os.path.exists(script_path):
+        if not os.path.isfile(script_path):
+            script_error = ScriptError(
+                "Script %s is not a regular file" % repr(script_path))
+            raise script_error
+    else:
         script_error = ScriptError(
-            "Script %s is not a regular file" % repr(script_path))
+            "Script %s does not exist" % repr(script_path))
         raise script_error
+    def _error_info():
+        return repr(script_path), sys.exc_info()[1]
     try:
         # Okay, now let's try
         sc_out = ""
         sc_err = ""
-        (sc_out, sc_err) = run_collect(
+        (sc_out, sc_err) = shell.run_collect(
             "%(python_path)s %(script_path)s --netsa-script-get-metadata",
             vars={'python_path': sys.executable,
                   'script_path': script_path})
-        script = model.parse_script_metadata(sc_out)
-        return script
+        return model.parse_script_metadata(sc_out)
     except ScriptError:
         raise
-    except:
-        script_error = ScriptError(
-            "Script %s failed to return metadata--not a framework script?\n"
-            "%s\n%s%s"
-            % (repr(script_path), sys.exc_info()[1], sc_out, sc_err))
+    except shell.PipelineException, e:
+        msg = "Script %s failed to execute:\n%s" % _error_info()
+        msg += "\nstderr[[[%s]]]" % e
+        script_error = ScriptError(msg)
         raise script_error
+    except ValueError:
+        msg = "Script %s failed to return metadata " \
+                "-- not a framework script?\n%s" % _error_info()
+        if sc_err:
+            msg += "\nstderr[[[%s]]]" % sc_err.strip()
+        script_error = ScriptError(msg)
+        raise script_error
+    # never say never
+    script_error = ScriptError(
+        "Script %s produced an unknown exception\n%s" % _error_info())
+    raise script_error
 
 def fetch_script_directory(path):
     """

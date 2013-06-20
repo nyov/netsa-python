@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -46,7 +46,9 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
+from netsa.data.test.countries import *
+from netsa.data.test.format import *
+from netsa.data.test.nice import *
 from netsa.data.test.timebin import *
 from netsa.data.test.times import *
-from netsa.data.test.format import *
 

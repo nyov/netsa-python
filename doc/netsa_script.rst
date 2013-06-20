@@ -1,3 +1,5 @@
+.. _netsa-script:
+
 :mod:`netsa.script` --- The NetSA Scripting Framework
 =====================================================
 
@@ -12,8 +14,11 @@
 
     .. autoexception:: ScriptError(message)
 
+
     Metadata Functions
     ------------------
+
+    .. _netsa-script-metadata-functions:
 
     The following functions define "metadata" for the script---they
     provide information about the name of the script, what the script
@@ -34,6 +39,9 @@
     .. autofunction:: set_authors(script_authors : str list)
 
     .. autofunction:: add_author(script_author : str)
+
+
+    .. _netsa-script-parameter-functions:
 
     Script Parameters
     -----------------
@@ -77,12 +85,18 @@
 
     .. autofunction:: get_param(name : str) -> value
 
+
+    .. _netsa-script-verbosity-functions:
+
     Verbose Output
     --------------
 
     .. autofunction:: get_verbosity() -> int
 
     .. autofunction:: display_message(text, [min_verbosity=1])
+
+
+    .. _netsa-script-flowdata-functions:
 
     Flow Data Parameters
     --------------------
@@ -132,6 +146,8 @@
         .. automethod:: using([flow_class : str, flow_type : str, flowtypes : str list, sensors : str list, start_date : datetime, end_date : datetime, input_pipe : str, xargs : str, filenames : str list]) -> Flow_params
 
 
+    .. _netsa-script-output-functions:
+
     Producing Output
     ----------------
 
@@ -155,14 +171,6 @@
 
     .. autofunction:: get_output_dir_file(dir_name : str, file_name : str, [description : str, mime_type : str]) -> file
 
-    Temporary Files
-    ---------------
-
-    .. autofunction:: get_temp_dir_file_name([file_name : str]) -> str
-
-    .. autofunction:: get_temp_dir_file([file_name : str, append=False]) -> file
-
-    .. autofunction:: get_temp_dir_pipe_name([pipe_name : str]) -> str
 
     Script Execution
     ----------------

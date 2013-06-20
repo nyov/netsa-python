@@ -1,11 +1,11 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2011 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -48,7 +48,6 @@
 
 import psycopg2
 import netsa.sql
-from DBUtils.PooledDB import PooledDB
 
 class ppg_driver(netsa.sql.db_driver):
     __slots__ = """
@@ -125,6 +124,12 @@ class ppg_pool(netsa.sql.db_pool):
     """.split()
 
     def __init__(self, driver, params):
+        try:
+            from DBUtils.PooledDB import PooledDB
+        except ImportError:
+            raise ImportError(
+                "Connection pooling requires the DButils Python package.")
+
         netsa.sql.db_pool.__init__(self, driver)
         self._pool = PooledDB(psycopg2,
                               blocking=True,

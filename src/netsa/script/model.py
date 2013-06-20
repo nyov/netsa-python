@@ -7,7 +7,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -90,10 +90,10 @@ class Script(object):
                  '_flow_params', '_flow_params_require_pull',
                  '_outputs')
     def __init__(self,
-                 script_path=None, script_params={}, script_metadata={},
-                 script_flow_params=False,
-                 script_flow_params_require_pull=False,
-                 script_outputs={}):
+                 script_path=None, params={}, metadata={},
+                 flow_params=False,
+                 flow_params_require_pull=False,
+                 outputs={}):
         """
         Creates a new :class:`Script` object from the various data
         that make up a script definition.  This should never need to
@@ -104,17 +104,17 @@ class Script(object):
         information from serialized metadata or existings scripts.
         """
         self._path = script_path
-        self._params = script_params
-        self._metadata = script_metadata
-        self._flow_params = script_flow_params
-        self._flow_params_require_pull = script_flow_params_require_pull
-        self._outputs = script_outputs
+        self._params = params
+        self._metadata = metadata
+        self._flow_params = flow_params
+        self._flow_params_require_pull = flow_params_require_pull
+        self._outputs = outputs
     def __repr__(self):
         """
         Returns a machine-readable representation of this
         :class:`Script` object.
         """
-        return "Script(%s)" % repr(self._path)
+        return "%s(%s)" % (type(self).__name__, repr(self._path))
     def _set_single_metadata(self, key, value):
         if netsa.DEBUG:
             if self._metadata.get(key, None) != None:
@@ -131,6 +131,16 @@ class Script(object):
         if self._metadata.get(key, None) == None:
             self._metadata[key] = []
         self._metadata[key].append(value)
+    def _set_dict_metadata(self, key, value):
+        if netsa.DEBUG:
+            if self._metadata.get(key, None):
+                netsa.DEBUG_print('netsa.script: %s meta set when non-empty'
+                                  % key)
+        self._metadata[key] = value
+    def _add_dict_metadata(self, key, mkey, value):
+        if self._metadata.get(key, None) == None:
+            self._metadata[key] = {}
+        self._metadata[key][mkey] = value
     def set_title(self, script_title):
         """
         Set the title for this script.  This should be the
@@ -679,7 +689,7 @@ Read list of input file names from a file or pipe pathname or 'stdin'.
         self._add_param(name, help, required, None, None, expert,
                         netsa.script.params.KIND_OUTPUT_DIR, {})
         self._outputs[name] = {'name': name,
-                               'kind': file,
+                               'kind': 'file',
                                'mime_type': mime_type,
                                'description': description}
 
@@ -695,22 +705,54 @@ def parse_script_metadata(metadata_text):
     version = script_metadata.get('netsa_script_version', None)
     if version == 1:
         try:
-            return Script(
+            kwargs = dict(
                 script_path=script_metadata['netsa_script_path'],
-                script_params=script_metadata['netsa_script_params'],
-                script_metadata=script_metadata['netsa_script_metadata'],
-                script_flow_params=script_metadata['netsa_script_flow_params'],
-                script_flow_params_require_pull=script_metadata[
+                params=script_metadata['netsa_script_params'],
+                metadata=script_metadata['netsa_script_metadata'],
+                flow_params=script_metadata['netsa_script_flow_params'],
+                flow_params_require_pull=script_metadata[
                     'netsa_script_flow_params_require_pull'],
-                script_outputs=script_metadata['netsa_script_outputs'])
+                outputs=script_metadata['netsa_script_outputs'])
         except KeyError:
             script_error = ScriptError("Cannot parse malformed script "
                                        "metadata")
             raise script_error
+        script_type = script_metadata.get('netsa_script_type', None)
+        if script_type is None or script_type == 'Script':
+            return Script(**kwargs)
+        elif script_type == 'Golem':
+            from netsa.script.golem.model import Golem
+            return Golem._make_from_meta(**kwargs)
+        else:
+            script_error = ScriptError(
+                "Unknown script type %s" % repr(script_type))
     else:
         script_error = ScriptError("Cannot parse script metadata for "
                                    "unknown version %s" % repr(version))
         raise script_error
+
+def _script_to_meta(script, version=1, verbose=False):
+    if version == 1:
+        try:
+            metadata = script._as_meta()
+        except AttributeError:
+            metadata = script._metadata
+        script_metadata = {
+            'netsa_script_version': 1,
+            'netsa_script_type': type(script).__name__,
+            'netsa_script_path': script._path,
+            'netsa_script_params': script._params,
+            'netsa_script_metadata': metadata,
+            'netsa_script_flow_params': script._flow_params,
+            'netsa_script_flow_params_require_pull':
+                script._flow_params_require_pull,
+            'netsa_script_outputs': script._outputs,
+        }
+    else:
+        script_error = ScriptError("Cannot unparse script metadata for "
+                                   "unknown version %s" % repr(version))
+        raise script_error
+    return script_metadata
 
 def unparse_script_metadata(script, version=1, verbose=False):
     """
@@ -721,21 +763,8 @@ def unparse_script_metadata(script, version=1, verbose=False):
     human-readable form of the JSON will be returned, otherwise a more
     compact form is used.
     """
-    if version == 1:
-        script_metadata = {
-            'netsa_script_version': 1,
-            'netsa_script_path': script._path,
-            'netsa_script_params': script._params,
-            'netsa_script_metadata': script._metadata,
-            'netsa_script_flow_params': script._flow_params,
-            'netsa_script_flow_params_require_pull':
-                script._flow_params_require_pull,
-            'netsa_script_outputs': script._outputs,
-        }
-    else:
-        script_error = ScriptError("Cannot unparse script metadata for "
-                                   "unknown version %s" % repr(version))
-        raise script_error
+    script_metadata = \
+        _script_to_meta(script, version=version, verbose=verbose)
     if verbose:
         extra_args = dict(sort_keys=True, indent=2)
     else:

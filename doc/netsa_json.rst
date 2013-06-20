@@ -9,4 +9,4 @@
     otherwise.  Please see the standard library documentation for
     details.
 
-    .. _`simplejson`: http://code.google.com/p/simplejson/
+.. _`simplejson`: http://simplejson.readthedocs.org/en/latest/

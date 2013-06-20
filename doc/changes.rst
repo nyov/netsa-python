@@ -1,6 +1,61 @@
 Changes
 =======
 
+Version 1.4 - 2011-09-30
+------------------------
+
+ * NOTE: Version 1.4 of NetSA Python is the last version that
+   will support Python 2.4.  Future major versions of NetSA Python
+   will require Python 2.6 or greater.
+
+ * Added new netsa_silk module, which provides a bridge between
+   netsa-python and PySiLK.  When PySiLK is available, it uses PySiLK
+   to provide a fast C implementation of IP address and related
+   functionality.  When PySiLK is not available, a pure Python
+   implementation from netsa-python is used instead.
+
+ * Added new netsa.script.golem script automation framework, for
+   building scripts to maintain large time-based data sets (among
+   other things.)
+
+ * Added regex_help argument to netsa.script.add_text_param and
+   add_label_param, to support providing a more useful error message
+   when the regex doesn't match the input.
+
+ * Added heapq.merge and os.path.relpath to netsa.util.compat.
+
+ * Replaced all temporary file code with new functions in the
+   netsa.files module, to avoid duplication of effort.  Similar
+   functions in other locations have been deprecated and are now
+   implemented using this version.
+
+ * Replaced PID locking code with new functions in the netsa.files
+   module, to avoid duplication of effort.
+
+ * Improved netsa.data.nice's results, particularly for time ticks.
+
+ * Added a large number of new tests to improve compatibility testing
+   for different versions of Python in the future.
+
+ * Moved the netsa.script.get_temp_dir... functions into netsa.files,
+   with slight renaming.  The old functions are still available but
+   deprecated.
+
+ * Deprecated netsa.files.DirLocker, netsa.files.LocalTmpDir, and
+   netsa.tools.service.  See the new functions
+   netsa.files.acquire_pidfile_lock, examine_pidfile_lock, and
+   release_pidfile_lock.
+
+ * Deprecated netsa.files.datefiles.
+
+ * Added documentation for the netsa.dist module, even though it is
+   primarily for internal use.
+
+ * Fixed bug involving SIGPIPE handling in netsa.util.shell.
+
+ * Fixed bug that prevented netsa.logging from importing correctly
+   under Python 2.7.
+
 Version 1.3 - 2011-03-28
 ------------------------
 

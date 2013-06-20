@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -76,6 +76,7 @@ class netsa_distribution(Distribution):
         self.source_dir = source_dir_default
         self.netsa_version_files = []
         self.netsa_doc_dir = None
+        self.netsa_doc_conf_dir = None
         self.netsa_unit_test_modules = []
         self.netsa_other_test_modules = []
         self.netsa_extra_globs = []
@@ -99,9 +100,15 @@ class netsa_distribution(Distribution):
 # build
 from distutils.command.build import build
 class netsa_build(build):
+    def initialize_options(self):
+        build.initialize_options(self)
+        self.has_run = False
     def run(self):
+        if self.has_run: return
         self.run_command('gen_version')
         build.run(self)
+        self.has_run = True
+        self.run_command('gen_doc_man')
 
 # build_clib - what the heck is this?  We don't use it
 
@@ -180,30 +187,34 @@ class netsa_clean(clean):
     def run(self):
         if self.all:
             for (filename, template) in self.distribution.netsa_version_files:
-                log.info("removing %r", filename)
-                if not self.dry_run:
-                    try:
+                if os.path.exists(filename):
+                    log.info("removing %r", filename)
+                    if not self.dry_run:
                         os.unlink(filename)
-                    except:
-                        log.debug("%r doesn't exist -- can't clean it",
-                                  filename)
             html_dir = self.get_finalized_command('gen_doc_html').gen_doc_html
             if os.path.exists(html_dir):
                 remove_tree(html_dir, dry_run=self.dry_run)
             pdf_file = self.get_finalized_command('gen_doc_pdf').gen_doc_pdf
-            log.info("removing %r", pdf_file)
-            if not self.dry_run:
-                try:
+            if os.path.exists(pdf_file):
+                log.info("removing %r", pdf_file)
+                if not self.dry_run:
                     os.unlink(pdf_file)
-                except:
-                    log.debug("%r doesn't exist -- can't clean it",
-                              pdf_file)
         latex_dir = self.get_finalized_command('gen_doc_pdf').gen_doc_latex
         extra_dir = self.get_finalized_command('gen_doc_pdf').gen_doc_extra
+        web_dir = self.get_finalized_command('gen_doc_tools_web').gen_doc_web
+        gen_man_dir = self.get_finalized_command('gen_doc_man').gen_doc_man
+        man_base = os.path.join(self.distribution.source_dir,
+                                self.distribution.netsa_doc_dir, "man")
         if os.path.exists(latex_dir):
             remove_tree(latex_dir, dry_run=self.dry_run)
         if os.path.exists(extra_dir):
             remove_tree(extra_dir, dry_run=self.dry_run)
+        if os.path.exists(web_dir):
+            remove_tree(web_dir, dry_run=self.dry_run)
+        if os.path.exists(gen_man_dir):
+            remove_tree(gen_man_dir, dry_run=self.dry_run)
+        if os.path.exists(man_base):
+            remove_tree(man_base, dry_run=self.dry_run)
         clean.run(self)
 
 
@@ -224,6 +235,35 @@ class netsa_install_data(install_data):
                 self.data_files.append(
                     (f[0], [os.path.join(self.distribution.source_dir, fn)
                             for fn in f[1]]))
+        # Can we generate man pages?
+        try:
+            import sphinx
+            if sphinx.__version__ < "1.0":
+                raise ImportError()
+            try:
+                self.run_command('gen_doc_man')
+            except:
+                pass
+        except ImportError:
+            pass
+        man_files = set()
+        man_base = os.path.join(self.distribution.source_dir,
+                                self.distribution.netsa_doc_dir, "man")
+        if os.path.exists(man_base):
+            for man_dir in os.listdir(man_base):
+                for man_page in os.listdir(os.path.join(man_base, man_dir)):
+                    man_files.add(os.path.join(man_dir, man_page))
+                    self.data_files.append(
+                        (os.path.join("share", "man", man_dir),
+                         [os.path.join(man_base, man_dir, man_page)]))
+        src_man = os.path.join(self.distribution.source_dir, man_base)
+        if os.path.exists(src_man):
+            for man_dir in os.listdir(src_man):
+                for man_page in os.listdir(os.path.join(src_man, man_dir)):
+                    if os.path.join(man_dir, man_page) not in man_files:
+                        self.data_files.append(
+                            (os.path.join("share", "man", man_dir),
+                             [os.path.join(src_man, man_dir, man_page)]))
         install_data.run(self)
         self.data_files = old_data_files
 
@@ -236,7 +276,7 @@ class netsa_install_data(install_data):
 # sdist
 from distutils.command.sdist import sdist
 class netsa_sdist(sdist):
-    def get_file_list(self, no_pdf=False):
+    def get_file_list(self, no_pdf=False, no_man=False):
         # Our own version, based on the 2.7 version plus special sauce
         self.filelist.findall()
         source_dir = self.distribution.source_dir
@@ -302,7 +342,11 @@ class netsa_sdist(sdist):
             self.run_command('gen_doc_pdf')
             self.filelist.extend(gen_doc_pdf_cmd.get_source_files())
             self.filelist.extend(gen_doc_pdf_cmd.get_generated_files())
-        
+        if not no_man:
+            gen_doc_man_cmd = self.get_finalized_command('gen_doc_man')
+            self.run_command('gen_doc_man')
+            self.filelist.extend(gen_doc_man_cmd.get_source_files())
+            self.filelist.extend(gen_doc_man_cmd.get_generated_files())
         self.prune_file_list()
         self.filelist.sort()
         self.filelist.remove_duplicates()
@@ -412,7 +456,8 @@ class netsa_gen_doc_html(Command):
     def finalize_options(self):
         build_base = self.get_finalized_command('build').build_base
         if self.gen_doc_html is None:
-            self.gen_doc_html = os.path.join(self.distribution.netsa_doc_dir,
+            self.gen_doc_html = os.path.join(self.distribution.source_dir,
+                                             self.distribution.netsa_doc_dir,
                                              'html')
         if self.gen_doc_extra is None:
             self.gen_doc_extra = os.path.join(build_base, 'gen.doc.extra')
@@ -435,6 +480,9 @@ class netsa_gen_doc_html(Command):
                 cmd = command("sphinx-build",
                               "-b", "html",
                               "-d", self.gen_doc_extra,
+                              "-c", os.path.join(
+                                  self.distribution.source_dir,
+                                  self.distribution.netsa_doc_conf_dir),
                               os.path.join(self.distribution.source_dir,
                                            self.distribution.netsa_doc_dir),
                               self.gen_doc_html)
@@ -447,9 +495,12 @@ class netsa_gen_doc_html(Command):
                 else:
                     del os.environ['PYTHONPATH']
     def get_source_files(self):
-        return distutils.filelist.findall(
-            os.path.join(self.distribution.source_dir,
-                         self.distribution.netsa_doc_dir))
+        if self.distribution.netsa_doc_dir:
+            return distutils.filelist.findall(
+                os.path.join(self.distribution.source_dir,
+                             self.distribution.netsa_doc_dir))
+        else:
+            return []
     def get_generated_files(self):
         # Only after running!
         return distutils.filelist.findall(self.gen_doc_html)
@@ -512,6 +563,9 @@ class netsa_gen_doc_tools_web(Command):
                               "-D", "html_theme=tools_web",
                               "-D", "html_style=tools.css",
                               "-d", self.gen_doc_extra,
+                              "-c", os.path.join(
+                                  self.distribution.source_dir,
+                                  self.distribution.netsa_doc_conf_dir),
                               os.path.join(self.distribution.source_dir,
                                            self.distribution.netsa_doc_dir),
                               os.path.join(self.gen_doc_web, self.base_name))
@@ -529,6 +583,82 @@ class netsa_gen_doc_tools_web(Command):
             self.make_archive(os.path.join('dist', self.base_name),
                               'gztar', self.gen_doc_web, self.base_name)
                               
+
+class netsa_gen_doc_man(Command):
+    description = "Create generated man pages for project"
+    user_options = []
+    def initialize_options(self):
+        self.gen_doc_extra = None
+        self.gen_doc_man = None
+    def finalize_options(self):
+        build_base = self.get_finalized_command('build').build_base
+        if self.gen_doc_extra is None:
+            self.gen_doc_extra = os.path.join(build_base, 'gen.doc.extra')
+        if self.gen_doc_man is None:
+            self.gen_doc_man = os.path.join(build_base, 'gen.doc.man')
+    def run(self):
+        self.run_command('build')
+        build_lib = self.get_finalized_command('build').build_lib
+        if self.distribution.netsa_doc_dir:
+            self.mkpath(self.gen_doc_extra)
+            self.mkpath(self.gen_doc_man)
+            gen_doc_config(self.distribution, self.gen_doc_extra)
+            old_pythonpath = None
+            try:
+                if 'PYTHONPATH' in os.environ:
+                    old_pythonpath = os.environ['PYTHONPATH']
+                    os.environ['PYTHONPATH'] = (
+                        self.gen_doc_extra + ":" + build_lib +
+                        ":" + old_pythonpath)
+                else:
+                    os.environ['PYTHONPATH'] = (
+                        self.gen_doc_extra + ":" + build_lib)
+                cmd = command("sphinx-build",
+                              "-b", "man",
+                              "-d", self.gen_doc_extra,
+                              "-c", os.path.join(
+                                  self.distribution.source_dir,
+                                  self.distribution.netsa_doc_conf_dir),
+                              os.path.join(self.distribution.source_dir,
+                                           self.distribution.netsa_doc_dir),
+                              self.gen_doc_man)
+                log.info("generating man pages with Sphinx")
+                try:
+                    run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
+                except Exception, ex:
+                    log.error(str(ex))
+                    sys.exit(-1)
+            finally:
+                if old_pythonpath:
+                    os.environ['PYTHONPATH'] = old_pythonpath
+                else:
+                    del os.environ['PYTHONPATH']
+            for man_page in os.listdir(self.gen_doc_man):
+                section = man_page.split('.')[-1]
+                man_dir = os.path.join(self.distribution.netsa_doc_dir,
+                                       "man", "man%s" % section)
+                self.mkpath(man_dir)
+                self.copy_file(os.path.join(self.gen_doc_man, man_page),
+                               os.path.join(man_dir, man_page))
+    def get_source_files(self):
+        if self.distribution.netsa_doc_dir:
+            return distutils.filelist.findall(
+                os.path.join(self.distribution.source_dir,
+                             self.distribution.netsa_doc_dir))
+        else:
+            return []
+    def get_generated_files(self):
+        # Only after running!
+        if self.distribution.netsa_doc_dir:
+            man_base = os.path.join(self.distribution.netsa_doc_dir, "man")
+            if os.path.isdir(man_base):
+                return [
+                    os.path.join(man_base, man_dir, man_page)
+                    for man_dir in os.listdir(man_base)
+                    for man_page in os.listdir(os.path.join(man_base, man_dir))]
+        return []
+
+                               
 
 class netsa_gen_doc_pdf(Command):
     description = "Create generated PDF documentation files for project"
@@ -566,6 +696,9 @@ class netsa_gen_doc_pdf(Command):
                 cmd = command("sphinx-build",
                               "-b", "latex",
                               "-d", self.gen_doc_extra,
+                              "-c", os.path.join(
+                                  self.distribution.source_dir,
+                                  self.distribution.netsa_doc_conf_dir),
                               os.path.join(self.distribution.source_dir,
                                            self.distribution.netsa_doc_dir),
                               self.gen_doc_latex)
@@ -582,17 +715,30 @@ class netsa_gen_doc_pdf(Command):
                 else:
                     del os.environ['PYTHONPATH']
             latex_name = ("%s.tex" % self.distribution.get_name())
+            index_name = ("%s.idx" % self.distribution.get_name())
             pdf_name = ("%s.pdf" % self.distribution.get_name())
             curdir = os.getcwd()
             try:
                 os.chdir(self.gen_doc_latex)
                 try:
                     run_parallel(["pdflatex %(latex_name)s"],
-                                 vars={'latex_name': latex_name})
+                                 vars={'latex_name': latex_name},
+                                 stdout_to_stderr=True)
                     run_parallel(["pdflatex %(latex_name)s"],
-                                 vars={'latex_name': latex_name})
+                                 vars={'latex_name': latex_name},
+                                 stdout_to_stderr=True)
                     run_parallel(["pdflatex %(latex_name)s"],
-                                 vars={'latex_name': latex_name})
+                                 vars={'latex_name': latex_name},
+                                 stdout_to_stderr=True)
+                    run_parallel(["makeindex -s python.ist %(index_name)s"],
+                                 vars={'index_name': index_name},
+                                 stdout_to_stderr=True)
+                    run_parallel(["pdflatex %(latex_name)s"],
+                                 vars={'latex_name': latex_name},
+                                 stdout_to_stderr=True)
+                    run_parallel(["pdflatex %(latex_name)s"],
+                                 vars={'latex_name': latex_name},
+                                 stdout_to_stderr=True)
                 except Exception, ex:
                     log.error(str(ex))
                     sys.exit(-1)
@@ -601,12 +747,18 @@ class netsa_gen_doc_pdf(Command):
             self.copy_file(os.path.join(self.gen_doc_latex, pdf_name),
                            self.gen_doc_pdf)
     def get_source_files(self):
-        return distutils.filelist.findall(
-            os.path.join(self.distribution.source_dir,
-                         self.distribution.netsa_doc_dir))
+        if self.distribution.netsa_doc_dir:
+            return distutils.filelist.findall(
+                os.path.join(self.distribution.source_dir,
+                             self.distribution.netsa_doc_dir))
+        else:
+            return []
     def get_generated_files(self):
         # Only after running!
-        return [self.gen_doc_pdf]
+        if self.distribution.netsa_doc_dir:
+            return [self.gen_doc_pdf]
+        else:
+            return []
 
 class netsa_check(Command):
     description = "Run automated tests for project"
@@ -638,9 +790,12 @@ class netsa_check_unit(Command):
                 os.environ['PYTHONPATH'] = build_lib
             python_exec = os.path.normpath(sys.executable)
             log.info("running unit tests...")
+            args = list(self.distribution.netsa_unit_test_modules)
+            if self.distribution.verbose > 1:
+                args.insert(0, "-v")
             try:
                 cmd = command(python_exec, "-m", "netsa.dist.run_unit_tests",
-                              "-v", *self.distribution.netsa_unit_test_modules)
+                              *args)
                 log.debug("PYTHONPATH=%s %s", os.environ['PYTHONPATH'], cmd)
                 run_parallel([cmd], stdout=sys.stdout, stderr=sys.stderr)
             except:
@@ -700,10 +855,10 @@ class netsa_dist(Command):
     def finalize_options(self):
         pass
     def run(self):
-        self.run_command('sdist')
-        self.run_command('gen_doc_tools_web')
         for func in self.distribution.netsa_dist_funcs:
             func(self)
+        self.run_command('sdist')
+        self.run_command('gen_doc_tools_web')
 
 class netsa_src_license(Command):
     description = "(CAREFUL) Modify source files in place to update license"
@@ -716,7 +871,7 @@ class netsa_src_license(Command):
         sdist = self.get_finalized_command('sdist')
         sdist.filelist = distutils.filelist.FileList()
         sdist.check_metadata()
-        sdist.get_file_list(no_pdf=True)
+        sdist.get_file_list(no_pdf=True, no_man=True)
         source_files = sdist.filelist.files
         license_dir = self.distribution.source_dir
         if not license_dir: license_dir = '.'
@@ -789,6 +944,7 @@ dist_module_ext = []
 dist_scripts = []
 dist_data_files = []
 dist_doc_dir = 'doc'
+dist_doc_conf_dir = 'doc'
 dist_version_files = []
 dist_test_functions = []
 dist_unit_test_modules = []
@@ -826,63 +982,173 @@ def split_email(s):
 ### Standard Metadata and Config
 
 def set_name(project_name):
+    """
+    Sets the name of the project.  This name is used as part of the
+    name of produced tarballs and documentation files.
+    """
     dist_info['name'] = project_name
 
 def set_title(project_title):
+    """
+    Sets the title for this project.  This should be the
+    human-readable name of the project.  It is displayed in most
+    places as the project name.
+    """
     dist_info['description'] = project_title
 
 def set_description(project_description):
+    """
+    Sets the long-form description for this project.  This should be a
+    detailed explanation of the project's purpose.
+    """
     dist_info['long_description'] = project_description
 
 def set_version(project_version):
+    """
+    Sets the version number for this project.  The version number is
+    used as part of the filename of distribution files, is included in
+    the documentation, and may be written out as version files (see
+    :func:`add_version_file` and :func:`netsa.find_version`).
+    """
     dist_info['version'] = project_version
 
 def set_copyright(project_copyright):
+    """
+    Sets the copyright date for this project.  This is used in
+    documentation generation, and in the project metadata.  For example::
+
+        dist.set_copyright("2008-2011, Carnegie Mellon University")
+    """
     dist_info['netsa_copyright'] = project_copyright
 
 def set_license(project_license):
+    """
+    Sets the license type for this project, which defaults to
+    ``'GPL'``.  This is used for project distribution metadata.
+    """
     dist_info['license'] = project_license
 
 def set_maintainer(project_maintainer):
+    """
+    Given a name and email address (i.e.
+    ``'Harry Q. Bovik <bovik@sample.samp>'``) sets the maintainer name and
+    email address metadata for the project.
+    """
     (maint_name, maint_email) = split_email(project_maintainer)
     dist_info['maintainer'] = maint_name
     dist_info['maintainer_email'] = maint_email
 
 def set_author(project_author):
+    """
+    Given a name and email address (i.e.
+    ``'Harry Q. Bovik <bovik@sample.samp>'``) sets the author name and
+    email address metadata for the project.
+    """
     (author_name, author_email) = split_email(project_author)
     dist_info['author'] = author_name
     dist_info['author_email'] = author_email
 
 def set_url(project_url):
+    """
+    Sets the home page URL metadata for this project.
+    """
     dist_info['url'] = project_url
 
 def set_download_url(project_download_url):
+    """
+    Sets the download page URL metadata for this project.
+    """
     dist_info['download_url'] = project_download_url
 
 def _deprecated_set_package_dir(project_python_dir):
     dist_info['package_dir'] = {'': project_python_dir}
 
 def add_package(package_name):
+    """
+    Adds a Python package to be installed, by package name.  For example::
+
+        dist.add_package("netsa.data")
+
+    The files for this Python package would be found under
+    ``src/netsa/dist``.  Remember that the package directory (and
+    every directory leading up to it) must include an ``__init__.py``
+    file to be accepted as a Python package.
+    """
     dist_package.append(package_name)
 
 def add_package_data(package_name, data_file_glob):
+    """
+    Adds one or more data files to be installed within a package.
+    Each file or directory that *data_file_glob* expands to is
+    included.  The files and directories should be stored under
+    ``src/<package_name>``, just like the Python source files for the
+    package.  For a method of installing files in different places,
+    see :func:`add_install_data`.
+    """
     dist_package_data[package_name] = \
         dist_package_data.get(package_name, []) + [data_file_glob]
 
 def add_module_py(module_name):
+    """
+    Adds a single module by module name.  For example::
+
+        dist.add_module_py("netsa.util.shell")
+
+    Thie file for this module would be found at
+    ``src/netsa/util/shell.py``.  Remember that the package directory
+    (and every directory leading up to it) must include an
+    ``__init__.py`` file, which will also be installed.
+    """
     dist_module_py.append(module_name)
 
 def add_module_ext(module_name, module_sources, **kwargs):
+    """
+    Adds a single C extension module, given a module name, a list of
+    sources, and optional keyword arguments as accepted by
+    :class:`distutils.core.Extension`.  For example::
+
+        dist.add_module_ext('foo', ['foo.c', 'bar.c'])
+    """
     dist_module_ext.append(
         distutils.extension.Extension(module_name, module_sources, **kwargs))
 
 def add_script(script_name):
+    """
+    Adds a single script by script name.  For example::
+
+        dist.add_script("helloworld")
+
+    The file for this script would be found at ``bin/helloworld``.
+    When installed, if the script has a ``#!`` line and contains ``python``,
+    it will automatically be modified to point to the version of
+    Python being used to install this project.
+    """
     dist_scripts.append(os.path.join("bin", script_name))
 
 def add_install_data(install_path, data_file_name):
+    """
+    Adds an extra data file that should be installed when the project
+    is installed.  The *data_file_name* should be the path to the file
+    from the top level of the project.  *install_path* should be the
+    path to the installation directory from the install prefix.  For example::
+
+        dist.add_install_data("share/doc/helloworld", "samples/helloworld.ini")
+
+    This would install the file found at ``samples/helloworld.ini`` as
+    ``.../share/doc/helloworld/helloworld.ini`` under the installation
+    prefix.
+    """
     dist_data_files.append((install_path, [data_file_name]))
 
 def add_extra_files(extra_glob):
+    """
+    Given a glob string, adds files which match that glob to the
+    distribution.  This is used to add any extra files (README, etc.)
+    that should be included in a source distribution but are not to be
+    installed.  If you do include in this list a file that's already
+    to be installed, it will still be installed, and it will still be
+    included in the distribution.
+    """
     dist_extra_globs.append(extra_glob)
 
 ### Version File Generation
@@ -891,6 +1157,24 @@ default_template = "%s\n"
 
 def add_version_file(version_file_name,
                      version_file_template=default_template):
+    """
+    Adds a "version file" to the project, with the given path and
+    template.  By default the template is ``"%s\\n"``, which simply
+    includes the version number and a newline.  The path should be
+    given relative to the base of the project.  The version file will
+    be generated automatically before any other processing is done.
+
+    See :func:`netsa.find_version` for a convenient method for
+    retrieving the version number from this file for your package.
+
+    Example::
+
+        # in setup.py
+        dist.add_version_file("src/netsa/VERSION")
+
+        # in netsa/__init__.py
+        __version__ = netsa.find_version(__file__)
+    """
     dist_version_files.append((version_file_name, version_file_template))
     if version_file_name.startswith("src/"):
         if not version_file_name.endswith(".py"):
@@ -901,16 +1185,50 @@ def add_version_file(version_file_name,
 
 ### Documentation Generation
 
-def deprecated_set_doc_dir(project_doc_dir):
+def set_doc_dir(project_doc_dir):
     global dist_doc_dir
     dist_doc_dir = project_doc_dir
+
+def set_doc_conf_dir(doc_conf_dir):
+    global dist_doc_conf_dir
+    dist_doc_conf_dir = doc_conf_dir
+
+def disable_documentation():
+    """
+    Disable documentation generation for this project.
+    """
+    set_doc_dir(None)
 
 ### Tests and Unit Tests
 
 def add_unit_test_module(script_unit_test_module):
+    """
+    Adds a unit test module to be run, by module name.  For example::
+
+        dist.add_unit_test_module("netsa.data.test")
+
+    The provided module is expected to be a :mod:`unittest` test
+    module, and the tests will be run in a separate process from the
+    process running ``setup.py``.  Running tests automatically builds
+    the project, and places the build area in the ``PYTHONPATH`` for
+    the test process.
+    """
     dist_unit_test_modules.append(script_unit_test_module)
 
 def add_other_test_module(script_other_test_module):
+    """
+    Adds a module to be run for testing, by module name.  For example::
+
+        dist.add_other_test_module("crunchy.test")
+
+    The provided module is called in a subprocess like this::
+
+        python -m crunchy.test ${source_dir}
+
+    Where ``${source_dir}`` is the top level source directory of the
+    project.  Running tests automatically builds the project, and
+    places the build area in the ``PYTHONPATH`` for the test process.
+    """
     dist_other_test_modules.append(script_other_test_module)
 
 ### Extra distribution generation steps
@@ -921,6 +1239,12 @@ def add_dist_func(script_dist_func):
 ###
 
 def execute():
+    """
+    Using the project as so far specified, parse command line options
+    and does what is required to build, install, test, or make a
+    distribution for the project.  This should be called as the last
+    thing in ``setup.py``.
+    """
     # Make sure to use sane umask to install
     old_umask = None
     try:
@@ -928,22 +1252,25 @@ def execute():
     except:
         pass
     setup_args = dict(dist_info)
-    setup_args['cmdclass'] = {'clean': netsa_clean,
-                              'build': netsa_build,
-                              'build_ext': netsa_build_ext,
-                              'build_py': netsa_build_py,
-                              'build_scripts': netsa_build_scripts,
-                              'gen_version': netsa_gen_version,
-                              'gen_doc_html': netsa_gen_doc_html,
-                              'gen_doc_tools_web': netsa_gen_doc_tools_web,
-                              'gen_doc_pdf': netsa_gen_doc_pdf,
-                              'install_data': netsa_install_data,
-                              'sdist': netsa_sdist,
-                              'check': netsa_check,
-                              'check_unit': netsa_check_unit,
-                              'check_other': netsa_check_other,
-                              'netsa_src_license': netsa_src_license,
-                              'netsa_dist': netsa_dist}
+    setup_args['cmdclass'] = {
+        'build': netsa_build,
+        'build_ext': netsa_build_ext,
+        'build_py': netsa_build_py,
+        'build_scripts': netsa_build_scripts,
+        'check': netsa_check,
+        'check_unit': netsa_check_unit,
+        'check_other': netsa_check_other,
+        'clean': netsa_clean,
+        'gen_doc_html': netsa_gen_doc_html,
+        'gen_doc_man': netsa_gen_doc_man,
+        'gen_doc_pdf': netsa_gen_doc_pdf,
+        'gen_doc_tools_web': netsa_gen_doc_tools_web,
+        'gen_version': netsa_gen_version,
+        'install_data': netsa_install_data,
+        'netsa_src_license': netsa_src_license,
+        'netsa_dist': netsa_dist,
+        'sdist': netsa_sdist,
+    }
     setup_args['distclass'] = netsa_distribution
     setup_args['packages'] = dist_package
     setup_args['package_data'] = dist_package_data
@@ -953,6 +1280,7 @@ def execute():
     setup_args['data_files'] = dist_data_files
     setup_args['netsa_version_files'] = dist_version_files
     setup_args['netsa_doc_dir'] = dist_doc_dir
+    setup_args['netsa_doc_conf_dir'] = dist_doc_conf_dir
     setup_args['netsa_unit_test_modules'] = dist_unit_test_modules
     setup_args['netsa_other_test_modules'] = dist_other_test_modules
     setup_args['netsa_extra_globs'] = dist_extra_globs
@@ -988,6 +1316,8 @@ __all__ = """
     add_extra_files
 
     add_version_file
+
+    disable_documentation
 
     add_unit_test_module
     add_other_test_module

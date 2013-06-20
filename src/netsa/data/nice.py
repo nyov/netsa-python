@@ -1,10 +1,11 @@
-# Copyright 2008-2010 by Carnegie Mellon University
+# Copyright 2008-2011 by Carnegie Mellon University
+
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -53,13 +54,13 @@ ranges.
 """
 
 from __future__ import division
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import calendar
 import copy
 import math
 import times
 
-
+from netsa.data.times import make_datetime, bin_datetime
 
 #
 # Regular number stuff (code mutated from original work by John
@@ -69,42 +70,47 @@ import times
 
 
 nice_intervals = [1.0, 2.0, 2.5, 3.0, 5.0, 10.0]
+int_intervals = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0]
+int_12_intervals = [1.0, 2.0, 3.0, 4.0, 6.0, 12.0]
+int_60_intervals = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 10.0,
+                    12.0, 15.0, 20.0, 30.0]
 
-def nice_ceil(x):
+def nice_ceil(x, intervals=nice_intervals, base=10.0):
     if x == 0:
         return 0
     if x < 0:
-        return nice_floor(x * -1) * -1
-    z = 10.0 ** math.floor(math.log10(x))
-    for i in xrange(len(nice_intervals) - 1):
-        result = nice_intervals[i] * z
+        return nice_floor(x * -1, intervals, base) * -1
+    z = base ** math.floor(math.log(x, base))
+    for i in xrange(len(intervals) - 1):
+        result = intervals[i] * z
         if x <= result: return result
-    return nice_intervals[-1] * z
+    return intervals[-1] * z
 
-def nice_floor(x):
+def nice_floor(x, intervals=nice_intervals, base=10.0):
     if x == 0:
         return 0
     if x < 0:
-        return nice_ceil(x * -1) * -1
-    z = 10.0 ** (math.ceil(math.log10(x)) - 1.0)
+        return nice_ceil(x * -1, intervals, base) * -1
+    z = base ** (math.ceil(math.log(x, base)) - 1.0)
     r = x / z
-    for i in xrange(len(nice_intervals)-1, 1, -1):
-        result = nice_intervals[i] * z
+    for i in xrange(len(intervals)-1, 1, -1):
+        result = intervals[i] * z
         if x >= result: return result
-    return nice_intervals[0] * z
+    return intervals[0] * z
     
-def nice_round(x):
+def nice_round(x, intervals=nice_intervals, base=10.0):
     if x == 0:
         return 0
-    z = 10.0 ** (math.ceil(math.log10(x)) - 1.0)
+    z = base ** (math.ceil(math.log(x, base)) - 1.0)
     r = x / z
-    for i in xrange(len(nice_intervals) - 1):
-        result = nice_intervals[i] * z
-        cutoff = (result + nice_intervals[i+1] * z) / 2.0
+    for i in xrange(len(intervals) - 1):
+        result = intervals[i] * z
+        cutoff = (result + intervals[i+1] * z) / 2.0
         if x <= cutoff: return result
-    return nice_intervals[-1] * z
+    return intervals[-1] * z
 
-def nice_ticks(lo, hi, ticks=5, inside=False):
+def nice_ticks(lo, hi, ticks=5, inside=False,
+               intervals=nice_intervals, base=10.0):
     """
     Find 'nice' places to put *ticks* tick marks for numeric data
     spanning from *lo* to *hi*.  If *inside* is ``True``, then the
@@ -119,15 +125,23 @@ def nice_ticks(lo, hi, ticks=5, inside=False):
     See also :func:`nice_ticks_seq`.
     """
 
+    if lo > hi:
+        value_error = ValueError(
+            "Low value greater than high value: %r, %r" % (lo, hi))
+        raise value_error
+
     delta_x = hi - lo
     if delta_x == 0:
-        if lo == 0:
-            return nice_ticks(-1, 1, ticks, inside)
-        else:
-            return nice_ticks(nice_floor(lo), nice_ceil(hi),
-                              ticks, inside)
-    nice_delta_x = nice_ceil(delta_x)
-    delta_t = nice_round(delta_x / (ticks - 1))
+        lo = nice_floor(lo, intervals, base)
+        hi = nice_ceil(hi, intervals, base)
+        delta_x = hi - lo
+        if delta_x == 0:
+            lo = lo - 0.5
+            hi = hi + 0.5
+            delta_x = hi - lo
+
+    nice_delta_x = nice_ceil(delta_x, intervals, base)
+    delta_t = nice_round(delta_x / (ticks - 1), intervals, base)
     if inside:
         lo_t = math.ceil(lo / delta_t) * delta_t
         hi_t = math.floor(hi / delta_t) * delta_t
@@ -149,341 +163,153 @@ def nice_ticks_seq(lo, hi, ticks=5, inside=False):
     """
     return tuple(nice_ticks(lo, hi, ticks, inside)[2])
 
+def nice_year_ticks(lo, hi, ticks=5, inside=False):
+    lo_year = lo.year
+    hi_year = hi.year
+    if hi - make_datetime(datetime(hi_year, 1, 1)):
+        hi_year += 1
+    if hi_year - lo_year < (ticks - 1):
+        raise ValueError()
+    t_min, t_max, t_iter = nice_ticks(lo_year, hi_year, ticks, inside,
+                                      intervals=int_intervals)
+    year_min = make_datetime(datetime(int(t_min), 1, 1))
+    year_max = make_datetime(datetime(int(t_max), 1, 1))
+    def y_iter():
+        for t in t_iter:
+            yield make_datetime(datetime(int(t), 1, 1))
+    return (year_min, year_max, y_iter())
 
-#
-# Time stuff. This shares some ideas with the above (T_r is basically
-# nice_intervals for a number of different units), but is implemented
-# totally differently, according to the method suggested by Wilkinson
-# in _The Grammar of Graphics_.
-#
-
-
-
-one_day = timedelta(seconds=3600 * 24)
-def end_of_month(year, month):
-    if month == 12:
-        return 31
-    else:
-        eom = date(year, month+1, 1) - one_day
-        return eom.day
-
-
-
-
-
-def month_floor(dt, n):
-    """Round datetime down to nearest date that falls evenly on an
-    n-month boundary. (E.g., valid intervals for a 3-month
-    boundary are 1/1, 4/1, 7/1, and 10/1)"""
-    year = dt.replace(month=1, day=1, hour=0,
-                      minute=0, second=0, microsecond=0)
-    next = year
-    curr = None
-    if next == dt:
-        return dt
-    else:
-        while next < dt:
-            curr = next
-            if next.month + n > 12:
-                break
-            next = next.replace(month=next.month + n)
-        return curr
-
-
-def month_ceil(dt, n):
-    """Round datetime up to nearest date that falls evenly on an
-    n-month boundary. (E.g., valid intervals for a 3-month
-    boundary are 1/1, 4/1, 7/1, and 10/1)"""
-    f = month_floor(dt, n)
-    # TODO: verify that this boundary works
-    if f.month + n - 1 > 12:
-        # TODO: verify that this works
-        new_year = f.year + 1
-        new_month = (((f.month - 1) + n) % 12) + 1
-        return f.replace(year=new_year, month=new_month)
-    else:
-        return f.replace(month=f.month + n - 1)
-
-
-
-class RollingDatetime(object):
-    def __init__(self, dt, orig_day=None):
-        assert dt is not None
-        self.dt = dt
-        # Keep the original day of the month around for reference
-        if orig_day is None:
-            self.orig_day = self.dt.day
+def nice_month_ticks(lo, hi, ticks=5, inside=False):
+    lo_year = lo.year
+    lo_month = lo.month - 1
+    hi_year = hi.year
+    hi_month = hi.month - 1
+    if hi - make_datetime(datetime(hi_year, hi.month, 1)):
+        if hi_month == 11:
+            hi_month = 0
+            hi_year += 1
         else:
-            self.orig_day = orig_day
-        if self.orig_day == end_of_month(self.dt.year, self.dt.month):
-            self.is_eom = True
-        else:
-            self.is_eom = False
-    def add_months(self, n):
-        """Increment current date by n months, with the following
-        semantics:
+            hi_month += 1
+    delta_year = hi_year - lo_year
+    if delta_year * 12 + hi_month - lo_month < (ticks - 1):
+        raise ValueError()
+    t_min, t_max, t_iter = nice_ticks(lo_month, delta_year * 12 + hi_month,
+                                      ticks, inside,
+                                      intervals=int_12_intervals, base=12.0)
+    t_min_year = int(lo_year + t_min / 12)
+    t_min_month = int(t_min % 12) + 1
+    t_max_year = int(lo_year + t_max / 12)
+    t_max_month = int(t_max % 12) + 1
+    month_min = make_datetime(datetime(t_min_year, t_min_month, 1))
+    month_max = make_datetime(datetime(t_max_year, t_max_month, 1))
+    def m_iter():
+        for t in t_iter:
+            year = int(lo_year + t / 12)
+            month = int(t % 12) + 1
+            yield make_datetime(datetime(year, month, 1))
+    return (month_min, month_max, m_iter())
 
-          - If the original day was the last day of the month, set the
-            new day to the last day of the new month.
-             
-          - If the current day of the month is later than the last day
-            of the new month, set it to the last day of the new month.
+WEEK_EPOCH = make_datetime('1970-01-04')
 
-          - Otherwise, use the same day of the month."""
-        allmonths = self.dt.month + n
-        if allmonths > 12:
-            new_year = self.dt.year + (allmonths // 12)
-            new_month = allmonths % 12
-        else:
-            new_year = self.dt.year
-            new_month = allmonths
-        new_eom = end_of_month(new_year, new_month)
-        if self.is_eom:
-            new_day = new_eom
-        else:
-            if new_eom < self.orig_day:
-                new_day = new_eom
-            else:
-                new_day = self.orig_day
-        self.dt = self.dt.replace(
-            year=new_year, month=new_month, day=new_day)
-        return self
-    def datetime(self):
-        return copy.copy(self.dt)
-    def __add__(self, n): raise NotImplemented("__add__")
-    def __sub__(self, n): raise NotImplemented("__sub__")
-    def floor(self, n): raise NotImplemented("floor")
-    def ceil(self, n): raise NotImplemented("ceil")
+def nice_week_ticks(lo, hi, ticks=5, inside=False):
+    lo_week = bin_datetime(timedelta(days=7), lo, WEEK_EPOCH)
+    hi_week = bin_datetime(timedelta(days=7), hi, WEEK_EPOCH)
+    if hi - hi_week:
+        hi_week += timedelta(days=7)
+    delta_weeks = (hi_week - lo_week).days / 7
+    if delta_weeks < (ticks - 1):
+        raise ValueError()
+    t_min, t_max, t_iter = nice_ticks(0, delta_weeks, ticks, inside,
+                                      int_intervals)
+    week_min = lo_week + timedelta(days=int(7*t_min))
+    week_max = lo_week + timedelta(days=int(7*t_max))
+    def w_iter():
+        for t in t_iter:
+            yield lo_week + timedelta(days=int(7*t))
+    return (week_min, week_max, w_iter())
 
+def nice_day_ticks(lo, hi, ticks=5, inside=False):
+    lo_day = bin_datetime(timedelta(days=1), lo)
+    hi_day = bin_datetime(timedelta(days=1), hi)
+    if hi - hi_day:
+        hi_day += timedelta(days=1)
+    delta_days = (hi_day - lo_day).days
+    if delta_days < (ticks - 1):
+        raise ValueError()
+    t_min, t_max, t_iter = nice_ticks(0, delta_days, ticks, inside,
+                                      int_intervals)
+    day_min = lo_day + timedelta(days=int(t_min))
+    day_max = lo_day + timedelta(days=int(t_max))
+    def d_iter():
+        for t in t_iter:
+            yield lo_day + timedelta(days=int(t))
+    return (day_min, day_max, d_iter())
 
+def nice_hour_ticks(lo, hi, ticks=5, inside=False):
+    lo_hour = bin_datetime(timedelta(hours=1), lo)
+    hi_hour = bin_datetime(timedelta(hours=1), hi)
+    if hi - hi_hour:
+        hi_hour += timedelta(hours=1)
+    delta_hours = ((hi_hour - lo_hour).seconds / 3600 +
+                   (hi_hour - lo_hour).days * 24)
+    if delta_hours < (ticks - 1):
+        raise ValueError()
+    t_min, t_max, t_iter = nice_ticks(0, delta_hours, ticks, inside,
+                                      intervals=int_12_intervals, base=24.0)
+    hour_min = lo_hour + timedelta(hours=int(t_min))
+    hour_max = lo_hour + timedelta(hours=int(t_max))
+    def h_iter():
+        for t in t_iter:
+            yield lo_hour + timedelta(hours=int(t))
+    return (hour_min, hour_max, h_iter())
 
-class Months(RollingDatetime):
-    def __add__(self, n):
-        return self.add_months(n)
-    def __sub__(self, n):
-        # TODO: find anything that relies on this (mis)definition and
-        # shoot it.
-        # return self.dt.month - n.dt.month
-        self_months = (self.dt.year * 12) + self.dt.month
-        n_months = (n.dt.year * 12) + n.dt.month
-        return self_months - n_months
-    def floor(self, n):
-        return Months(month_floor(self.dt, n), orig_day=self.orig_day)
-    def ceil(self, n):
-        return Months(month_ceil(self.dt, n), orig_day=self.orig_day)
+def nice_minute_ticks(lo, hi, ticks=5, inside=False):
+    lo_min = bin_datetime(timedelta(minutes=1), lo)
+    hi_min = bin_datetime(timedelta(minutes=1), hi)
+    if hi - hi_min:
+        hi_min += timedelta(minutes=1)
+    delta_mins = (hi_min - lo_min).seconds / 60 + (hi_min - lo_min).days * 1440
+    if delta_mins < (ticks - 1):
+        raise ValueError()
+    t_min, t_max, t_iter = nice_ticks(0, delta_mins, ticks, inside,
+                                      intervals=int_60_intervals, base=60.0)
+    min_min = lo_min + timedelta(minutes=int(t_min))
+    min_max = lo_min + timedelta(minutes=int(t_max))
+    def m_iter():
+        for t in t_iter:
+            yield lo_min + timedelta(minutes=int(t))
+    return (min_min, min_max, m_iter())
 
-    
+def nice_second_ticks(lo, hi, ticks=5, inside=False):
+    lo_sec = bin_datetime(timedelta(seconds=1), lo)
+    hi_sec = bin_datetime(timedelta(seconds=1), hi)
+    if hi - hi_sec:
+        hi_sec += timedelta(seconds=1)
+    delta_secs = (hi_sec - lo_sec).seconds + (hi_sec - lo_sec).days * 86400
+    if delta_secs < (ticks - 1):
+        raise ValueError()
+    t_min, t_max, t_iter = nice_ticks(0, delta_secs, ticks, inside,
+                                      int_60_intervals, base=60.0)
+    min_sec = lo_sec + timedelta(seconds=int(t_min))
+    max_sec = lo_sec + timedelta(seconds=int(t_max))
+    def s_iter():
+        for t in t_iter:
+            yield lo_sec + timedelta(seconds=int(t))
+    return (min_sec, max_sec, s_iter())
 
-class Years(RollingDatetime):
-    def __add__(self, n):
-        self.dt = self.dt.replace(year = self.dt.year + n)
-        return self
-    def __sub__(self, n):
-        return self.dt.year - n.dt.year
-    def floor(self, n):
-        return Years(month_floor(self.dt, n * 12), orig_day=self.orig_day)
-    def ceil(self, n):
-        return Years(month_ceil(self.dt, n * 12), orig_day=self.orig_day)
+def nice_arb_ticks(lo, hi, ticks=5, inside=False):
+    base = bin_datetime(timedelta(minutes=1), lo)
+    lo_sec = (lo - base).seconds + (lo - base).days * 86400
+    hi_sec = (hi - base).seconds + (hi - base).days * 86400
+    t_min, t_max, t_iter = nice_ticks(lo_sec, hi_sec, ticks, inside)
+    min_sec = base + timedelta(seconds=t_min)
+    max_sec = base + timedelta(seconds=t_max)
+    def s_iter():
+        for t in t_iter:
+            yield base + timedelta(seconds=t)
+    return (min_sec, max_sec, s_iter())
 
-    
-# A set of time scales, and the data required to deal with each
-# one. Each tuple contains:
-#
-#   1. A list of "nice numbers," measured in seconds, for each
-#      scale.
-#   2. The unit of measure (normalized to seconds) to which to round
-#      endpoints.
-#
-# This just does the "regular" time intervals. Months and years are
-# handled separately.
-SECOND = 1
-MINUTE = 60 * SECOND
-HOUR   = 60 * MINUTE
-DAY    = 24 * HOUR
-WEEK   = 7  * DAY
-T_r = [
-    ([s for s in (1, 2, 5, 15, 30)], SECOND),
-    ([m * MINUTE for m in (1, 2, 5, 15, 30)], MINUTE),
-    ([h * HOUR  for h in (1, 2, 3, 4, 6, 12)], HOUR),
-    ([DAY], DAY),
-    ([WEEK], WEEK)
-]
-
-
-def granularity(k, m):
-    #print "k, m: ", k, ",", m
-    if 0 < k and k < 2 * m:
-        return 1 - (abs(k - m)/m)
-    else:
-        return 0
-def coverage(r_d, r_s) :
-    if r_d/r_s >= .75:
-        return r_d/r_s
-    else:
-        return 0
-
-
-
-#
-# "Calendar" time ticks 
-#
-
-def calendar_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
-    """Nice numbers for times at 'calendar' intervals (months and
-    years) that are sometimes irregular in terms of time passed.
-
-    @type lo: datetime
-    @param lo: low end of time scale
-    
-    @type hi: datetime
-    @param hi: high end of time scale
-    
-    @type ticks: int
-    @param ticks: desired number of tick marks
-    
-    @type inside: bool
-    @param inside: Should the ticks lie inside the lo-hi range?"""
-    def as_seconds(dt):
-        return calendar.timegm(dt.timetuple())
-    d_range = as_seconds(hi) - as_seconds(lo)
-
-    def intv_time_ticks(lo, hi, intv):
-        if inside:
-            s_end = hi.floor(intv)
-            s_start = lo.ceil(intv)
-        else:
-            s_end = hi.ceil(intv)
-            s_start = lo.floor(intv)
-        #print "start: %s" % s_start.dt
-        #print "end  : %s" % s_end.dt
-        s_range_units = s_end - s_start
-        s_range_seconds = as_seconds(s_end.dt) - as_seconds(s_start.dt)
-        #print "s_range_units:", s_range_units
-        s_ticks = s_range_units / intv
-        g = granularity(s_ticks, ticks)
-        #print "g:            ", g
-        c = coverage(d_range, s_range_seconds)
-        weighted_ave = (g + c)/2
-        #print "ave:          ", weighted_ave
-        return (s_start, s_end, intv, weighted_ave)
-
-    candidate = (0, 0, 0, 0)
-    # Go through month intervals first
-    month_lo, month_hi = [Months(x) for x in (lo, hi)]
-    for months in (1, 2, 3, 4, 6):
-        new_candidate = intv_time_ticks(month_lo, month_hi, months)
-        weighted_ave = new_candidate[3]
-        if weighted_ave > candidate[3]:
-            candidate = new_candidate
-    # Do years
-    year_lo, year_hi = [Years(x) for x in (lo, hi)]
-    for years in (1, 2, 3, 4, 5, 10, 25):
-        new_candidate = intv_time_ticks(year_lo, year_hi, years)
-        weighted_ave = new_candidate[3]
-        if weighted_ave > candidate[3]:
-            candidate = new_candidate
-    start, stop, step, score = candidate
-    # return the beginning and end of the range, and an iterator
-    # through it
-    def tts(dt):
-        return calendar.timegm(dt.timetuple())
-    def dt_iter():
-        curr = start
-        while curr.dt <= stop.dt:
-            yield curr.dt
-            curr += step
-    if as_datetime:
-        return start.dt, stop.dt, dt_iter()
-    else:
-        it = dt_iter()
-        def as_seconds():
-            for i in it:
-                yield calendar.timegm(i.timetuple())
-        return tts(start.dt), tts(stop.dt), as_seconds()
-        
-#
-# "Regular" time ticks
-#
-
-def regular_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
-    """Nice numbers for times at regular intervals---seconds, minutes,
-    days, weeks.
-
-    @type lo: float
-    @param lo: low end of time scale, in seconds
-    
-    @type hi: float
-    @param hi: high end of time scale, in seconds
-    
-    @type ticks: int
-    @param ticks: desired number of tick marks
-    
-    @type inside: bool
-    @param inside: Should the ticks lie inside the lo-hi range?"""
-    # Convenience functions
-    def interval_floor(intv, x): return (x // intv) * intv
-    def interval_ceil(intv, x): return ((x // intv) * intv) + intv
-    drange = hi - lo
-    candidate = (0, 0, 0, 0)
-    for Q, unit in T_r:
-        for q in Q:
-            # units_rlookup = {
-            #     SECOND : 'second',
-            #     MINUTE : 'minute',
-            #     HOUR   : 'hour',
-            #     DAY    : 'day',
-            #     WEEK   : 'week'
-            # }
-            # print "====================================="
-            # print "q:      %s (%s %ss)" % (q, q/unit, units_rlookup[unit])
-            # print "-------------------------------------"
-            # range of the scale (r_s )
-            if inside:
-                s_start = interval_ceil(q, lo)
-                s_end = interval_floor(q, hi)
-            else:
-                s_start = interval_floor(q, lo)
-                s_end = interval_ceil(q, hi)
-            s_range = s_end - s_start
-            # Reject invalid ranges. (s_end <= s_start happens
-            # sometimes when inside == True)
-            if s_range <= 0:
-                continue
-            # print "s_range:", s_range
-            # Mind the fencepost
-            s_ticks =  (s_range / q) + 1
-            g = granularity(s_ticks, ticks)
-            # print "g:      ", g
-            c = coverage(drange, s_range)
-            # print "c:      ", c
-            weighted_ave = (g + c)/2
-            # print "ave:    ", weighted_ave
-            if weighted_ave > candidate[3]:
-                candidate = (s_start, s_end, q, weighted_ave)
-    if candidate[0] is None:
-        raise RuntimeError("Couldn't find usable time scale")
-    # print "Winner: %s" % str(candidate)
-    start, stop, step, score = candidate
-    # Some shorthand
-    def fts(s):
-        return times.make_datetime(s)
-    if as_datetime:
-        def dt_iter():
-            for secs in xrange(int(start), int(stop), step):
-                yield fts(secs)
-            yield fts(int(stop))
-        return fts(start), fts(stop), dt_iter()
-    else:
-        def as_seconds():
-            for secs in xrange(int(start), int(stop), step):
-                yield secs
-        return start, stop, as_seconds()
-
-
-    
-    
-# Renamed from get_time_ticks
-def nice_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
+def nice_time_ticks(lo, hi, ticks=5, inside=False):
     """
     Find 'nice' places to put *ticks* tick marks for time data
     spanning from *lo* to *hi*.  If *inside* is ``True``, then the
@@ -500,20 +326,43 @@ def nice_time_ticks(lo, hi, ticks=5, inside=False, as_datetime=True):
 
     See also :func:`nice_time_ticks_seq`.
     """
-    hi_secs = calendar.timegm(hi.timetuple())
-    lo_secs = calendar.timegm(lo.timetuple())
-    # Give it to months/years algorithm if it's that big
-    if hi_secs - lo_secs >= 8 * WEEK:
-        return calendar_time_ticks(lo, hi, ticks, inside, as_datetime)
-    else:
-        return regular_time_ticks(lo_secs, hi_secs, ticks, inside, as_datetime)
+    try:
+        return nice_year_ticks(lo, hi, ticks, inside)
+    except ValueError:
+        pass
+    try:
+        return nice_month_ticks(lo, hi, ticks, inside)
+    except ValueError:
+        pass
+    try:
+        return nice_day_ticks(lo, hi, ticks, inside)
+    except ValueError:
+        pass
+    try:
+        return nice_hour_ticks(lo, hi, ticks, inside)
+    except ValueError:
+        pass
+    try:
+        return nice_minute_ticks(lo, hi, ticks, inside)
+    except ValueError:
+        pass
+    try:
+        return nice_second_ticks(lo, hi, ticks, inside)
+    except ValueError:
+        pass
+    try:
+        return nice_arb_ticks(lo, hi, ticks, inside)
+    except ValueError:
+        pass
+    raise ValueError("Unable to compute nice time ticks")
 
-def nice_time_ticks_seq(lo, hi, ticks=5, inside=False, as_datetime=True):
+def nice_time_ticks_seq(lo, hi, ticks=5, inside=False):
     """
     A convenience wrapper of :func:`nice_time_ticks` to return the
     nice range as a sequence.
     """
-    return tuple(nice_time_ticks(lo, hi, ticks, inside, as_datetime)[2])
+    (a, b, i) = nice_time_ticks(lo, hi, ticks, inside)
+    return tuple(i)
 
 __all__ = """
     nice_ticks

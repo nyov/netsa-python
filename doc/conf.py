@@ -2,4 +2,4 @@
 
 from netsa_sphinx_config import *
 
-html_static_path.append("static_html")
+add_static_path("static_html")

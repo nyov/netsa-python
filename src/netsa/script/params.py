@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -66,7 +66,7 @@ RegexType = type(re.compile(""))
 
 def check_param_text_args(kind_args):
     kind_arg_names = set(kind_args.iterkeys())
-    allowed_arg_names = set(["regex"])
+    allowed_arg_names = set(["regex", "regex_help"])
     if not kind_arg_names <= allowed_arg_names:
         kind_arg_names -= allowed_arg_names
         error = TypeError("text param got unexpected keyword arguments: "
@@ -82,6 +82,10 @@ def check_param_text_args(kind_args):
         except:
             error = ValueError("invalid regex for text param %s" %
                                kind_args['name'])
+    if "regex_help" in kind_args:
+        if not isinstance(kind_args["regex_help"], basestring):
+            error = TypeError("text param expected str value for 'regex_help'")
+            raise error
 
 def check_param_int_args(kind_args):
     kind_arg_names = set(kind_args.iterkeys())
@@ -128,7 +132,7 @@ def check_param_date_args(kind_args):
 
 def check_param_label_args(kind_args):
     kind_arg_names = set(kind_args.iterkeys())
-    allowed_arg_names = set(["regex"])
+    allowed_arg_names = set(["regex", "regex_help"])
     if not kind_arg_names <= allowed_arg_names:
         kind_arg_names -= allowed_arg_names
         error = TypeError("label param got unexpected keyword arguments: "
@@ -139,7 +143,12 @@ def check_param_label_args(kind_args):
         if not isinstance(kind_args["regex"], (basestring, RegexType)):
             error = TypeError("label param expected str or regex value "
                               "for 'regex'")
-            raise error    
+            raise error
+    if "regex_help" in kind_args:
+        if not isinstance(kind_args["regex_help"], basestring):
+            error = TypeError("text param expected str value for 'regex_help'")
+            raise error
+
 
 def check_param_file_args(kind_args):
     kind_arg_names = set(kind_args.iterkeys())
@@ -310,15 +319,16 @@ def parse_param_text_value(param, value):
     kind_args = param['kind_args']
     if 'regex' in kind_args:
         regex = kind_args['regex']
+        regex_help = kind_args.get('regex_help',
+                                   "did not match required pattern")
         try:
             regex = re.compile(regex)
-            if not regex.match(value):
-                error = ParamError(param, value,
-                                   "did not match required pattern")
-                raise error
         except:
             error = ValueError("Invalid regex for %s: %s" %
                                (param['name'], repr(regex)))
+            raise error
+        if not regex.match(value):
+            error = ParamError(param, value, regex_help)
             raise error
     return value
 
@@ -375,10 +385,11 @@ def parse_param_date_value(param, value):
 def parse_param_label_value(param, value):
     kind_args = param['kind_args']
     regex = kind_args.get('regex', r"[^\S,]+")
+    regex_help = kind_args.get('regex_help', "not a valid label")
     try:
         regex = re.compile(regex)
         if not regex.match(value):
-            error = ParamError(param, value, "did not match required pattern")
+            error = ParamError(param, value, regex_help)
             raise error
     except:
         error = ValueError("Invalid regular expression")

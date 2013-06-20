@@ -13,28 +13,26 @@
 
     .. autofunction:: is_relpath(p : str, base : str) -> bool
 
+    Process ID Locks
+    ----------------
 
-    Directory-based Locking
-    -----------------------
+    This form of lock is generally used by services that wish to
+    ensure that only one copy of the service is running at a time.
 
-    .. autoexception:: DirLockBlock(message)
+    .. autofunction:: acquire_pidfile_lock(path : str) -> bool
 
-    .. autoclass:: DirLocker(name : str, [dir : str, seize=False, debug=False])
-        :members:
+    .. autofunction:: examine_pidfile_lock(path : str) -> (int, bool) or None
 
-    Garbage Collected Temporary Directories
-    ---------------------------------------
+    .. autofunction:: release_pidfile_lock(path : str)
 
-    .. autoexception:: LocalTmpDirError(message)
+    .. _netsa-files-tempfile-functions:
 
-    .. autoclass:: LocalTmpDir([dir : str, prefix='tmp', create=True, verbose=False, autodelete=True])
+    Temporary Files
+    ---------------
 
-        .. automethod:: assert_dir()
+    .. autofunction:: get_temp_file_name([file_name : str]) -> str
 
-        .. automethod:: prefix()
+    .. autofunction:: get_temp_file([file_name : str, mode='r']) -> file
 
-        .. automethod:: tmp_file() -> NamedTemporaryFile
+    .. autofunction:: get_temp_pipe_name([pipe_name : str]) -> str
 
-        .. automethod:: tmp_filename() -> str
-
-        .. automethod:: tmp_pipe() -> str

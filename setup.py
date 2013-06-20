@@ -7,7 +7,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -59,7 +59,8 @@ sys.path[:0] = \
 from netsa import dist
 
 dist.set_name("netsa-python")
-dist.set_version("1.3")
+dist.set_version("1.4")
+dist.set_copyright("2008-2011, Carnegie Mellon University")
 
 dist.set_title("NetSA Python")
 dist.set_description("""
@@ -82,9 +83,12 @@ dist.add_package_data("netsa.dist", "tools_web")
 dist.add_package("netsa.files")
 dist.add_package("netsa.files.test")
 dist.add_package("netsa.json")
+dist.add_package("netsa.json.test")
 dist.add_package("netsa.json.simplejson")
 dist.add_package("netsa.logging")
+dist.add_package("netsa.logging.test")
 dist.add_package("netsa.script")
+dist.add_package("netsa.script.golem")
 dist.add_package("netsa.sql")
 dist.add_package("netsa.sql.test")
 dist.add_package("netsa.tools")
@@ -94,10 +98,15 @@ dist.add_package("netsa.util.sentinel.audit")
 dist.add_package("netsa.util.sentinel.ledger")
 dist.add_package("netsa.util.sentinel.sig")
 dist.add_package("netsa.util.sentinel.test")
+dist.add_package("netsa.util.test")
+dist.add_package("netsa._netsa_silk")
+dist.add_package("netsa._netsa_silk.test")
+
+dist.add_module_py("netsa_silk")
 
 dist.add_version_file("src/netsa/VERSION")
 
-dist.add_install_data("share/netsa-python", "sql/create-sa_meta-0.9.sql")
+dist.add_install_data("share/netsa-python/sql", "sql/create-sa_meta-0.9.sql")
 
 dist.add_extra_files("GPL.txt")
 dist.add_extra_files("CHANGES")
@@ -105,7 +114,11 @@ dist.add_extra_files("sql")
 
 dist.add_unit_test_module("netsa.data.test")
 dist.add_unit_test_module("netsa.files.test")
+dist.add_unit_test_module("netsa.json.test")
+dist.add_unit_test_module("netsa.logging.test")
 dist.add_unit_test_module("netsa.util.sentinel.test")
+dist.add_unit_test_module("netsa.util.test")
 dist.add_unit_test_module("netsa.sql.test")
+dist.add_unit_test_module("netsa._netsa_silk.test")
 
 dist.execute()

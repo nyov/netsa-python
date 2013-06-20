@@ -7,7 +7,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -244,9 +244,11 @@ import sys
 import tempfile
 import textwrap
 import threading
+import warnings
 import weakref
 
 import netsa
+import netsa.files
 import netsa.json
 import netsa.util.shell
 
@@ -1251,7 +1253,6 @@ def get_output_file(name, append=False):
         _get_output_file_lock.release()
 
 _get_output_dir_lock = threading.Lock()
-_get_output_dir_map = weakref.WeakValueDictionary()
 
 def get_output_dir_file_name(dir_name, file_name,
                              description=None, mime_type=None):
@@ -1303,13 +1304,6 @@ def get_output_dir_file(dir_name, file_name,
     """
     _get_output_dir_lock.acquire()
     try:
-        if (dir_name, file_name) in _get_output_dir_map:
-            out_file = _get_output_dir_map[(dir_name, file_name)]
-            if out_file != None and out_file.closed:
-                # Have to re-open
-                out_file = None
-            else:
-                return out_file
         fn = get_output_dir_file_name(dir_name, file_name, description,
                                       mime_type)
         if fn == None:
@@ -1319,82 +1313,59 @@ def get_output_dir_file(dir_name, file_name,
             if append:
                 mode = 'ab'
             out_file = open(fn, mode)
-        _get_output_dir_map[(dir_name, file_name)] = out_file
         return out_file
     finally:
         _get_output_dir_lock.release()
 
-_temp_dir = tempfile.mkdtemp()
-atexit.register(os.system, ("rm -rf %s" % _temp_dir))
-os.environ["TMPDIR"] = _temp_dir
-os.environ["TEMP"] = _temp_dir
-os.environ["TMP"] = _temp_dir
-
-_get_temp_dir_lock = threading.RLock()
-_get_temp_dir_map = weakref.WeakValueDictionary()
-_get_temp_dir_filenames = set()
-_get_temp_dir_filename_counter = 0
-
 def get_temp_dir_file_name(file_name=None):
     """
+    *Deprecated* as of netsa-python v1.4.  Use
+    :func:`netsa.files.get_temp_file_name` instead.    
+
     Return the path to a file named *file_name* in a temporary
     directory that will be cleaned up when the process exits.  If
     *file_name* is ``None`` then a new file name is created that has
     not been used before.
     """
-    global _get_temp_dir_filename_counter
-    _get_temp_dir_lock.acquire()
-    try:
-        while file_name == None or file_name in _get_temp_dir_filenames:
-            # Allocate new filenames until one not in the list of used
-            # filenames is found.
-            _get_temp_dir_filename_counter += 1
-            file_name = "tmp%d.tmp" % _get_temp_dir_filename_counter
-        # Remember the filename used.
-        _get_temp_dir_filenames.add(file_name)
-        return os.path.join(_temp_dir, file_name)
-    finally:
-        _get_temp_dir_lock.release()
+    warnings.warn("netsa.script.get_temp_dir_file_name is deprecated, "
+                  "please see netsa.files.get_temp_file_name",
+                  DeprecationWarning)
+    return netsa.files.get_temp_file_name(file_name)
+
 
 def get_temp_dir_file(file_name=None, append=False):
     """
+    *Deprecated* as of netsa-python v1.4.  Use
+    :func:`netsa.files.get_temp_file` instead.
+
     Returns an open :class:`file` object for the file named
     *file_name* in the script's temporary working directory.  If
     *append* is ``True``, the file is opened for append.  Otherwise,
     the file is opened for write.  If *file_name* is ``None`` then a
     new file name is used that has not been used before.
     """
-    _get_temp_dir_lock.acquire()
-    try:
-        fn = get_temp_dir_file_name(file_name)
-        out_file = _get_temp_dir_map.get(fn, None)
-        if out_file == None or out_file.closed:
-            out_file = None
-        else:
-            return out_file
-        mode = 'wb'
-        if append:
-            mode = 'ab'
-        out_file = open(fn, mode)
-        _get_temp_dir_map[file_name] = out_file
-        return out_file
-    finally:
-        _get_temp_dir_lock.release()
+    warnings.warn("netsa.script.get_temp_dir_file is deprecated, "
+                  "please see netsa.files.get_temp_file",
+                  DeprecationWarning)
+    mode = 'wb'
+    if append:
+        mode = 'ab'
+    return netsa.files.get_temp_file(file_name, mode)
 
 def get_temp_dir_pipe_name(file_name=None):
     """
+    *Deprecated* as of netsa-python v1.4.  Use
+    :func:`netsa.files.get_temp_pipe_name` instead.
+
     Returns the path to a named pipe *file_name* that has been created
     in a temporary directory that will be cleaned up when the process
     exits. If *file_name* is ``None`` then a new file name is created
     that has not been used before.
     """
-    _get_temp_dir_lock.acquire()
-    try:
-        pn = get_temp_dir_file_name(file_name)
-        os.mkfifo(pn)
-        return pn
-    finally:
-        _get_temp_dir_lock.release()
+    warnings.warn("netsa.script.get_temp_dir_pipe_name is deprecated, "
+                  "please see netsa.files.get_temp_pipe_name",
+                  DeprecationWarning)
+    return netsa.files.get_temp_pipe_name(file_name)
 
 def execute(func):
     """
@@ -1409,6 +1380,11 @@ def execute(func):
     metadata queries to be very inefficient.
     """
     global _script_verbosity
+    # Set up temp dir environment variables for subprocesses
+    temp_dir = netsa.files.get_temp_dir_base()
+    os.environ["TMPDIR"] = temp_dir
+    os.environ["TEMP"] = temp_dir
+    os.environ["TMP"] = temp_dir
     args = sys.argv[1:]
     # Check for special command-line arguments.  If they exist, we ignore
     # everything else and exit.
@@ -1671,6 +1647,7 @@ __all__ = """
     set_title
     set_description
     set_version
+    set_package_name
     set_contact
     set_authors
     add_author

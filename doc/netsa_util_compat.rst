@@ -25,6 +25,9 @@ The additional functions currently provided by this module are:
   * :func:`all`
 
   * :func:`any`
+  
+  * :func:`heapq.merge`
 
   * :func:`itertools.product`
-      
+
+  * :func:`os.path.relpath`

@@ -5,7 +5,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -46,7 +46,7 @@
 # contract clause at 252.227.7013.
 # @OPENSOURCE_HEADER_END@
 
-import os, re, sys, itertools
+import os, re, sys, itertools, warnings
 
 from os       import path
 from datetime import datetime
@@ -56,6 +56,8 @@ from netsa.util.tandem import dzip
 
 class DateFileParseError(Exception):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Raised if a function is unable to parse a date within the provided
     filename.
     """
@@ -66,11 +68,14 @@ def warning(msg):
 
 def date_from_file(file):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Attempt to extract dates from a filename. The filename can be a
     full pathname or relative path. Dates are presumed to exist
     somewhere in the pathname.  See :func:`split_on_date` for more
     detail on how dates are parsed from filenames.
     """
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     (dir, chop) = split_on_date(file)
     ymd = {}
     for (i, field) in ( (1, 'year'), (3, 'month'),  (5, 'day'),
@@ -88,6 +93,8 @@ def date_from_file(file):
 
 def split_on_date(file):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Given a string (presumably the pathname to a file) with a date in
     it, return the directory of the file and the date/non-date
     components of the file name as an array. This routine is pretty
@@ -128,6 +135,7 @@ def split_on_date(file):
 
     Separators between hour/minute/sec must be ':'
     """
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     pat = re.compile( \
         "(\d{4})(\D)?(\d\d)?(\D)?(\d\d)?((:)(\d\d))?((:)(\d\d))?((:)(\d\d))?")
     suffix = None
@@ -156,6 +164,8 @@ def split_on_date(file):
 
 def date_file_template(file, wildcard='x'):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Given a pathname *file*, returns the string with ``'x'`` in place
     of date components. The replacement character can be overridden
     with the *wildcard* argument.
@@ -163,6 +173,7 @@ def date_file_template(file, wildcard='x'):
     This is useful for determining what dated naming series are present
     in a shared directory.
     """
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     if len(wildcard) > 1:
         raise ValueError, "wildcard must be a single character"
     (dir, chop) = split_on_date(file)
@@ -211,9 +222,12 @@ def sibling_date_files(file, dates):
 
 def sibling_date_file(file, date):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Given a filename *file*, along with a date, returns the analagous
     filename corresponding to that date.
     """
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     res = list(sibling_date_files(file, [date]))
     if res:
         return res[0]
@@ -221,6 +235,8 @@ def sibling_date_file(file, date):
 def datefile_walker(dir, suffix=None,
                     silent=False, snapper=None, descend=True, reverse=False):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Returns an iterator based on the dated files that exist in
     directory *dir*.  Each value returned by the iterator is a tuple
     of ``(date, [file1, file2, ...])``, where each file matches the
@@ -238,6 +254,7 @@ def datefile_walker(dir, suffix=None,
     it will be used to enforce the alignment of dates, throwing a
     :exc:`ValueError` if a misaligned date is encountered.
     """
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     if not path.isdir(dir):
         raise ValueError, "not a directory: %s" % dir
     if suffix:
@@ -273,6 +290,8 @@ def datefile_walker(dir, suffix=None,
 def latest_datefile(dir, suffix=None,
                     silent=False, snapper=None, descend=True):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Traverses the given directory and returns a single tuple ``(date,
     [file1, file2, ...])`` where date is the latest date present and
     each file in the list contains that date.  See
@@ -286,7 +305,7 @@ def latest_datefile(dir, suffix=None,
     will be used to enforce the alignment of dates, throwing a
     :exc:`ValueError` if a misaligned date is encountered.
     """
-
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     dates = datefile_walker(dir, suffix=suffix, silent=silent,
                             snapper=snapper, descend=descend, reverse=True)
     for d in dates:
@@ -325,6 +344,8 @@ def datedir_walker(dirname, silent=False):
 
 def date_snap_walker(dir, snapper, suffix=None, sparse=True):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Returns an iterator based on traversing the given directory.  Each
     value returned by the iterator is a tuple ``(date_bin, ((date,
     file), (date2, file2), ...))`` where each filename contains a date
@@ -341,6 +362,7 @@ def date_snap_walker(dir, snapper, suffix=None, sparse=True):
     If *suffix* is provided, all files not ending with the provided
     extension are ignored.
     """
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     dwalker = datefile_walker(dir, suffix=suffix, silent=True)
     bwalker = ((snapper.date_bin(d), d, f) for d, f in dwalker)
     last_bin = None
@@ -355,6 +377,8 @@ def date_snap_walker(dir, snapper, suffix=None, sparse=True):
 def tandem_datefile_walker(sources, suffix=None,
                            silent=True, snapper=None, reverse=False):
     """
+    *Deprecated* as of netsa-python v1.4.
+
     Returns an iterator based on traversing multiple directories given
     by *sources*.  Each value returned by the iterator is a tuple
     ``(date, (dir, file), (dir2, file2), ...)``, where the given
@@ -380,6 +404,7 @@ def tandem_datefile_walker(sources, suffix=None,
     it will be used to enforce the alignment of dates, throwing a
     :exc:`ValueError` if a misaligned date is encountered.
     """
+    warnings.warn("netsa.files.datefiles is deprecated", DeprecationWarning)
     def _dwalk(d):
         w = datefile_walker(d, suffix=suffix,
                             silent=silent, snapper=snapper, reverse=reverse)

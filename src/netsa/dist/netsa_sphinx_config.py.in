@@ -9,7 +9,7 @@
 # related source code is subject to the terms of the following licenses:
 # 
 # GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.225-7013
+# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
 # 
 # NO WARRANTY
 # 
@@ -110,6 +110,9 @@ html_theme_path = [netsa.dist.get_theme_path()]
 
 html_static_path = []
 
+def add_static_path(d):
+    html_static_path.append(d)
+
 # html_last_updated_fmt = '%%b %%d, %%Y'
 
 html_use_smartypants = True
@@ -142,8 +145,12 @@ htmlhelp_basename = %(project_name)r + "doc"
 
 latex_documents = [
     ('index', %(project_name)r + ".tex", %(project_title)r + " Documentation",
-     u'Carnegie Mellon University', 'manual')
+     u'Carnegie Mellon University', 'manual', True)
 ]
+
+def add_latex_doc(source_file, target_file, title, author):
+    latex_documents.append((source_file, target_file, title, author,
+                            'manual', True))
 
 # latex_logo = None
 
@@ -159,8 +166,13 @@ latex_documents = [
 
 # latex_domain_indices = True
 
+latex_use_modindex = False
+
 man_pages = []
 
+def add_man_page(source_file, man_page, description, section=1):
+    man_pages.append((source_file, man_page, description, [], str(section)))
+
 intersphinx_mapping = {
-    'http://docs.python.org/': None
+    'python': ('http://docs.python.org/', None),
 }
