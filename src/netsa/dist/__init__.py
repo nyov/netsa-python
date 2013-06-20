@@ -97,6 +97,15 @@ class netsa_distribution(Distribution):
     def finalize_options(self):
         self.source_dir = distutils.util.convert_path(self.source_dir)
         Distribution.finalize_options(self)
+    def has_data_files(self):
+        if Distribution.has_data_files(self):
+            return True
+        if self.netsa_doc_dir:
+            man_base = os.path.join(self.source_dir, self.netsa_doc_dir, "man")
+            if os.path.exists(man_base):
+                return True
+        return False
+
 
 ### Overridden Distutils Commands
 

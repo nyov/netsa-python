@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 1.4.2 - 2012-12-07
+--------------------------
+
+ * Fix problem where netsa.dist would not install manpages unless the
+   distribution also had install_data.
+
 Version 1.4.1 - 2012-11-09
 --------------------------
 

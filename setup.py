@@ -59,7 +59,7 @@ sys.path[:0] = \
 from netsa import dist
 
 dist.set_name("netsa-python")
-dist.set_version("1.4.1")
+dist.set_version("1.4.2")
 dist.set_copyright("2008-2012, Carnegie Mellon University")
 
 dist.set_title("NetSA Python")
