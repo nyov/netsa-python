@@ -1,55 +1,10 @@
-# Copyright 2008-2013 by Carnegie Mellon University
+# Copyright 2008-2016 by Carnegie Mellon University
+# See license information in LICENSE-OPENSOURCE.txt
 
-# @OPENSOURCE_HEADER_START@
-# Use of the Network Situational Awareness Python support library and
-# related source code is subject to the terms of the following licenses:
-# 
-# GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
-# 
-# NO WARRANTY
-# 
-# ANY INFORMATION, MATERIALS, SERVICES, INTELLECTUAL PROPERTY OR OTHER 
-# PROPERTY OR RIGHTS GRANTED OR PROVIDED BY CARNEGIE MELLON UNIVERSITY 
-# PURSUANT TO THIS LICENSE (HEREINAFTER THE "DELIVERABLES") ARE ON AN 
-# "AS-IS" BASIS. CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY 
-# KIND, EITHER EXPRESS OR IMPLIED AS TO ANY MATTER INCLUDING, BUT NOT 
-# LIMITED TO, WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE, 
-# MERCHANTABILITY, INFORMATIONAL CONTENT, NONINFRINGEMENT, OR ERROR-FREE 
-# OPERATION. CARNEGIE MELLON UNIVERSITY SHALL NOT BE LIABLE FOR INDIRECT, 
-# SPECIAL OR CONSEQUENTIAL DAMAGES, SUCH AS LOSS OF PROFITS OR INABILITY 
-# TO USE SAID INTELLECTUAL PROPERTY, UNDER THIS LICENSE, REGARDLESS OF 
-# WHETHER SUCH PARTY WAS AWARE OF THE POSSIBILITY OF SUCH DAMAGES. 
-# LICENSEE AGREES THAT IT WILL NOT MAKE ANY WARRANTY ON BEHALF OF 
-# CARNEGIE MELLON UNIVERSITY, EXPRESS OR IMPLIED, TO ANY PERSON 
-# CONCERNING THE APPLICATION OF OR THE RESULTS TO BE OBTAINED WITH THE 
-# DELIVERABLES UNDER THIS LICENSE.
-# 
-# Licensee hereby agrees to defend, indemnify, and hold harmless Carnegie 
-# Mellon University, its trustees, officers, employees, and agents from 
-# all claims or demands made against them (and any related losses, 
-# expenses, or attorney's fees) arising out of, or relating to Licensee's 
-# and/or its sub licensees' negligent use or willful misuse of or 
-# negligent conduct or willful misconduct regarding the Software, 
-# facilities, or other rights or assistance granted by Carnegie Mellon 
-# University under this License, including, but not limited to, any 
-# claims of product liability, personal injury, death, damage to 
-# property, or violation of any laws or regulations.
-# 
-# Carnegie Mellon University Software Engineering Institute authored 
-# documents are sponsored by the U.S. Department of Defense under 
-# Contract FA8721-05-C-0003. Carnegie Mellon University retains 
-# copyrights in all material produced under this contract. The U.S. 
-# Government retains a non-exclusive, royalty-free license to publish or 
-# reproduce these documents, or allow others to do so, for U.S. 
-# Government purposes only pursuant to the copyright license under the 
-# contract clause at 252.227.7013.
-# @OPENSOURCE_HEADER_END@
-
-from datetime import datetime, timedelta
-from os import path
+from datetime import timedelta
+import os
 from copy import copy
-import sys, itertools
+import __main__ as main
 
 import netsa.json
 from netsa.script      import Flow_params
@@ -91,11 +46,11 @@ class Golem(Script):
                  '_epoch', '_lag', 'realtime',
                  'tags', 'arg_tags', 'flow_maps', 'loops',
                  'golem_inputs', 'output_templates', 'input_templates',
-                 'query_templates', '_version')
+                 'query_templates', 'input_groups', 'output_groups',
+                 '_version')
 
-    default_span     = timedelta(days=1)
     default_interval = timedelta(days=1)
-    default_lag      = timedelta(hours=3)
+    default_lag      = timedelta()
     default_epoch    = times.dow_epoch()
 
     @classmethod
@@ -146,6 +101,10 @@ class Golem(Script):
             kwargs['input_templates'] = mdata.pop('golem_input_templates')
         if 'golem_query_templates' in mdata:
             kwargs['query_templates'] = mdata.pop('golem_query_templates')
+        if 'output_groups' in mdata:
+            kwargs['output_groups'] = mdata.pop('output_groups')
+        if 'input_groups' in mdata:
+            kwargs['input_groups'] = mdata.pop('input_groups')
         return cls(**kwargs)
 
     def _as_meta(self):
@@ -177,6 +136,10 @@ class Golem(Script):
             meta['golem_input_templates'] = self.input_templates
         if self.query_templates:
             meta['golem_query_templates'] = self.query_templates
+        if self.output_groups:
+            meta['output_groups'] = self.output_groups
+        if self.input_groups:
+            meta['input_groups'] = self.input_groups
         if self.flow_maps:
             meta['golem_flow_maps'] = self.flow_maps
         if self.golem_inputs:
@@ -193,7 +156,8 @@ class Golem(Script):
                        tags=None, arg_tags=None, loops=None,
                        flow_maps=None, golem_inputs=None,
                        output_templates=None, input_templates=None,
-                       query_templates=None, _version=None, **kwargs):
+                       query_templates=None, input_groups=None,
+                       output_groups=None, _version=None, **kwargs):
         """
         Creates a new :class:`Golem` object from the various data that
         make up a golem script definition. This should never need to be
@@ -209,12 +173,18 @@ class Golem(Script):
 
         self.name = name
         """
-        The short name of this jool script, if any.
+        The short name of this golem script, if any.
         """
+        if self.name is None:
+            try:
+                self.name = os.path.basename(main.__file__)
+                self.name.replace('.py', '')
+            except AttributeError:
+                self.name = "python"
 
         self.suite = suite_name
         """
-        The short name of this jool script's suite, if any.
+        The short name of this golem script's suite, if any.
         """
 
         self._epoch = None
@@ -232,7 +202,7 @@ class Golem(Script):
         of this :class:`Golem` instance.
         """
 
-        self.span = times.make_timedelta(span or self.default_span)
+        self.span = times.make_timedelta(span or self.interval)
         """
         A :class:`timedelta` representing the data window of
         this :class:`Golem` instance.
@@ -258,7 +228,7 @@ class Golem(Script):
         if not isinstance(tags, dict):
             tags = dict(tags or ())
         self.tags = tags
-        
+
         if not isinstance(arg_tags, dict):
             arg_tags = dict(arg_tags or ())
         self.arg_tags = arg_tags
@@ -299,12 +269,10 @@ class Golem(Script):
         self.input_templates = tuple(input_templates or ())
         for x in self.input_templates:
             name, t, spec = x
-            if isinstance(x, tuple) and (isinstance(t, tuple) or callable(t)):
+            if isinstance(x, tuple):
                 continue
             templates = []
             for name, t, spec in self.input_templates:
-                if not callable(t):
-                    t = tuple(t)
                 templates.append((name, t, spec))
             self.input_templates = tuple(templates)
             break
@@ -329,6 +297,9 @@ class Golem(Script):
             self.query_templates = tuple(templates)
             break
 
+        self.input_groups = tuple(input_groups or ())
+        self.output_groups = tuple(output_groups or ())
+
         self.golem_inputs = tuple(golem_inputs or ())
 
         self._validate_params()
@@ -339,7 +310,8 @@ class Golem(Script):
                     tags=Nada, arg_tags=Nada, loops=Nada,
                     flow_maps=Nada, golem_inputs=Nada,
                     output_templates=Nada, input_templates=Nada,
-                    query_templates=Nada):
+                    query_templates=Nada, input_groups=Nada,
+                    output_groups=Nada):
         """
         Clones the current :class:`Golem` object, possibly replacing
         certain parameters. Available parameters correspond to those
@@ -385,6 +357,10 @@ class Golem(Script):
             kwargs['output_templates'] = output_templates
         if query_templates is not Nada:
             kwargs['query_templates'] = query_templates
+        if input_groups is not Nada:
+            kwargs['input_groups'] = input_groups
+        if output_groups is not Nada:
+            kwargs['output_groups'] = output_groups
         if loops is not Nada:
             kwargs['loops'] = loops
         if golem_inputs is not Nada:
@@ -418,6 +394,10 @@ class Golem(Script):
             golem.golem_inputs = self.golem_inputs
         if query_templates is Nada:
             golem.query_templates = self.query_templates
+        if input_groups is Nada:
+            golem.input_groups = self.input_groups
+        if output_groups is Nada:
+            golem.output_groups = self.output_groups
         if loops is Nada:
             golem.loops = self.loops
         return golem
@@ -427,7 +407,7 @@ class Golem(Script):
         def _check(n):
             if n in seen:
                 script_error = GolemScriptError(
-                    "multiple instances of name '%s'" % n)
+                    "multiple instances of tag '%s'" % n)
                 raise script_error
             seen.add(n)
         if self.interval <= NULL_DELTA:
@@ -452,6 +432,10 @@ class Golem(Script):
             _check(name)
         for name in (x[0] for x in self.query_templates):
             _check(name)
+        for name in (x[0] for x in self.output_groups):
+            _check(name)
+        for name in (x[0] for x in self.input_groups):
+            _check(name)
         for jin, spec in self.golem_inputs:
             for name in (x[0] for x in jin.output_templates):
                 _check(name)
@@ -464,11 +448,6 @@ class Golem(Script):
                 raise script_error
         for name, fmap in self.flow_maps:
             _check(name)
-            for v in fmap.values():
-                if v not in seen:
-                    script_error = GolemScriptError(
-                        "invalid flow map label '%s'" % v)
-                    raise script_error
 
     def select(self, loop, vals):
         """
@@ -478,7 +457,7 @@ class Golem(Script):
         current values.
         """
         loops = list(self.loops)
-        for i, (name, (v, gr, gn, sep)) in enumerate(loops): 
+        for i, (name, (v, gr, gn, sep)) in enumerate(loops):
             if name != loops:
                 continue
             if set(vals).difference(v):
@@ -500,8 +479,7 @@ class Golem(Script):
         particular day of the week. By default, bins align to Monday
         within any given week.
         """
-        e = self._epoch or self.default_epoch
-        return times.bin_datetime(self.interval, e)
+        return self._epoch or self.default_epoch
 
     @property
     def lag(self):
@@ -515,8 +493,8 @@ class Golem(Script):
 
     def precision(self):
         """
-        Returns a precision value as defined in :mod:`netsa.data.times`
-        (e.g. ``netsa.data.times.DATETIME_DAY``) based on the apparent
+        Returns a precision value as defined in :mod:`netsa.data.format`
+        (e.g. ``netsa.data.format.DATETIME_DAY``) based on the apparent
         precision of the *interval* and *span* of this
         :class:`Golem` instance.
         """
@@ -536,7 +514,7 @@ class Golem(Script):
         else:
             return DATETIME_DAY
 
-    def _map_outputs(self, label_map):
+    def _map_outputs(self, label_map, filter=False):
         lmap = dict(label_map)
         outs = []
         for name, template, spec in self.output_templates:
@@ -545,13 +523,22 @@ class Golem(Script):
                 spec['oname'] = name
                 outs.append((lmap.pop(name), template, spec))
             else:
-                continue
+                if not filter:
+                    outs.append((name, template, spec))
+        out_groups = []
+        for name, group in self.output_groups:
+            if name in lmap:
+                group = [lmap.get(x, x) for x in group]
+                out_groups.append((lmap.pop(name), group))
+            else:
+                if not filter:
+                    out_groups.append((name, group))
         if lmap:
             script_error = GolemScriptError(
                 "unknown golem outputs for '%s': '%s'" \
                     % (self.name, ','.join(sorted(lmap))))
             raise script_error
-        return self.using(output_templates=outs)
+        return self.using(output_templates=outs, output_groups=out_groups)
 
     def _date_bin(self, date):
         return times.bin_datetime(self.interval, date, self.epoch)

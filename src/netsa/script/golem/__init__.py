@@ -1,50 +1,5 @@
-# Copyright 2008-2013 by Carnegie Mellon University
-
-# @OPENSOURCE_HEADER_START@
-# Use of the Network Situational Awareness Python support library and
-# related source code is subject to the terms of the following licenses:
-# 
-# GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
-# 
-# NO WARRANTY
-# 
-# ANY INFORMATION, MATERIALS, SERVICES, INTELLECTUAL PROPERTY OR OTHER 
-# PROPERTY OR RIGHTS GRANTED OR PROVIDED BY CARNEGIE MELLON UNIVERSITY 
-# PURSUANT TO THIS LICENSE (HEREINAFTER THE "DELIVERABLES") ARE ON AN 
-# "AS-IS" BASIS. CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY 
-# KIND, EITHER EXPRESS OR IMPLIED AS TO ANY MATTER INCLUDING, BUT NOT 
-# LIMITED TO, WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE, 
-# MERCHANTABILITY, INFORMATIONAL CONTENT, NONINFRINGEMENT, OR ERROR-FREE 
-# OPERATION. CARNEGIE MELLON UNIVERSITY SHALL NOT BE LIABLE FOR INDIRECT, 
-# SPECIAL OR CONSEQUENTIAL DAMAGES, SUCH AS LOSS OF PROFITS OR INABILITY 
-# TO USE SAID INTELLECTUAL PROPERTY, UNDER THIS LICENSE, REGARDLESS OF 
-# WHETHER SUCH PARTY WAS AWARE OF THE POSSIBILITY OF SUCH DAMAGES. 
-# LICENSEE AGREES THAT IT WILL NOT MAKE ANY WARRANTY ON BEHALF OF 
-# CARNEGIE MELLON UNIVERSITY, EXPRESS OR IMPLIED, TO ANY PERSON 
-# CONCERNING THE APPLICATION OF OR THE RESULTS TO BE OBTAINED WITH THE 
-# DELIVERABLES UNDER THIS LICENSE.
-# 
-# Licensee hereby agrees to defend, indemnify, and hold harmless Carnegie 
-# Mellon University, its trustees, officers, employees, and agents from 
-# all claims or demands made against them (and any related losses, 
-# expenses, or attorney's fees) arising out of, or relating to Licensee's 
-# and/or its sub licensees' negligent use or willful misuse of or 
-# negligent conduct or willful misconduct regarding the Software, 
-# facilities, or other rights or assistance granted by Carnegie Mellon 
-# University under this License, including, but not limited to, any 
-# claims of product liability, personal injury, death, damage to 
-# property, or violation of any laws or regulations.
-# 
-# Carnegie Mellon University Software Engineering Institute authored 
-# documents are sponsored by the U.S. Department of Defense under 
-# Contract FA8721-05-C-0003. Carnegie Mellon University retains 
-# copyrights in all material produced under this contract. The U.S. 
-# Government retains a non-exclusive, royalty-free license to publish or 
-# reproduce these documents, or allow others to do so, for U.S. 
-# Government purposes only pursuant to the copyright license under the 
-# contract clause at 252.227.7013.
-# @OPENSOURCE_HEADER_END@
+# Copyright 2008-2016 by Carnegie Mellon University
+# See license information in LICENSE-OPENSOURCE.txt
 
 import netsa, netsa.script
 
@@ -57,9 +12,11 @@ from netsa.data        import times
 from netsa             import json
 from netsa.data.format import datetime_iso, datetime_iso_basic, \
                               datetime_silk, timedelta_iso
+from netsa.files       import get_temp_file_name
 
 import sys, os, re, itertools, tempfile, atexit
 from datetime import datetime, timedelta
+from glob import glob
 
 import netsa.util.compat
 
@@ -72,24 +29,27 @@ class GolemInitError(GolemScriptError):
 class GolemUserError(UserError):
     pass
 
-class GolemInputMissing(GolemUserError):
+class GolemException(Exception):
     pass
 
-class GolemOutputMissing(GolemUserError):
+class GolemInputMissing(GolemException):
     pass
 
-class GolemOutputExists(GolemUserError):
+class GolemPartialComplete(GolemException):
     pass
 
-class GolemIgnore(Exception):
+class GolemComplete(GolemException):
+    pass
+
+class GolemIgnore(GolemException):
     pass
 
 class Nada(object):
     pass
 
-def _make_timedelta(days=0, minutes=0, hours=0, weeks=0):
+def _make_timedelta(days=0, minutes=0, hours=0, weeks=0, allow_negative=False):
     delta = timedelta(days=days, minutes=minutes, hours=hours, weeks=weeks)
-    if not delta or (abs(delta) != delta):
+    if not delta or (not allow_negative and abs(delta) != delta):
         raise ValueError, "positive timedelta required"
     return delta
 
@@ -154,7 +114,7 @@ class GolemView(object):
           Select a different ending time bin based on the provided
           :class:`datetime <datetime.datetime>` object.
         """
-        if golem is Nada or not golem:
+        if not golem or golem is Nada:
             golem = self.golem
         if first_date is Nada:
             first_date = self._first_date
@@ -162,6 +122,16 @@ class GolemView(object):
             last_date = self._last_date
         return self.__class__(golem,
             first_date=first_date, last_date=last_date)
+
+    def using_span(self, days=0, minutes=0, hours=0, weeks=0):
+        """
+        Return a new :class:`GolemView` object containing a golem object
+        with the given span, specified with keywords
+        weeks/days/hours/minutes.
+        """
+        span = _make_timedelta(days=days, minutes=minutes,
+                               hours=hours, weeks=weeks)
+        return self.using(golem=self.golem.using(span=span))
 
     def _current_bin(self):
         return self.golem._horizon_bin(self.today)
@@ -185,7 +155,7 @@ class GolemView(object):
         if first_bin > last_bin:
             fs = datetime_iso(first_bin, self.golem.precision())
             ls = datetime_iso(last_bin,  self.golem.precision())
-            param_error = ParamError('first-bin', fs,
+            param_error = ParamError('first bin', fs,
                 "exceeds last bin '%s'" % ls)
             raise param_error
         return first_date, last_date
@@ -225,12 +195,17 @@ class GolemView(object):
     def end_date(self):
         """
         A :class:`datetime <datetime.datetime>` object representing the
-        end of the last data span represented by this view. This is
-        determined based the interval defined by :attr:`last_bin`:
-        ``last_bin + interval - 1 millisecond``.
+        end of the last data span covered by this view. If the span
+        is less than or equal to the interval, this is equal to
+        ``last_bin + interval - 1 microsecond``, otherwise it is equal
+        to ``last_bin + span - 1 microsecond``.
         """
-        return self.last_bin + \
-               self.golem.interval - timedelta(microseconds=1)
+        if self.golem.span >= self.golem.interval:
+            return self.last_bin + \
+                   self.golem.interval - timedelta(microseconds=1)
+        else:
+            return self.last_bin + \
+                   self.golem.span - timedelta(microseconds=1)
 
     def bin_dates(self):
         """
@@ -244,7 +219,7 @@ class GolemView(object):
             yield step_bin
             step_bin += self.golem.interval
 
-    def by_bin_date(self):
+    def bins(self):
         """
         Provide an iterator over :class:`GolemView` objects for each
         interval represented by this view.
@@ -306,7 +281,7 @@ class GolemView(object):
         the order in which they were defined. Each view thus provided is
         therefore fully resolved, with no loops remaining.
         """
-        for gview in self.by_bin_date():
+        for gview in self.bins():
             if gview.golem.loops:
                 labels = [x[0] for x in gview.golem.loops]
                 for _, gv in gview.group_by(*labels):
@@ -350,7 +325,8 @@ class GolemView(object):
         """
         return self.product()
 
-    def sync_to(self, other, count=None, offset=None, cover=False):
+    def sync_to(self, other, count=None, offset=None,
+                cover=False, trail=False):
         """
         Given another :class:`GolemView` object, return a version of
         *self* that has been synchronized to the given view object.
@@ -369,19 +345,23 @@ class GolemView(object):
             Calculate a *count* necessary to cover all intervals
             represented by the given object (overrides *count* and
             *offset*)
+
+          *trail*
+            Force the *end_date* of the new view to always be less than
+            or equal to the *end_date* of the given view.
         """
 
         gv = self.using(first_date=other.end_date, last_date=other.end_date)
         golem = gv.golem
-        while gv.end_date > other.end_date:
+        while trail and gv.end_date > other.end_date:
             first_date = gv._first_date - golem.interval
             last_date  = gv._last_date  - golem.interval
             gv = gv.using(first_date=first_date, last_date=last_date)
         if cover:
             gv = gv.using(first_date=other.start_date)
         if offset:
-            first_bin = gv.first_bin - abs(offset) * golem.interval
-            last_bin  = gv.last_bin  - abs(offset) * golem.interval
+            first_bin = gv.first_bin - abs(offset or 0) * golem.interval
+            last_bin  = gv.last_bin  - abs(offset or 0) * golem.interval
             gv = gv.using(first_date=first_bin, last_date=last_bin)
         if count:
             first_bin = gv.first_bin - golem.interval * (abs(count) - 1)
@@ -417,6 +397,12 @@ class GolemView(object):
             first_date = self._first_date,
             last_date  = self._last_date,
         )
+
+    def tags(self):
+        """
+        Return a dictionary of resolved tags for this view.
+        """
+        return self.loop().tags()
 
     def _get_io(self, label):
         if not self._inputs:
@@ -461,15 +447,17 @@ class GolemOutputs(GolemView):
     multiple iterations.
     """
 
-    def _expand(self):
+    def _expand(self, glob_it=True):
         labels = []
         meta   = dict()
         for name, _, spec in self.golem.output_templates:
             labels.append(name)
             meta[name] = dict(spec)
+        for group, members in self.golem.output_groups:
+            meta[group] = {}
         outs = {}
         for gv in self.loop().product():
-            for k, args in gv._output_tags():
+            for k, args in gv._output_tags(glob_it=glob_it):
                 if k not in outs:
                     outs[k] = [gv, args]
                 else:
@@ -489,13 +477,10 @@ class GolemOutputs(GolemView):
         Returns a :class:`GolemArgs` object representing all resolved
         output templates for the current view.
         """
-        outputs = None
+        outputs = GolemArgs()
         for args in (x[-1] for x in self._expand()):
-            if not outputs:
-                outputs = args
-            else:
-                outputs += args
-        return outputs or GolemArgs()
+            outputs += args
+        return outputs
 
     def __len__(self):
         """
@@ -503,12 +488,14 @@ class GolemOutputs(GolemView):
         current view.
         """
         return self.expand().__len__()
+    __nonzero__ = __len__
+    __bool__ = __len__
 
     def __iter__(self):
         """
         Iterate over each resolved output template for the current view.
         """
-        return iter(self.expand())
+        return self.expand()
 
 
 class GolemInputs(GolemView):
@@ -522,7 +509,7 @@ class GolemInputs(GolemView):
 
     def members(self, *select):
         """
-        Iterate over each golem script that provides inputs for the for
+        Iterate over each golem script that provides inputs for
         this golem script, returning each as a synchronized
         :class:`GolemOutputs` object.
         """
@@ -592,30 +579,38 @@ class GolemInputs(GolemView):
                 gv = gv.using(first_date=first_date)
             yield gv
 
-    def _from_input_templates(self):
-        seen = set()
+    def _from_input_templates(self, glob_it=True):
         if self.golem.input_templates:
-            meta = {}
-            for k, _, spec in self.golem.input_templates:
-                meta[k] = dict(spec)
-            for gv in self.loop().product():
-                for label, args in gv._input_tags():
-                    st_args = str(args)
-                    if (label, st_args) not in seen:
-                        seen.add((label, st_args))
-                        yield label, meta[label], args
+            for name, t, spec in self.golem.input_templates:
+                nspec = dict(spec)
+                join = {}
+                for loop in (x[0] for x in self.golem.loops):
+                    join[loop] = loop
+                gout = self.golem.using(output_templates=[(name, t, {})])
+                gin = self.golem.using(
+                    input_templates=[],
+                    golem_inputs=[(gout, nspec)]
+                )
+                gvnew = self.using(golem=gin)
+                for gv, label, meta, args in \
+                        gvnew._expand_members(glob_it=glob_it):
+                    meta["source_name"] = nspec.get("source_name", "unknown")
+                    yield label, meta, args
 
-    def _expand(self):
-        inputs = []
+    def _expand_members(self, glob_it=True):
         for jio in self.members():
-            for gv, label, meta, args in jio._expand():
+            for gv, label, meta, args in jio._expand(glob_it=glob_it):
                 if not args:
                     error = GolemScriptError(
                         "input mapping failure for '%s.%s' in '%s'"
                             % (gv.golem.name, label, self.golem.name))
                     raise error
                 yield gv, label, meta, args
-        for label, meta, args in self._from_input_templates():
+
+    def _expand(self, glob_it=True):
+        for gv, label, meta, args in self._expand_members(glob_it=glob_it):
+            yield gv, label, meta, args
+        for label, meta, args in self._from_input_templates(glob_it=glob_it):
             yield self, label, meta, args
 
     def expand(self):
@@ -623,13 +618,10 @@ class GolemInputs(GolemView):
         Returns a :class:`GolemArgs` object representing all resolved
         input templates for the current view.
         """
-        inputs = None
+        inputs = GolemArgs()
         for args in (x[-1] for x in self._expand()):
-            if not inputs:
-                inputs = args
-            else:
-                inputs += args
-        return inputs or GolemArgs()
+            inputs += args
+        return inputs
 
     def __len__(self):
         """
@@ -637,12 +629,14 @@ class GolemInputs(GolemView):
         current view.
         """
         return len(self.expand())
+    __nonzero__ = __len__
+    __bool__ = __len__
 
     def __iter__(self):
         """
         Iterate over each resolved input template for the current view.
         """
-        return iter(self.expand())
+        return self.expand()
 
 
 class GolemTags(GolemView):
@@ -654,12 +648,13 @@ class GolemTags(GolemView):
     _input_cache = {}
 
     def _basic_tags(self):
-        first_bin = self.first_bin
-        last_bin  = self.last_bin
-        interval  = self.golem.interval
-        span      = self.golem.span
+        first_bin  = self.first_bin
+        last_bin   = self.last_bin
+        interval   = self.golem.interval
+        span       = self.golem.span
         start_date = (first_bin + interval) - span
-        end_date = last_bin + (interval - timedelta(microseconds=1))
+        end_date   = last_bin + (interval - timedelta(microseconds=1))
+        next_date  = last_bin + interval
         prec = self.golem.precision()
         tags = {}
 
@@ -668,6 +663,8 @@ class GolemTags(GolemView):
             tags['golem_suite'] = self.golem.suite
         elif self.golem.name:
             tags['golem_suite'] = self.golem.name
+        tags['golem_repository'] = self.golem.repository
+        tags['golem_home'] = get_home()
 
         tags['golem_span']              = span
         tags['golem_interval']          = interval
@@ -698,13 +695,23 @@ class GolemTags(GolemView):
         tags['golem_end_second']        = end_date.second
         tags['golem_end_microsecond']   = end_date.microsecond
 
+        tags['golem_next_bin_date']          = next_date
+        tags['golem_next_bin_year']          = next_date.year
+        tags['golem_next_bin_month']         = next_date.month
+        tags['golem_next_bin_day']           = next_date.day
+        tags['golem_next_bin_hour']          = next_date.hour
+        tags['golem_next_bin_second']        = next_date.second
+        tags['golem_next_bin_microsecond']   = next_date.microsecond
+
         tags['golem_bin_iso']   = datetime_iso(first_bin,  precision=prec)
         tags['golem_start_iso'] = datetime_iso(start_date, precision=prec)
         tags['golem_end_iso']   = datetime_iso(end_date,   precision=prec)
+        tags['golem_next_bin_iso'] = datetime_iso(next_date,   precision=prec)
 
         tags['golem_bin_silk']   = datetime_silk(first_bin, precision=prec)
         tags['golem_start_silk'] = datetime_silk(start_date, precision=prec)
         tags['golem_end_silk']   = datetime_silk(end_date, precision=prec)
+        tags['golem_next_bin_silk'] = datetime_silk(next_date, precision=prec)
 
         tags['golem_bin_basic']   = \
             datetime_iso_basic(first_bin,  precision=prec)
@@ -712,6 +719,8 @@ class GolemTags(GolemView):
             datetime_iso_basic(start_date, precision=prec)
         tags['golem_end_basic']   = \
             datetime_iso_basic(end_date,   precision=prec)
+        tags['golem_next_bin_basic']   = \
+            datetime_iso_basic(next_date,   precision=prec)
 
         loopers = {}
         for k, (vals, g, n, s) in self.golem.loops:
@@ -726,14 +735,14 @@ class GolemTags(GolemView):
             if k in tags:
                 error = GolemScriptError("tag collision '%s'" % k)
                 raise error
-            tags[k] = (s or ',').join(kvals)
+            tags[k] = GolemArgs(*kvals, sep=s)
             if len(kvals) > 1:
                 loopers[k] = kvals
             if nvals:
                 if n in tags:
                     error = GolemScriptError("tag collision '%s'" % k)
                     raise error
-                tags[n] = (s or ',').join(nvals)
+                tags[n] = GolemArgs(*nvals, sep=s)
                 if len(nvals) > 1:
                     loopers[n] = nvals
 
@@ -773,39 +782,38 @@ class GolemTags(GolemView):
             else:
                 tags[k] = GolemArgs(t % tags)
 
-        return tags, loopers
+        return tags
 
-    def _output_tags(self, tags=None):
+    def _output_tags(self, tags=None, glob_it=True):
         if not tags:
-            tags, _ = self._basic_tags()
+            tags = self._basic_tags()
+        output_group_map = {}
+        output_group_args = {}
+        for group, members in self.golem.output_groups:
+            output_group_args[group] = GolemArgs()
+            for member in members:
+                output_group_map.setdefault(member, set())
+                output_group_map[member].add(group)
+        file_resource = GolemFileResource(self)
         for k, template, spec in self.golem.output_templates:
             resolved = template % tags
             if self.golem.repository:
-                r = GolemFileResource(self)
-                resolved = r.repository_fmt_full(resolved)
-            yield k, GolemArgs(resolved)
-
-    def _input_tags(self, tags=None):
-        if not tags:
-            tags, _ = self._basic_tags()
-        for k, templates, _ in self.golem.input_templates:
-            if callable(templates):
-                ck = (templates, self.first_bin) 
-                for v in (x[1][0] for x in self.golem.loops):
-                    ck += (v,)
-                if ck not in self._input_cache:
-                    t = templates(k, tags)
-                    if t and not isinstance(t, basestring):
-                        t = tuple(t)
-                    self._input_cache[ck] = t
-                templates = self._input_cache[ck]
-            if templates:
-                if isinstance(templates, basestring):
-                    templates = [templates]
-                val = GolemArgs([x % tags for x in templates])
+                resolved = file_resource.repository_fmt_full(resolved)
+            if glob_it:
+                res = glob(resolved)
+                if res:
+                    resolved = res
+                else:
+                    resolved = [resolved]
             else:
-                val = GolemArgs()
-            yield k, val
+                resolved = [resolved]
+            args = GolemArgs(resolved)
+            if k in output_group_map:
+                for group in output_group_map[k]:
+                    output_group_args[group] += args
+            yield k, args
+        for k, args in output_group_args.iteritems():
+            yield k, args
 
     def tags(self):
         """
@@ -814,22 +822,31 @@ class GolemTags(GolemView):
         invoking the :meth:`product <GolemView.product>` method).
         """
 
-        tags, loopers = self._basic_tags()
+        tags = self._basic_tags()
 
-        # add output tags
-        tags.update(self._output_tags(tags))
+        # add output tags (including a dictionary of all outputs)
+        tags['golem_outputs'] = dict(self._output_tags(tags))
+        tags.update(tags['golem_outputs'])
 
-        # add input tags
+        # add input tags (including a dictionary of all inputs)
+        tags['golem_inputs'] = {}
         for _, label, _, args in self.inputs()._expand():
             tags[label] = args
+            tags['golem_inputs'][label] = args
+        for name, members in self.golem.input_groups:
+            if name not in tags:
+                tags[name] = GolemArgs()
+            for m in members:
+                tags[name] += tags[m]
 
         # bind flow maps
         for name, flow_map in self.golem.flow_maps:
             kwargs = {}
             for fk, pk in flow_map.iteritems():
-                v = tags[pk]
-                if fk == 'sensors' and isinstance(v, basestring):
-                    v = v.split(',')
+                v = tags.get(pk, pk)
+                if fk == 'sensors':
+                    if isinstance(v, basestring):
+                        v = v.split(',')
                 kwargs[fk] = v
                 if 'start_date' not in kwargs:
                     kwargs['start_date'] = tags['golem_start_date']
@@ -857,17 +874,19 @@ class GolemArgs(object):
     A :class:`GolemArgs` object encapsulates a list of resolved input
     or output templates destined to be used as a parameter in a tags
     dictionary. The constructor takes any number of strings, or string
-    iterators, and flattens them into a unique list in the order they
-    were seen.
+    iterators, and flattens them into a unique sorted tuple. Individual
+    items can be accessed and iterated over like a tuple. One keyword
+    argument is accepted, *sep*, which will be used to join the
+    items when rendered as a string. It defaults to a single space.
 
-    It will resolve to a string of space-separated values and will
-    properly resolve when passed to the :mod:`netsa.util.shell` module
-    for command and pipeline execution.
+    If a space is the separator, the object will resolve to a string of
+    space-separated values and will properly resolve when passed to the
+    :mod:`netsa.util.shell` module for command and pipeline execution.
 
     Note that some file-related python functions (such as :func:`open`)
     will complain if passed a single-value :class:`GolemArgs` object
     (representing a single file name) without having first explicitly
-    converted it to a string via :func:`str`.
+    converted it to a string via :func:`str` or index 0.
 
     The length of a :class:`GolemArgs` object represents the number
     of items it contains. These can be accessed via an index like a
@@ -875,63 +894,98 @@ class GolemArgs(object):
     as with sets.
     """
 
-    __slots__ = ['items']
+    __slots__ = ['items', 'members', 'sep']
 
-    def __init__(self, *items):
-        content = []
-        seen = set()
+    def __init__(self, *items, **kwargs):
+        self.items = []
+        self.members = set()
+        if 'sep' in kwargs:
+            self.sep = kwargs.pop('sep') or ''
+        else:
+            self.sep = ' '
+        if kwargs:
+            raise TypeError("invalid keyword args: %s" % ', '.join(kwargs))
         for item in items:
-            if isinstance(item, basestring):
-                item = [item]
-            for x in item:
-                if x not in seen:
-                    content.append(x)
-                    seen.add(x)
-        self.items = tuple(content)
-    
-    def __getitem__(self, idx):
-        return self.items[idx]
+            try:
+                if isinstance(item, basestring):
+                    item = [item]
+                for x in item:
+                    if x not in self.members:
+                        self.members.add(x)
+                        self.items.append(x)
+            except TypeError:
+                if item not in self.members:
+                    self.members.add(item)
+                    self.items.append(item)
 
     def __str__(self):
-        return ' '.join(self)
+        return self.sep.join("%s" % x for x in self)
 
     def __unicode__(self):
         return unicode(str(self))
 
-    def __len__(self):
-        return len(self.items)
-
-    def __add__(self, other):
-        return self.__class__(self.items + self.__class__(other).items)
-
     def __hash__(self):
         return str(self).__hash__()
 
+    def __len__(self):
+        return len(self.items)
+
     def __eq__(self, other):
-        if isinstance(other, basestring):
-            return str(self) == other
-        else:
-            try:
-                return all((x == y) for x, y in itertools.izip(self, other))
-            except TypeError:
-                return False
+        if not isinstance(other, self.__class__):
+            other = self.__class__(other)
+        # loop tags are GolemArgs and get compared to strings
+        return str(self) == str(other)
+
+    def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            other = self.__class__(other)
+        # loop tags are GolemArgs and get compared to strings
+        return str(self) != str(other)
+
+    def __add__(self, other):
+        if not isinstance(other, self.__class__):
+            other = self.__class__(other)
+        return self.__class__(self.items + other.items)
 
     def __iadd__(self, other):
-        new = self + other
-        self.items = new.items
+        if not isinstance(other, self.__class__):
+            other = self.__class__(other)
+        for item in other.items:
+            if item not in self.members:
+                self.members.add(item)
+                self.items.append(item)
         return self
 
     def __sub__(self, other):
-        other = set(self.__class__(other).items)
-        return self.__class__(filter(lambda x: x not in other, self.items))
+        if not isinstance(other, self.__class__):
+            other = self.__class__(other)
+        return self.__class__(
+            filter(lambda x: x not in other.members, self.items))
 
     def __isub__(self, other):
         other = self - other
         self.items = other.items
+        self.members = other.members
         return self
+
+    def __getitem__(self, idx):
+        return self.items[idx]
+
+    def __contains__(self, item):
+        return item in self.members
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def __repr__(self):
+        return "netsa.script.golem.GolemArgs(%s)" \
+            % ', '.join(repr(x) for x in self)
 
     def get_argument_list(self):
         # Bridge method for compatibility with the netsa.util.shell
+        # Without this method, When there are multiple items, it would
+        # by default put quotes around the items. For a single item, a
+        # space would be inserted, i.e. "--items= item"
         if len(self.items) <= 1:
             raise AttributeError, "single argument, stringify"
         return self
@@ -979,7 +1033,7 @@ def set_default_home(*paths):
     set.  Multiple arguments will be joined together as with
     :func:`os.path.join`.  If the provided path is relative, it is
     assumed to be relative to the directory in which script resides.
-    
+
     The actual home path will be decided by the first available source
     in the following order:
 
@@ -1044,9 +1098,11 @@ class GolemResource(object):
     audit_cache = {}
     proc_cache = {}
 
-    def __init__(self, gview):
+    def __init__(self, gview, name=None):
         if not isinstance(gview, GolemView):
             raise TypeError("GolemView object required")
+        if name:
+            gview = gview.using(golem=gview.golem.using(name=name))
         self.gview = gview
 
     @property
@@ -1079,14 +1135,13 @@ class GolemResource(object):
             raise KeyError("unknown label %s" % repr(label))
         pcache[label] = {}
 
-    def audit_expand(self, labels=None):
+    def audit_expand(self, labels=None, glob_it=False):
         if labels and isinstance(labels, basestring):
             labels = set([labels])
-        auditors = {}
-        for gv, label, meta, args in self.gview._expand():
+        for gv, label, meta, args in self.gview._expand(glob_it=glob_it):
             if labels and label not in labels:
                 continue
-            r = GolemFileResource(gv)
+            r = GolemFileResource(gv, name=meta.get("source_name", None))
             lc = r._get_audit_cache(label)
             new_args = []
             for item in args:
@@ -1095,7 +1150,7 @@ class GolemResource(object):
             yield r, label, r.audit, args, new_args
 
     def audit_all(self):
-        tags, _ = self.gview.loop()._basic_tags()
+        tags = self.gview.loop()._basic_tags()
         for r, label, audit, args, new_args in self.audit_expand():
             lc = r._get_audit_cache(label)
             if args:
@@ -1104,10 +1159,10 @@ class GolemResource(object):
                 for item in args:
                     yield r, label, lc[item], item, tags
             else:
-                yield r, label, False, None, tags
+                yield r, label, None, None, tags
 
     def audit_all_by_label(self):
-        tags, _ = self.gview.loop()._basic_tags()
+        tags = self.gview.loop()._basic_tags()
         for r, label, audit, raw_args, new_args in self.audit_expand():
             lc = r._get_audit_cache(label)
             args = GolemArgs()
@@ -1116,15 +1171,15 @@ class GolemResource(object):
                 if new_args:
                     lc.update(audit(label, new_args, tags))
                 for item in raw_args:
-                    if lc[item]:
+                    if item in lc and lc[item]:
                         args += item
                     else:
                         miss += item
             yield r, label, args, miss, tags
 
     def audit_by_bin(self):
-        for rbin in (self.__class__(x) for x in self.gview.by_bin_date()):
-            tags, _ = rbin.gview.loop()._basic_tags()
+        for rbin in (self.__class__(x) for x in self.gview.bins()):
+            tags = rbin.gview.loop()._basic_tags()
             for r, label, audit, args, new_args in self.audit_expand():
                 lc = r._get_audit_cache(label)
                 if args:
@@ -1133,10 +1188,10 @@ class GolemResource(object):
                     for item in args:
                         yield r, label, lc[item], item, tags
                 else:
-                    yield r, label, False, None, tags
+                    yield r, label, None, None, tags
 
     def audit_by_label(self, labels):
-        tags, _ = self.gview.loop()._basic_tags()
+        tags = self.gview.loop()._basic_tags()
         labels = labels or set()
         if isinstance(labels, basestring):
             labels = [labels]
@@ -1144,6 +1199,8 @@ class GolemResource(object):
         found  = set()
         for r, label, audit, raw_args, new_args in self.audit_expand():
             found.add(label)
+            if labels and label not in labels:
+                continue
             lc = r._get_audit_cache(label)
             if raw_args:
                 if new_args:
@@ -1151,35 +1208,67 @@ class GolemResource(object):
                 for item in raw_args:
                     yield r, label, lc[item], item, tags
             else:
-                yield r, label, False, None, tags
+                yield r, label, None, None, tags
         if labels.difference(found):
             diff = labels.difference(found)
             diff = ', '.join(sorted(diff))
             error = GolemScriptError("unknown label %s" % diff)
             raise error
 
-    def prepare_output(self, overwrite=False, zap_empty=True, create=True):
+    def purge_output(self):
         rsrc = self.__class__(self.gview.outputs())
-        tags, _ = self.gview.loop()._basic_tags()
-        for r, label, audit, args, new_args in self.audit_expand():
+        tags = self.gview.loop()._basic_tags()
+        hits = GolemArgs()
+        misses = GolemArgs()
+        dirs = set()
+        for r, label, audit, args, new_args in \
+                self.audit_expand(glob_it=True):
             lc = r._get_audit_cache(label)
             items = []
             if args and new_args:
                 lc.update(audit(label, new_args, tags))
             for item in args:
                 items.append((item, lc[item]))
-            r.prepare_output_items(label, items, overwrite=overwrite,
-                                   zap_empty=zap_empty, create=create)
+            r.purge_output_items(items)
+            for item, _ in items:
+                lc[item] = None
+
+    def prepare_output(self, overwrite=False, zap_empty=True, create=True):
+        rsrc = self.__class__(self.gview.outputs())
+        tags = self.gview.loop()._basic_tags()
+        hits = GolemArgs()
+        misses = GolemArgs()
+        for r, label, audit, args, new_args in \
+                self.audit_expand(glob_it=True):
+            lc = r._get_audit_cache(label)
+            items = []
+            if args and new_args:
+                lc.update(audit(label, new_args, tags))
+            for item in args:
+                items.append((item, lc[item]))
+            h, m = r.prepare_output_items(label, items, overwrite=overwrite,
+                                          zap_empty=zap_empty, create=create)
+            hits += h
+            misses += m
+        return hits, misses
 
     def finalize_output(self, zap_empty=True):
         rsrc = self.__class__(self.gview.outputs())
-        tags, _ = self.gview.loop()._basic_tags()
+        tags = self.gview.loop()._basic_tags()
+        for r, label, audit, args, new_args in self.audit_expand():
+            pc = r._get_proc_cache(label)
+            for item in args:
+                if item in pc:
+                    del pc[item]
+            lc = r._get_audit_cache(label)
+            for item in args:
+                if item in lc:
+                    del lc[item]
         for r, label, audit, args, new_args in self.audit_expand():
             pc = r._get_proc_cache(label)
             args = filter(lambda x: x not in pc, args)
             if not args:
                 continue
-            lc = r._get_audit_cache(label)
             items = []
             if args and new_args:
                 lc.update(audit(label, new_args, tags))
@@ -1195,8 +1284,12 @@ class GolemResource(object):
             r.finalize_output_items(label, items, zap_empty=zap_empty)
 
     def is_complete(self):
-        r = self.__class__(self.gview.outputs())
-        return all(x[2] for x in r.audit_all())
+        o = self.gview.outputs()
+        if o:
+            r = self.__class__(o)
+            return all(x[2] for x in r.audit_all())
+        else:
+            return False
 
     def contains(self, item):
         return False
@@ -1207,18 +1300,11 @@ class GolemResource(object):
     def repository_fmt_full(self, item):
         return item
 
-    def repository_fmt(self, items, verbose=False, prefix=None):
-        if verbose or len(items) <= 1:
-            return items
-        else:
-            new = []
-            if prefix is None:
-                prefix = os.path.commonprefix(items)
-            for item in items:
-                if item.startswith(prefix) and item != prefix:
-                    item = item.split(prefix, 1)[1]
-                new.append(item)
-            return new
+    def repository_fmt(self, item, verbose=False, prefix=None):
+        if prefix and not verbose:
+            if item.startswith(prefix) and item != prefix:
+                item = item.split(prefix, 1)[1]
+        return item
 
     def repository_exists(self):
         return NotImplemented
@@ -1233,6 +1319,9 @@ class GolemResource(object):
                              zap_empty=True, create=True):
         return NotImplemented
 
+    def purge_output_items(self, items):
+        return NotImplemented
+
     def finalize_output_items(self, label, items, zap_empty=True):
         return NotImplemented
 
@@ -1243,10 +1332,16 @@ class GolemFileResource(GolemResource):
 
     def audit(self, label, args, tags):
         for f in args:
-            try:
-                status = os.path.getsize(f)
-            except OSError:
+            f = self.repository_fmt_full(f)
+            files = glob(f)
+            if files:
+                status = 0
+                for fg in files:
+                    status += os.path.getsize(fg)
+            else:
                 status = None
+            if files and not status:
+                status = True
             yield f, status
 
     def repository_exists(self):
@@ -1280,51 +1375,39 @@ class GolemFileResource(GolemResource):
             item = os.path.join(base, item)
             item = os.path.abspath(os.path.normpath(item))
         return item
-        
-    def repository_fmt(self, items, verbose=False):
-        new = []
+
+    def repository_fmt(self, item, verbose=False):
         if not self.gview.golem.repository:
-            return items
-        for item in items:
-            if not verbose:
-                if not os.path.isabs(item) \
-                        or self.repository_contains(item):
-                    new.append(os.path.basename(item))
-                else:
-                    rel = self.repository_fmt_rel(item)
-                    if len(rel) < len(item):
-                        item = rel
-                    new.append(item)
-            elif verbose == 1:
-                rel = self.repository_fmt_rel(item)
-                if len(rel) < len(item):
-                    item = rel
-                new.append(item)
-            else:
-                new.append(self.repository_fmt_full(item))
-        return new
+            return item
+        if verbose > 1:
+            item = self.repository_fmt_full(item)
+        elif verbose == 1:
+            item = self.repository_fmt_rel(item)
+        else:
+            item = os.path.basename(item)
+        return item
 
     def prepare_output_items(self, label, items, overwrite=False,
                              zap_empty=True, create=True):
         cache = self._get_proc_cache(label, set())
+        hits = GolemArgs()
+        misses = GolemArgs()
         for f, size in items:
-            if f in cache:
-                continue
             p = os.path.dirname(f)
             if p not in cache:
-                if not os.path.isdir(p):
-                    if create:
-                        os.makedirs(p)
-                    else:
-                        raise GolemOutputMissing(p)
+                if not os.path.isdir(p) and create and '*' not in p:
+                    os.makedirs(p)
                 cache.add(p)
             if size is None:
+                misses += f
                 continue
             if overwrite or (zap_empty and not size):
                 if os.path.exists(f):
                     os.remove(f)
+                    misses += f
             else:
-                raise GolemOutputExists(f)
+                hits += f
+        return hits, misses
 
     def finalize_output_items(self, label, items, zap_empty=True):
         for f, size in items:
@@ -1332,6 +1415,21 @@ class GolemFileResource(GolemResource):
                 continue
             if size == 0 and zap_empty and os.path.exists(f):
                 os.remove(f)
+                continue
+
+    def purge_output_items(self, items):
+        dirs = set()
+        for f, size in items:
+            if os.path.isdir(f):
+                dirs.add(f)
+                continue
+            if size is not None:
+                os.remove(f)
+                dirs.add(os.path.dirname(f))
+        for d in dirs:
+            try:
+                os.removedirs(d)
+            except OSError:
                 continue
 
     def copy_query_result(self, src_tag, tgt_tag, tags):
@@ -1360,6 +1458,8 @@ class _cfg(object):
     golem_inputs = []
     input_templates = []
     output_templates = []
+    input_groups = []
+    output_groups = []
     query_templates = []
     sensor_loops = []
 
@@ -1384,17 +1484,18 @@ class _cfg(object):
     @classmethod
     def get_repository(cls):
         if cls.repository:
-            if os.path.isabs(cls.repository):
-                return cls.repository
-            else:
-                return os.path.join(cls.get_home(), cls.repository)
+            p = cls.repository
+            if not os.path.isabs(p):
+                p = os.path.join(cls.get_home(), p)
+            return os.path.normpath(p)
 
     @classmethod
     def get_sources(cls):
         sd = get_script_dir()
         hd = cls.get_home()
-        for p in os.getenv('GOLEM_SOURCES').split(':'):
-            yield p
+        if os.getenv('GOLEM_SOURCES'):
+            for p in os.getenv('GOLEM_SOURCES').split(':'):
+                yield p
         for p in cls.golem_sources:
             if not os.path.isabs(p):
                 p = os.path.join(hd, p)
@@ -1566,21 +1667,29 @@ class _ctx(object):
 
     @classmethod
     def get_date_range(cls):
-        first_date_p = cls.get_param('first-date')
-        last_date_p  = cls.get_param('last-date')
-        intervals_p  = cls.get_param('intervals')
-        first_date   = cls.get_script_param('first-date')
-        last_date    = cls.get_script_param('last-date')
-        intervals    = cls.get_script_param('intervals')
+        first_date_p    = cls.get_param('first-date')
+        last_date_p     = cls.get_param('last-date')
+        intervals_p     = cls.get_param('intervals')
+        last_interval_p = cls.get_param('last-interval')
+        first_date    = cls.get_script_param('first-date')
+        last_date     = cls.get_script_param('last-date')
+        intervals     = cls.get_script_param('intervals')
+        last_interval = cls.get_script_param('last-interval')
         if first_date_p.enabled ^ last_date_p.enabled:
             first_date = last_date = first_date or last_date
-        if intervals_p.enabled and intervals:
-            gv = current_view()
+        gv = current_view()
+        if not last_date:
+            # latest bin
             last_date = gv.last_bin
-            interval  = gv.golem.interval
-            first_date = last_date - (intervals - 1) * interval
+        if not first_date:
+            first_date = last_date
+        if last_interval_p.enabled and last_interval:
+            last_date = last_date - last_interval * gv.golem.interval
+            if first_date > last_date:
+                first_date = last_date
+        if intervals_p.enabled and intervals:
+            first_date = last_date - (intervals - 1) * gv.golem.interval
         return first_date, last_date
-
 
     @classmethod
     def skip_missing_inputs(cls):
@@ -1589,6 +1698,14 @@ class _ctx(object):
     @classmethod
     def overwrite_outputs(cls):
         return cls.get_script_param('overwrite')
+
+    @classmethod
+    def skip_partial_outputs(cls):
+        return cls.get_script_param('skip-partial')
+
+    @classmethod
+    def data_purge(cls):
+        return cls.get_script_param('data-purge')
 
     @classmethod
     def load_state(cls, gv):
@@ -1652,7 +1769,7 @@ def set_interval(days=0, minutes=0, hours=0, weeks=0):
 def set_span(days=0, minutes=0, hours=0, weeks=0):
     """
     Set the span over which this golem script will expect input data for
-    each processing interval. Defaults to one day.
+    each processing interval. Defaults to the processing interval.
 
     The span will manifest as how much data is being pulled from a SiLK
     repository or possibly how many outputs from another golem script
@@ -1664,15 +1781,25 @@ def set_span(days=0, minutes=0, hours=0, weeks=0):
     t = _make_timedelta(days=days, minutes=minutes, hours=hours, weeks=weeks)
     _set_golem(span=t)
 
+def set_skew(days=0, minutes=0, hours=0, weeks=0):
+    """
+    Shift the epoch from which all time bins and spans are anchored. For
+    example, given a golem script with an interval of one week, skew can
+    control which day of the week processing occurs.
+    """
+    t = _make_timedelta(days=days, minutes=minutes, hours=hours, weeks=weeks,
+                        allow_negative=True)
+    _set_golem(epoch=times.dow_epoch() + t)
+
 def set_lag(days=0, minutes=0, hours=0, weeks=0):
     """
     Set the lag for this golem script relative to the current date and
-    time.
+    time. Defaults to 0.
 
-    The default lag is 3 hours, a typical value for data to finish
-    accumulating in a given hour within a SiLK repository. The lag
-    effectively shifts the script's concept of the current time this far
-    into the past.
+    As an example, 3 hours is a typical value for data to finish
+    accumulating in a given hour within a SiLK repository. Setting lag
+    to 3 hours effectively shifts the script's concept of the current
+    time that far into the past.
     """
     t = _make_timedelta(days=days, minutes=minutes, hours=hours, weeks=weeks)
     _set_golem(lag=t)
@@ -1740,9 +1867,10 @@ def add_output_template(name, template, scope=None,
                         mime_type=None, description=None):
     """
     Define an output template tag key *name* with the provided
-    *template*. The provided template can avail itself of the same set
-    of tags available to command line templates. Absolute paths are
-    not allowed.
+    *template*. The provided template can use any of the tags available
+    for each processing iteration. Wildcards are acceptable in the
+    template specification. Absolute paths are not allowed since outputs
+    must reside in the data repository.
 
     The following optional keyword arguments are available. Pass any of
     them a value of ``None`` to disable entirely:
@@ -1757,7 +1885,7 @@ def add_output_template(name, template, scope=None,
 
       *mime_type*
         The expected MIME Content-Type of the output file, if any.
-      
+
       *description*
         A long-form text description, if any, of the contents of this
         output file.
@@ -1780,17 +1908,16 @@ def add_output_template(name, template, scope=None,
     _cfg.output_templates.append((name, template, spec))
 
 def add_input_template(name, template, required=True,
-                             mime_type=None, description=None):
+                             count=None, offset=None, cover=False,
+                             source_name=None, mime_type=None,
+                             description=None):
     """
     Define an input template tag under key *name*. This is useful for
-    defining inputs not produced by other golem scripts. The template
-    can be specified as a callable function, in which case the function
-    is given a dictionary of currently defined template tags for each
-    iteration and should return a template string if one is available
-    for the current iteration.
+    defining inputs not produced by other golem scripts. Wildcards
+    are allowed in the template specification.
 
-    The provided template can use the same set of tags available to
-    output and command templates. The resolved string is available to
+    The provided template can use the any of the set of tags available
+    on each processing iteration. The resolved string is available to
     command templates under key *name*.
 
     Optional keyword arguments:
@@ -1798,10 +1925,32 @@ def add_input_template(name, template, required=True,
       *required*
         When ``False`` will ignore missing inputs once the template is
         resolved. Defaults to ``True``.
-      
+
+      *count*
+        Specifies how many intervals (as defined by this script)
+        over which to resolve the input template. For example, if
+        this script has an *interval* of one week, a *count* of 4
+        will resolve to the last 4 days of the week in question.
+
+      *offset*
+        Specify how far backwards (in intervals) to anchor this input.
+        If a *count* has been specified, the offset shifts the entire
+        count of intervals.
+
+      *cover*
+        If ``True``, a *count* will be calculated such that the template
+        will be resolved over all *intervals* covered by the *span* of
+        this script. For example, a script with an interval of one day
+        and span of seven, the input template will be resolved for all
+        seven days in the span.
+
+      *source_name*
+        Specify what produced this input For informational purposes when
+        listing script inputs.
+
       *mime_type*
         The expected MIME Content-Type of the input.
-      
+
       *description*
         A long-form text description of the expected contents of
         this input.
@@ -1815,8 +1964,37 @@ def add_input_template(name, template, required=True,
         spec['mime_type'] = mime_type
     if description:
         spec['description'] = description
+    if source_name:
+        spec['source_name'] = source_name
+    if count:
+        spec['count'] = count
+    if offset:
+        spec['offset'] = offset
+    if cover:
+        spec['cover'] = cover
     spec['required'] = int(required)
     _cfg.input_templates.append((name, template, spec))
+
+def add_input_group(name, inputs):
+    """
+    Group the given inputs under the provided tag as a single
+    :class:`GolemArgs` object. The result can be used the same
+    as the regular inputs.
+    """
+    _cfg.register_tag(name)
+    spec = {}
+    _cfg.input_groups.append((name, inputs))
+
+def add_output_group(name, inputs):
+    """
+    Group the given outputs under the provided tag as a single
+    :class:`GolemArgs` object. The result can be used the same
+    as the regular outputs, including as inputs to other golem
+    scripts.
+    """
+    _cfg.register_tag(name)
+    spec = {}
+    _cfg.output_groups.append((name, inputs))
 
 def add_query_handler(name, query_handler):
     """
@@ -1913,7 +2091,7 @@ def add_sensor_loop(name='sensor', sensors=None,
 
       *group_name*
         Same as with :func:`add_loop`
-      
+
       *auto_group*
         Causes *group_by* to be set to the :func:`get_sensor_group`
         function, a convenience function that strips numbers, possibly
@@ -1938,7 +2116,7 @@ def add_sensor_loop(name='sensor', sensors=None,
 
 def add_golem_input(golem_script, name, output_name=None,
                     count=None, cover=False, offset=None, span=None,
-                    join_on=None, join=None, required=True):
+                    join=None, required=True, join_on=None):
     """
     Specify a tag, under key *name*, that represents the path (or paths)
     to an output of an external *golem script*. Only a single output can
@@ -1950,7 +2128,15 @@ def add_golem_input(golem_script, name, output_name=None,
     time intervals and loop tags as appropriate. By default, this is the
     output of the most recent interval of the other golem script that
     corresponds to the interval currently under consideration within the
-    local script.
+    local script. Covering multiple intervals of the input is controlled by
+    *cover*, *count*, or *span*. If, for example, you're pulling inputs
+    with an hourly interval into a script with a daily interval, the
+    *cover* parameter should probably be used, otherwise only a single
+    hour would be pulled in.
+
+    Matching loop tags are automatically joined unless the *join*
+    parameter is provided, in which case the only joins that happen
+    are the ones provided.
 
     Optional keyword arguments:
 
@@ -1958,7 +2144,7 @@ def add_golem_input(golem_script, name, output_name=None,
         The tag name used for this output in the external script if it
         differs from the value of *name* used locally for this input. By
         default the names are assumed to be identical.
-      
+
       *count*
         Specifies how many intervals (as defined by the external script)
         of output data are to be used as input. By default, the most
@@ -1997,18 +2183,12 @@ def add_golem_input(golem_script, name, output_name=None,
         cover the provided span. Cannot be used simultaneously with
         *count*, *offset*, or *cover*.
 
-      *join_on*
-        A string or an iterable that specifies equivalent loop tags
-        shared between the other golem input and the local script. Loops
-        joined in this way will be synchronized in their iterations. By
-        using this parameter, the loop tags in both scripts are assumed
-        to share the same name. If this is not the case, use the *join*
-        parameter instead (described below).
-
       *join*
         A dictionary or iterable of tuples that provides an equivalence
-        mapping between template tags defined in the other golem script
-        and locally defined tags.
+        mapping between template loops defined in the other golem script
+        and locally defined loops. If no join mapping is provided, an
+        attempt is made to join on loops sharing the same name. If the
+        join parameter is provided, no auto-join is performed.
 
         For example, if the other script defines a template loop on the
         ``%(my_sensor)s`` tag, and the local script defines a loop on
@@ -2033,13 +2213,10 @@ def add_golem_input(golem_script, name, output_name=None,
     """
     if not output_name:
         output_name = name
-    if join_on or join:
-        join = dict(join or {})
-        if join_on:
-            if isinstance(join_on, basestring):
-                join_on = (join_on,)
-            for n in join_on:
-                join[n] = n
+    # note: None signals auto-join, {} means no joins
+    if join:
+        join = dict(join)
+    # note: join_on is deprecated
     _cfg.golem_inputs.append((golem_script, name, output_name, join, \
                               count, cover, offset, span, required))
 
@@ -2106,19 +2283,21 @@ def add_flow_tag(name, flow_class=None, flow_type=None, flowtypes=None,
     """
     Add a :class:`netsa.script.Flow_params` object as a template tag
     under key *name*. The rest of the keyword arguments correspond to
-    the same parameters accepted by the :class:`netsa.script.Flow_params`
-    constructor and serve to map these fields to specific template tags
-    in the golem script. If not otherwise specified, the *start_date*
-    and *end_date* attributes are bound to the values of
-    ``%(golem_start_date)s`` and ``%(golem_end_date)s``, respectively,
-    for each loop iteration. Additionally, if any sensor-specific loops
-    were specified via :func:`add_sensor_loop`, the *sensors* parameter
-    defaults to the tag associated with the last defined sensor loop
-    (typically ``%(sensor)s``). The resulting
-    :class:`netsa.script.Flow_params` object is associated with a tag
-    entry specified by *name*. The values of tags associated with
-    :class:`netsa.script.Flow_params` attributes in this way are
-    still accessible under their original tag names.
+    the same parameters accepted by the
+    :class:`netsa.script.Flow_params` constructor and serve to map
+    these fields to *either* specific template tags in the golem script
+    or to the literal string if it is not present in the template
+    tags.. If not otherwise specified, the *start_date* and *end_date*
+    attributes are bound to the values of ``%(golem_start_date)s`` and
+    ``%(golem_end_date)s``, respectively, for each loop iteration.
+    Additionally, if any sensor-specific loops were specified via
+    :func:`add_sensor_loop`, the *sensors* parameter defaults to the
+    tag associated with the last defined sensor loop (typically
+    ``%(sensor)s``). The resulting :class:`netsa.script.Flow_params`
+    object is associated with a tag entry specified by *name*. The
+    values of tags associated with :class:`netsa.script.Flow_params`
+    attributes in this way are still accessible under their original
+    tag names.
 
     The following optional keyword arguments are available to map
     template tag values to their corresponding attributes in the flow
@@ -2206,8 +2385,9 @@ def add_golem_param(name, alias=Nada, help=Nada, **kwargs):
     _ctx.modify_golem_param(name, enabled=True,
                             alias=alias, help=help, **kwargs)
 
-_golem_basic_params = ['last-date', 'first-date', 'intervals',
-                       'skip-incomplete', 'overwrite']
+_golem_basic_params = ['last-date', 'first-date', 'last-interval',
+                       'intervals', 'skip-incomplete', 'skip-partial',
+                       'overwrite']
 _golem_basic_params_disabled = set()
 _ctx.register_params(*_golem_basic_params)
 
@@ -2236,12 +2416,24 @@ def _bind_golem_basic_params():
         required=False, default_help="value of last-date")
 
     interval_str = timedelta_iso(current_view().golem.interval)
+
+    _ctx.bind_golem_param(
+        'last-interval', netsa.script.add_int_param,
+        """
+        Set the last processing date N intervals (%s) prior to the
+        provided last date, which defaults to the most recent date. This
+        can be useful when purging old results when used in conjunction
+        with --intervals.
+        """ % interval_str, required=False)
+
     _ctx.bind_golem_param(
         'intervals', netsa.script.add_int_param,
         """
         Optionally process or query the last N intervals (%s) of data
-        from the current date. This will override any other provided
-        date ranges.
+        from the last date, which defaults to the most recent date. This
+        will override the first interval date if it was provided. This
+        can be useful when purging old results when used in conjunction
+        with --last-interval.
         """ % interval_str, required=False)
 
     _ctx.bind_golem_param(
@@ -2252,10 +2444,17 @@ def _bind_golem_basic_params():
         """)
 
     _ctx.bind_golem_param(
+        'skip-partial', netsa.script.add_flag_param,
+        """
+        Skip processing bins that have partial output results,
+        as opposed to aborting.
+        """)
+
+    _ctx.bind_golem_param(
         'overwrite', netsa.script.add_flag_param,
         "Overwrite output results if they already exist.")
 
-_golem_query_params = ['output-select', 'output-path', 'show-inputs']
+_golem_query_params = ['output-select', 'output-path']
 _ctx.register_params(*_golem_query_params)
 
 def add_golem_query_params(without_params=None):
@@ -2294,19 +2493,9 @@ def _bind_golem_query_params():
         '-', and 'stdout'.
         """, required=False)
 
-    if not _cfg.input_templates and not _cfg.golem_inputs:
-        _ctx.modify_golem_param('show-inputs', enabled=False)
-    _ctx.bind_golem_param(
-        'show-inputs', netsa.script.add_flag_param,
-        """
-        Show the status of input dependencies from other golem scripts
-        or defined templates, given the options provided. No processing
-        is performed.
-        """)
-
-
-_golem_repository_params = ['data-load', 'data-status', 'data-queue',
-                            'data-complete', 'data-inputs', 'data-outputs']
+_golem_repository_params = ['data-process', 'data-purge', 'data-status',
+                            'data-queue', 'data-complete', 'data-inputs',
+                            'data-outputs', 'data-load']
 _ctx.register_params(*_golem_repository_params)
 
 def add_golem_repository_params(without_params=None):
@@ -2324,25 +2513,38 @@ def _bind_golem_repository_params():
     # default golem-related data-generation command line parameters
 
     _ctx.bind_golem_param(
-        'data-load', netsa.script.add_flag_param,
+        'data-process', netsa.script.add_flag_param,
         """
         Generate incomplete or missing repository results,
         skipping those that are complete.
+        """)
+
+    _ctx.bind_golem_param(
+        'data-load', netsa.script.add_flag_param,
+        """
+        Alias for --data-process.
         """, expert=True)
+
+    _ctx.bind_golem_param(
+        'data-purge', netsa.script.add_flag_param,
+        """
+        Purge any repository results present for the given processing
+        intervals. This negates --data-process if present.
+        """)
 
     _ctx.bind_golem_param(
         'data-status', netsa.script.add_flag_param,
         """
         Show the status of repository date-bin results given the
         options provided. No processing is performed.
-        """, expert=True)
+        """)
 
     _ctx.bind_golem_param(
         'data-queue', netsa.script.add_flag_param,
         """
         List the dates of all pending repository results given
         the options provided. No processing is performed.
-        """, expert=True)
+        """)
 
     _ctx.bind_golem_param(
         'data-complete', netsa.script.add_flag_param,
@@ -2350,7 +2552,7 @@ def _bind_golem_repository_params():
         List the dates of all repository results currently
         completed, given the options provided. No processing is
         performed.
-        """, expert=True)
+        """)
 
     if not _cfg.input_templates and not _cfg.golem_inputs:
         _ctx.modify_golem_param('data-inputs', enabled=False)
@@ -2360,14 +2562,14 @@ def _bind_golem_repository_params():
         Show the status of input dependencies from other golem scripts
         or defined templates, given the options provided. No processing
         is performed.
-        """, expert=True)
+        """)
 
     _ctx.bind_golem_param(
         'data-outputs', netsa.script.add_flag_param,
         """
         Show the status of repository output results given the
         options provided. No processing is performed.
-        """, expert=True)
+        """)
 
     if not _cfg.get_repository():
         for name in _golem_repository_params:
@@ -2424,7 +2626,18 @@ def loop(gview=None):
             raise error
     return gview.loop()
 
-def process(gview=None):
+def _status_pfx(gview, tags=None):
+    if not tags:
+        tags = gview.tags()
+    loops = []
+    for l in (x[0] for x in gview.golem.loops):
+        loops.append("%%(%s)s" % l)
+    pfx = "%(golem_bin_basic)s"
+    if loops:
+        pfx = ' '.join([pfx, "(%s)" % ','.join(loops)])
+    return pfx % tags
+
+def process(gview=None, exception_handler=None):
     """
     Returns a :class:`GolemProcess` wrapper around the given golem view,
     which defaults to the main script view. The result behaves much like
@@ -2434,6 +2647,10 @@ def process(gview=None):
     directories and/or files) in preparation for whatever processing the
     developer specifies in the processing loop. Views that have already
     completed processing are ignored.
+
+    Also takes an optional 'exception_handler' keyword argument
+    which must be a function that accepts an exception and a
+    golem view object (advanced use only).
     """
     if not gview:
         try:
@@ -2442,14 +2659,52 @@ def process(gview=None):
             error = GolemScriptError(
                 "process() invoked outside of main()")
             raise error
-    overwrite_outputs   = _ctx.overwrite_outputs()
-    skip_complete       = not _ctx.overwrite_outputs()
-    skip_missing_inputs = _ctx.skip_missing_inputs()
+    overwrite_outputs    = _ctx.overwrite_outputs()
+    skip_missing_inputs  = _ctx.skip_missing_inputs()
+    skip_partial_outputs = _ctx.skip_partial_outputs()
+    data_purge           = _ctx.data_purge()
+
+    verbose = netsa.script.get_verbosity()
+
+    def handler(e, gv):
+        try:
+            raise e
+        except GolemInputMissing:
+            if skip_missing_inputs:
+                if verbose > 1:
+                    msg = _status_pfx(gv) + ": inputs missing (skipping)"
+                    print >> sys.stderr, msg
+                raise GolemIgnore
+            else:
+                pn = _ctx.get_pname('skip-incomplete')
+                msg = _status_pfx(gv) + \
+                      ": %s (use --%s to skip bins missing inputs)" % (e, pn)
+                raise GolemUserError, msg
+        except GolemPartialComplete:
+            if skip_partial_outputs:
+                if verbose > 1:
+                    msg = _status_pfx(gv) + \
+                          ": partially complete (skipping)"
+                    print >> sys.stderr, msg
+                raise GolemIgnore
+            else:
+                pn1 = _ctx.get_pname('overwrite')
+                pn2 = _ctx.get_pname('skip-partial')
+                msg = _status_pfx(gv) + \
+                      ": partial result present: use --%s to overwrite " \
+                      "or --%s to skip" % (pn1, pn2)
+                raise GolemUserError, msg
+        except GolemComplete:
+            if verbose > 1:
+                msg = _status_pfx(gv) + ": already complete (skipping)"
+                print >> sys.stderr, msg
+            raise GolemIgnore
+        except GolemIgnore:
+            pass
 
     return GolemProcess(gview,
-        overwrite_outputs   = overwrite_outputs,
-        skip_complete       = skip_complete,
-        skip_missing_inputs = skip_missing_inputs,
+        exception_handler = exception_handler or handler,
+        overwrite_outputs = overwrite_outputs,
     )
 
 def generate_query_result(tgt_file, gproc=None):
@@ -2473,7 +2728,7 @@ def generate_query_result(tgt_file, gproc=None):
         if gproc.overwrite_outputs:
             os.remove(tgt_file)
         else:
-            error = GolemOutputExists("output exists %s" % repr(tgt_file))
+            error = GolemComplete("output exists %s" % repr(tgt_file))
             raise error
     tags  = gproc.tags()
     tags['golem_query_tgt'] = tgt_file
@@ -2525,7 +2780,7 @@ def _resolve_loops_and_params():
             vals = new_vals
         golem_loops.append((name, (vals, groups, group_name, sep)))
         pname = _ctx._golem_loop_param_default(name, groups, group_name)
-        avail = ','.join(sorted(groups or vals))
+        avail = ','.join((str(x) for x in sorted(groups or vals)))
         pdesc = """
             Optional list of %s values (separated by %s) on which to
             limit processing or querying (if any). Available values: %s
@@ -2567,7 +2822,7 @@ def execute(func):
         if callable(val):
             val = val()
         golem_tags.append((name, val))
-    _cfg.tags = tuple(golem_tags)
+    _cfg.tags = golem_tags
 
     # resolve arg tags
     golem_arg_tags = []
@@ -2604,7 +2859,7 @@ def execute(func):
     _bind_golem_repository_params()
 
     # inform golem
-    gv = _set_golem(
+    gview = _set_golem(
         repository       = _cfg.get_repository(),
         tags             = golem_tags,
         loops            = golem_loops,
@@ -2612,24 +2867,26 @@ def execute(func):
         flow_maps        = golem_flow_params,
         output_templates = golem_output_templates,
         query_templates  = golem_query_templates,
+        input_groups     = list(_cfg.input_groups),
+        output_groups    = list(_cfg.output_groups)
     )
 
     # process command line parameters, possibly dump metadata
     netsa.script.execute(lambda: True)
-    ctx = _ctx.load_state(gv)
+    ctx = _ctx.load_state(gview)
 
     # adjust output and query-only templates if output-select was
     # specified
     selects = set(ctx['output-select'])
-    outs = gv.golem.output_templates
+    outs = gview.golem.output_templates
     outs = []
     queries = []
     if selects:
-        for x in gv.golem.output_templates:
+        for x in gview.golem.output_templates:
             if x[0] in selects:
                 outs.append(x)
                 selects.remove(x[0])
-        for x in gv.golem.query_templates:
+        for x in gview.golem.query_templates:
             if x[0] in selects:
                 queries.append(x)
                 selects.remove(x[0])
@@ -2639,17 +2896,12 @@ def execute(func):
             error = ParamError(pname, outs, "invalid output select")
             _print_failure(sys.stderr, error)
     if not outs:
-        outs = gv.golem.output_templates
-    gv = _set_golem(output_templates=outs, query_templates=queries)
-
+        outs = gview.golem.output_templates
+    gview = _set_golem(output_templates=outs, query_templates=queries)
 
     # commit input templates
     golem_input_templates = []
     for name, t, spec in _cfg.input_templates:
-        if isinstance(t, basestring):
-            t = (t,)
-        elif not callable(t):
-            t = tuple(t)
         golem_input_templates.append((name, t, dict(spec)))
 
     # adjust loop values if any loop-select params were specified,
@@ -2684,9 +2936,7 @@ def execute(func):
         ap2 = os.path.normpath(get_script_path())
         if ap1 == ap2:
             # self-input
-            gin = gv.golem.using()
-            if join is None:
-                join = dict((x[0], x[0]) for x in gin.loops)
+            gin = gview.golem.using()
             if offset is None:
                 offset = -1
         elif isinstance(gscript, model.Golem):
@@ -2697,6 +2947,12 @@ def execute(func):
             error = GolemScriptError(
                 "input script has no outputs %s" % repr(gscript))
             raise error
+        # auto-join on matching loop names
+        if join is None:
+            join = {}
+            for loop in set(x[0] for x in gview.golem.loops).intersection(
+                            x[0] for x in gin.loops):
+                join[loop] = loop
         if span:
             if cover or count:
                 error = GolemScriptError(
@@ -2708,7 +2964,7 @@ def execute(func):
                     "input span must cover more than one interval")
                 raise error
         spec = {}
-        spec['output_name'] = output_name or name
+        spec['output_name'] = output_name
         if join:
             spec['join'] = join
         if cover:
@@ -2718,7 +2974,7 @@ def execute(func):
         if offset or offset is not None:
             spec['offset'] = offset
         spec['required'] = int(required)
-        gin = gin._map_outputs({output_name: name})
+        gin = gin._map_outputs({output_name: name}, filter=True)
         golem_inputs.append((gin, spec))
 
     # check loop alignment
@@ -2739,54 +2995,61 @@ def execute(func):
             raise error
 
     # finalize inputs and loops
-    gv = _set_golem(
+    gview = _set_golem(
         loops            = golem_loops,
         golem_inputs     = golem_inputs,
         input_templates  = golem_input_templates)
 
     # finalize date window and repository
     first_date, last_date = ctx['first-date'], ctx['last-date']
-    gv = _set_golem_view(first_date=first_date, last_date=last_date)
+    gview = _set_golem_view(first_date=first_date, last_date=last_date)
 
     has_out = {}
-    for o in ('data-load', 'output-path'):
+    for o in ('data-process', 'data-load', 'output-path'):
         p = ctx[o]
         p = _ctx.get_param(o)
         if _ctx.get_param(o).enabled:
             has_out[o] = ctx[o]
 
-    if _ctx.get_param('data-load').enabled:
-        data_load = ctx['data-load']
+    if _ctx.get_param('data-process').enabled or \
+           _ctx.get_param('data-load').enabled:
+        data_load = ctx['data-process'] or ctx['data-load']
+    elif _cfg.passive_mode and not has_out:
+        data_load = True
     else:
         tmp_dir = tempfile.mkdtemp()
         atexit.register(os.system, ("rm -rf %s" % tmp_dir))
-        gv = _set_golem(repository=tmp_dir)
+        gview = _set_golem(repository=tmp_dir)
         data_load = True
-        
+
     verbose = netsa.script.get_verbosity()
 
     if ctx['data-status']:
-        _print_status(sys.stdout, gv)
+        _print_status(sys.stdout, gview)
         sys.exit(0)
 
     if ctx['data-queue']:
-        _print_queue(sys.stdout, gv)
+        _print_queue(sys.stdout, gview)
         sys.exit(0)
 
     if ctx['data-complete']:
-        _print_complete(sys.stdout, gv)
+        _print_complete(sys.stdout, gview)
         sys.exit(0)
 
-    if _ctx.get_script_param('data-inputs'):
-        _print_io(sys.stdout, gv.inputs(), verbose=verbose)
+    if ctx['data-inputs']:
+        _print_io(sys.stdout, gview.inputs(), verbose=verbose)
         sys.exit(0)
 
-    if _ctx.get_script_param('data-outputs'):
-        _print_io(sys.stdout, gv.outputs(), verbose=verbose)
+    if ctx['data-outputs']:
+        _print_io(sys.stdout, gview.outputs(), verbose=verbose)
         sys.exit(0)
 
-    if _ctx.get_script_param('show-inputs'):
-        _print_io(sys.stdout, gv.outputs(), verbose=verbose)
+    if ctx['data-purge']:
+        verbose = netsa.script.get_verbosity()
+        for gv in gview:
+            if verbose > 1:
+                print >> sys.stderr, _status_pfx(gv) + ": purging"
+            GolemResource(gv.outputs()).purge_output()
         sys.exit(0)
 
     # process
@@ -2798,13 +3061,13 @@ def execute(func):
         if out_path:
             pname = 'output-select'
             error = None
-            otc = len(gv.golem.output_templates)
-            qtc = len(gv.golem.query_templates)
+            otc = len(gview.golem.output_templates)
+            qtc = len(gview.golem.query_templates)
             if (otc > 1 and not qtc) or (qtc and qtc > 1):
                 error = GolemUserError(
                     "no output selected with --%s" % _ctx.get_pname(name))
                 raise error
-            bc = gv.bin_count()
+            bc = gview.bin_count()
             lc = len(golem_loops)
             if lc == 1:
                 lc = len(golem_loops[0][1][0])
@@ -2826,44 +3089,30 @@ def execute(func):
                     error = GolemUserError(
                         "%s selected on tty" % out_path)
                     raise error
-                out_path = get_temp_dir_file_name()
+                out_path = get_temp_file_name()
 
-        rsrc = GolemFileResource(gv)
-        if gv.golem.repository and not rsrc.repository_exists():
+        rsrc = GolemFileResource(gview)
+        if gview.golem.repository and not rsrc.repository_exists():
             error = GolemScriptError(
                 "missing repository %s (create it, set $GOLEM_HOME"
                     " environment variable or use"
-                    " set_default_home())" % repr(gv.golem.repository))
+                    " set_default_home())" % repr(gview.golem.repository))
             raise error
         if has_out and not _cfg.passive_mode:
             if not any((ctx[x] for x in has_out)):
                 error = GolemUserError("no output actions specified")
                 raise error
 
-        try:
+        # load repository
+        if data_load or (_cfg.passive_mode and not out_path):
+            func()
 
-            # load repository
-            if data_load or (_cfg.passive_mode and not out_path):
-                func()
-
-            # load query
-            if out_path:
-                generate_query_result(out_path)
-                if out_fh:
-                    import subprocess
-                    subprocess.call(['cat', out_path])
-
-        except GolemOutputExists, e:
-            pn = _ctx.get_pname('overwrite')
-            msg = "use --%s to overwrite output '%s'" % (pn, e)
-            raise GolemUserError, msg
-        except GolemInputMissing, e:
-            pn = _ctx.get_pname('skip-incomplete')
-            msg = "%s (use --%s to skip bins missing inputs)" % (e, pn)
-            raise GolemUserError, msg
-        except GolemOutputMissing, e:
-            msg = "no such directory %s" % repr(str(e))
-            raise GolemUserError, msg
+        # load query
+        if out_path:
+            generate_query_result(out_path)
+            if out_fh:
+                import subprocess
+                subprocess.call(['cat', out_path])
 
     except UserError:
         netsa.script._print_failure(sys.stderr, str(sys.exc_info()[1]))
@@ -2911,6 +3160,10 @@ class GolemProcess(object):
     checking for required inputs, pre-existing outputs, creating
     output paths, etc) while iterating over the provided view.
 
+      *exception_handler*
+        Function for processing GolemException events. Takes
+        the exception and the current GolemView as arguments.
+
       *overwrite_outputs*
         Delete existing outputs prior to processing. (default:
         ``False``)
@@ -2919,31 +3172,20 @@ class GolemProcess(object):
         Consider zero-byte output results to be valid, otherwise
         they will be ignored or deleted when encountered, regardless of
         the value of *overwrite_results*. (default: ``False``)
-
-      *skip_complete*
-        Ignore processing bins whose results appear to be completed.
-        (default: ``True``)
-
-      *skip_missing_inputs*
-        If insufficient inputs are present, determines whether this
-        iteration should be skipped, as opposed to raising an
-        exception. (default: ``False``)
     """
 
-    __slots__ = ('gview', 'overwrite_outputs', 'skip_complete',
-                 'keep_empty_outputs', 'skip_missing_inputs')
+    __slots__ = ('gview', 'exception_handler', 'overwrite_outputs',
+                 'keep_empty_outputs')
 
-    def __init__(self, gview, overwrite_outputs=False, skip_complete=True,
-                 keep_empty_outputs=False, skip_missing_inputs=False):
+    def __init__(self, gview, exception_handler=None,
+                 overwrite_outputs=False, keep_empty_outputs=False):
         self.gview               = gview.loop()
+        self.exception_handler   = exception_handler
         self.overwrite_outputs   = overwrite_outputs
-        self.skip_complete       = skip_complete
         self.keep_empty_outputs  = keep_empty_outputs
-        self.skip_missing_inputs = skip_missing_inputs
 
-    def using(self, gview=Nada,
-              overwrite_outputs=Nada, skip_complete=Nada,
-              keep_empty_outputs=Nada, skip_missing_inputs=Nada):
+    def using(self, gview=Nada, exception_handler=Nada,
+              overwrite_outputs=Nada, keep_empty_outputs=Nada):
         """
         Return a copy of this :class:`GolemProcess` object, possibly
         replacing certain attributes corresponding to the keyword
@@ -2951,19 +3193,16 @@ class GolemProcess(object):
         """
         if gview is Nada:
             gview = self.gview
+        if exception_handler is Nada:
+            exception_handler = self.exception_handler
         if overwrite_outputs is Nada:
             overwrite_outputs = self.overwrite_outputs
-        if skip_complete is Nada:
-            skip_complete = self.skip_complete
         if keep_empty_outputs is Nada:
             keep_empty_outputs = self.keep_empty_outputs
-        if skip_missing_inputs is Nada:
-            skip_missing_inputs = self.skip_missing_inputs
         return self.__class__(gview,
+                exception_handler=exception_handler,
                 overwrite_outputs=overwrite_outputs,
-                skip_complete=skip_complete,
-                keep_empty_outputs=keep_empty_outputs,
-                skip_missing_inputs=skip_missing_inputs)
+                keep_empty_outputs=keep_empty_outputs)
 
     def _check_inputs(self):
         required = {}
@@ -2972,9 +3211,19 @@ class GolemProcess(object):
         for gin, spec in self.golem.golem_inputs:
             for k in [x[0] for x in gin.output_templates]:
                 required[k] = int(spec.get('required', 0) or 0)
-        rsrc = GolemResource(self.inputs())
+        input_groups = set(x[0] for x in self.golem.input_groups)
+        rsrc = GolemFileResource(self.inputs())
+        hits = GolemArgs()
+        misses = GolemArgs()
         for r, label, args, miss, tags in rsrc.audit_all_by_label():
-            if miss or (not args and not miss):
+            if label in input_groups:
+                continue
+            if not args and not miss:
+                if required[label]:
+                    error = GolemInputMissing(
+                        "required input missing '%s'" % label)
+                    raise error
+            if miss:
                 v = abs(required[label])
                 if required[label] == 1:
                     f = sorted(miss)[0]
@@ -2988,20 +3237,21 @@ class GolemProcess(object):
                             "at least %d items required for input '%s'" \
                                     % (v, label))
                         raise error
+            hits +=args
+            misses += miss
+        return hits, misses
 
     def _initialize(self):
-        if self.skip_complete and self.is_complete():
-            raise GolemIgnore
-        try:
-            self._check_inputs()
-        except GolemInputMissing, e:
-            if self.skip_missing_inputs:
-                raise GolemIgnore
-            else:
-                raise e
-        GolemResource(self.outputs()).prepare_output(
+        self._check_inputs()
+        hits, misses = GolemResource(self.outputs()).prepare_output(
             overwrite = self.overwrite_outputs,
             zap_empty = not self.keep_empty_outputs)
+        if not hits and not misses:
+            pass
+        elif not misses:
+            raise GolemComplete
+        elif hits:
+            raise GolemPartialComplete
 
     def _finalize(self):
         zap_empty = not self.keep_empty_outputs
@@ -3023,33 +3273,32 @@ class GolemProcess(object):
                 gp._initialize()
                 yield gp
                 gp._finalize()
-            except GolemIgnore:
-                pass
+            except GolemException, e:
+                if self.exception_handler:
+                    try:
+                        self.exception_handler(e, gv)
+                        yield gv
+                    except GolemIgnore:
+                        pass
+                else:
+                    raise e
 
-    def by_bin_date(self):
+    def bins(self):
         """
         Provide an iterator over :class:`GolemProcess` objects for each
-        processing interval represented by this view, possibly
-        performing system level tasks along the way. Iterations for
+        processing interval represented by this view Iterations for
         which processing is complete will be skipped, unless
         :class:`overwrite_outputs <GolemProcess>` has been enabled for
         this object.
         """
-        for gv in self.gview.by_bin_date():
-            gp = self.using(gv)
-            try:
-                gp._initialize()
-                yield gp
-                gp._finalize()
-            except GolemIgnore:
-                pass
+        for gv in self.gview.bins():
+            yield self.using(gv)
 
     def group_by(self, *keys):
         """
         Returns an iterator that yields a tuple with a primary key and
-        a :class:`GolemProcess` object, grouped by the provided keys,
-        possibly performing system level tasks along the way. Each
-        primary key is a tuple containing the current values of the keys
+        a :class:`GolemProcess` object, grouped by the provided keys.
+        Each primary key is a tuple containing the current values of the keys
         provided. Iterating over the resulting process objects process
         objects will resolve any remaining loops remaining in that view,
         if any. Views for which processing is complete will be skipped,
@@ -3057,32 +3306,18 @@ class GolemProcess(object):
         enabled for this object.
         """
         for pkey, gv in self.gview.group_by(*keys):
-            gp = self.using(gv)
-            try:
-                gp._initialize()
-                yield pkey, gp
-                gp._finalize()
-            except GolemIgnore:
-                pass
+            yield pkey, self.using(gv)
 
     def by_key(self, key):
         """
         Similar to :meth:`group_by` but takes a single key as an
         argument. Returns and iterator that yields :class:`GolemProcess`
-        objects for each value of the key, possibly performing system
-        level tasks along the way. Views for which processing is
-        complete will be skipped, unless
-        :class:`overwrite_outputs <GolemProcess>` has been enabled for
-        this object.
+        objects for each value of the key. Views for which processing is
+        complete will be skipped, unless :class:`overwrite_outputs
+        <GolemProcess>` has been enabled for this object.
         """
         for gv in self.gview.by_key(key):
-            gp = self.using(gv)
-            try:
-                gp._initialize()
-                yield gp
-                gp._finalize()
-            except GolemIgnore:
-                pass
+            yield self.using(gv)
 
     def is_complete(self):
         """
@@ -3287,9 +3522,8 @@ def _print_basic_outputs(out, gview, verbose=False, base=None):
     rsrc = GolemResource(gview.outputs())
     verbose = verbose or 1
     for r, _, _, args in rsrc.audit_expand():
-        args = r.repository_fmt(args, verbose=verbose)
         for f in args:
-            out.write(f + "\n")
+            out.write(r.repository_fmt(f, verbose=verbose) + "\n")
 
 def _print_status(out, gview):
     def _status_row(gv, count=None):
@@ -3298,7 +3532,7 @@ def _print_status(out, gview):
         # fix later
         sstr = None
         hit = miss = 0
-        tags, _ = gv.loop()._basic_tags()
+        tags = gv.loop()._basic_tags()
         first_iso = start_iso = None
         for _, _, exists, _, _ in GolemResource(gv).audit_all():
             if exists:
@@ -3324,8 +3558,26 @@ def _print_status(out, gview):
     # fix
     hrow += ['done', 'int', 'spn', 'bins',
              'first_bin', 'start_date', 'end_date']
-    stats = [_status_row(gview.outputs())]
-    # fix cascade
+    order = []
+    seen = {}
+    def _cascade(gview):
+        key = (gview.golem.name, gview.first_bin, gview.last_bin)
+        if key not in seen:
+            order.append(key)
+            seen[key] = gview
+        else:
+            gv = seen[key]
+            go = gv.golem.output_templates
+            for ot in gview.golem.output_templates:
+                if ot not in go:
+                    go += (ot,)
+            seen[key] = gv.using(golem=gv.golem.using(output_templates=go))
+        for gv in gview.members():
+            _cascade(gv.inputs())
+    _cascade(gview.inputs())
+    stats = []
+    for key in order:
+        stats.append(_status_row(seen[key].outputs()))
     widths = [len(x) for x in hrow]
     for row in stats:
         for i, v in enumerate(row):
@@ -3364,12 +3616,12 @@ def _print_io(out, gview, verbose=False):
     rows = []
     count  = 0
 
-    rsrcs = {}
-    items = {}
-    for gv in gview.by_bin_date():
+    items = set()
+    for gv in gview.bins():
         for r, label, exists, f, tags in GolemResource(gv).audit_all():
             if f in items:
                 continue
+            items.add(f)
             bin_date = tags['golem_bin_iso']
             if not f:
                 f = 'unavailable'
@@ -3377,27 +3629,13 @@ def _print_io(out, gview, verbose=False):
                 exists = 'yes'
             else:
                 exists = 'no'
-            row = [bin_date, r.name, label, exists]
-            row.append(f)
+            row = [bin_date, r.name, label, exists,
+                   r.repository_fmt(f, verbose=verbose)]
             for i, v in enumerate(row):
                 w = len(str(v))
                 if w > widths[i]:
                     widths[i] = w
             rows.append(row)
-            if verbose < 2:
-                rsrcs.setdefault(label, [r]).append(f)
-                items[f] = f
-    if verbose < 2:
-        for l, paths in rsrcs.iteritems():
-            r = paths.pop(0)
-            for i, x in enumerate(r.repository_fmt(paths)):
-                items[paths[i]] = x
-        widths[-1] = 0
-        for i, r in enumerate(rows):
-            r[-1] = items[r[-1]]
-            w = len(r[-1])
-            if w > widths[-1]:
-                widths[-1] = w
     res_str = ''
     if rows:
         tot = sum(widths)
@@ -3419,6 +3657,7 @@ __all__ = netsa.script.__all__ + """
     set_name
     set_interval
     set_span
+    set_skew
     set_lag
     set_realtime
     set_tty_safe
@@ -3440,12 +3679,14 @@ __all__ = netsa.script.__all__ + """
     add_arg
     add_output_template
     add_input_template
+    add_input_group
+    add_output_group
+    add_query_handler
     add_loop
     add_sensor_loop
     add_golem_input
     add_self_input
     add_flow_tag
-    add_query_handler
     add_golem_source
 
     execute

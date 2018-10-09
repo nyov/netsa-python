@@ -1,52 +1,6 @@
 # -*- coding: utf-8 -*-
-
-# Copyright 2008-2014 by Carnegie Mellon University
-
-# @OPENSOURCE_HEADER_START@
-# Use of the Network Situational Awareness Python support library and
-# related source code is subject to the terms of the following licenses:
-# 
-# GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
-# 
-# NO WARRANTY
-# 
-# ANY INFORMATION, MATERIALS, SERVICES, INTELLECTUAL PROPERTY OR OTHER 
-# PROPERTY OR RIGHTS GRANTED OR PROVIDED BY CARNEGIE MELLON UNIVERSITY 
-# PURSUANT TO THIS LICENSE (HEREINAFTER THE "DELIVERABLES") ARE ON AN 
-# "AS-IS" BASIS. CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY 
-# KIND, EITHER EXPRESS OR IMPLIED AS TO ANY MATTER INCLUDING, BUT NOT 
-# LIMITED TO, WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE, 
-# MERCHANTABILITY, INFORMATIONAL CONTENT, NONINFRINGEMENT, OR ERROR-FREE 
-# OPERATION. CARNEGIE MELLON UNIVERSITY SHALL NOT BE LIABLE FOR INDIRECT, 
-# SPECIAL OR CONSEQUENTIAL DAMAGES, SUCH AS LOSS OF PROFITS OR INABILITY 
-# TO USE SAID INTELLECTUAL PROPERTY, UNDER THIS LICENSE, REGARDLESS OF 
-# WHETHER SUCH PARTY WAS AWARE OF THE POSSIBILITY OF SUCH DAMAGES. 
-# LICENSEE AGREES THAT IT WILL NOT MAKE ANY WARRANTY ON BEHALF OF 
-# CARNEGIE MELLON UNIVERSITY, EXPRESS OR IMPLIED, TO ANY PERSON 
-# CONCERNING THE APPLICATION OF OR THE RESULTS TO BE OBTAINED WITH THE 
-# DELIVERABLES UNDER THIS LICENSE.
-# 
-# Licensee hereby agrees to defend, indemnify, and hold harmless Carnegie 
-# Mellon University, its trustees, officers, employees, and agents from 
-# all claims or demands made against them (and any related losses, 
-# expenses, or attorney's fees) arising out of, or relating to Licensee's 
-# and/or its sub licensees' negligent use or willful misuse of or 
-# negligent conduct or willful misconduct regarding the Software, 
-# facilities, or other rights or assistance granted by Carnegie Mellon 
-# University under this License, including, but not limited to, any 
-# claims of product liability, personal injury, death, damage to 
-# property, or violation of any laws or regulations.
-# 
-# Carnegie Mellon University Software Engineering Institute authored 
-# documents are sponsored by the U.S. Department of Defense under 
-# Contract FA8721-05-C-0003. Carnegie Mellon University retains 
-# copyrights in all material produced under this contract. The U.S. 
-# Government retains a non-exclusive, royalty-free license to publish or 
-# reproduce these documents, or allow others to do so, for U.S. 
-# Government purposes only pursuant to the copyright license under the 
-# contract clause at 252.227.7013.
-# @OPENSOURCE_HEADER_END@
+# Copyright 2008-2016 by Carnegie Mellon University
+# See license information in LICENSE-OPENSOURCE.txt
 
 """
 Overview
@@ -211,7 +165,7 @@ example.
         frob_limit = script.get_param("frob-limit")
         frobnitz_sensitivity = script.get_param("frobnitz-sensitivity")
         out_file = script.get_output_file("output-path")
-        for hour_data in script.get_flow_params().by_hour():
+        for hour_params in script.get_flow_params().by_hour():
             process_hourly_data(out_file, hour_params, frob_limit,
                                 frobnitz_sensitivity)
 
@@ -402,10 +356,11 @@ def add_flow_params(require_pull=False, without_params=[]):
     return _script.add_flow_params(require_pull, without_params)
 add_flow_params.__doc__ = _script.add_flow_params.__doc__
 
-def add_output_file_param(name, help, required=True, expert=False,
-                          description=None,
+def add_output_file_param(name, help, required=True, default=None,
+                          default_help=None, expert=False, description=None,
                           mime_type="application/octet-stream"):
-    return _script.add_output_file_param(name, help, required, expert,
+    return _script.add_output_file_param(name, help, required, default,
+                                         default_help, expert,
                                          description, mime_type)
 add_output_file_param.__doc__ = _script.add_output_file_param.__doc__
 
@@ -479,7 +434,7 @@ def _print_usage(out, expert=False):
         if p['expert']:
             any_expert = True
             break
-    if any_expert:     
+    if any_expert:
         out.write("--help-expert No Arg. Print expert usage output "
                   "and exit.\n")
     out.write("--verbose Opt. Arg. Set verbose output level. (Also -v[v...].)\n")
@@ -503,7 +458,7 @@ def _print_usage(out, expert=False):
             text[0] = "--%s %s%s%s" % (p['name'], required, req_arg, text[0])
             text[-1] = "%s%s" % (text[-1], default_text)
             _print_short(out, text)
-    if any_expert:     
+    if any_expert:
         if expert:
             out.write("\n")
             out.write("EXPERT SWITCHES:\n")
@@ -522,7 +477,7 @@ def _print_usage(out, expert=False):
                         default_text = " Def. %s" % p['default_help']
                     elif p['default'] != None:
                         default_text = " Def. %s" % p['default']
-                    text = list(p['help'])                        
+                    text = list(p['help'])
                     text[0] = "--%s %s%s%s" % (p['name'], required,
                                                req_arg, text[0])
                     text[-1] = "%s%s" % (text[-1], default_text)
@@ -590,7 +545,7 @@ def display_message(text, min_verbosity=1):
     if _script_verbosity >= min_verbosity:
         sys.stderr.write(text)
         sys.stderr.write("\n")
-        
+
 
 _flow_params_filenames = None
 
@@ -919,7 +874,7 @@ class Flow_params(object):
                 self._start_date != None or
                 self._end_date != None):
             return False
-        return False        
+        return False
 
     def using(self, flow_class=Nothing, flow_type=Nothing, flowtypes=Nothing,
               sensors=Nothing, start_date=Nothing, end_date=Nothing,
@@ -947,7 +902,7 @@ class Flow_params(object):
         if filenames != Nothing: result._filenames = filenames
         result._check_params()
         return result
-        
+
     def get_argument_list(self, no_meta=False):
         """
         Returns the bundle of flow selection parameters as a list of
@@ -1176,7 +1131,7 @@ def get_flow_params():
 def get_output_file_name(name):
     """
     Returns the filename for the output parameter *name*.  Note that
-    many SiLK tools treat the names ``stdout``, ``stderr`, and ``-``
+    many SiLK tools treat the names ``stdout``, ``stderr``, and ``-``
     as meaning something special.  ``stdout`` and ``-`` imply the
     output should be written to standard out, and ``stderr`` implies
     the output should be written to standard error.  It is not
@@ -1251,6 +1206,7 @@ def get_output_file(name, append=False):
                 _print_failure(sys.stderr, str(output_error))
             else:
                 _get_output_file_used_stderr = True
+                out_file = sys.stderr
         else:
             # An actual filename
             mode = 'wb'
@@ -1326,56 +1282,6 @@ def get_output_dir_file(dir_name, file_name,
         return out_file
     finally:
         _get_output_dir_lock.release()
-
-def get_temp_dir_file_name(file_name=None):
-    """
-    *Deprecated* as of netsa-python v1.4.  Use
-    :func:`netsa.files.get_temp_file_name` instead.    
-
-    Return the path to a file named *file_name* in a temporary
-    directory that will be cleaned up when the process exits.  If
-    *file_name* is ``None`` then a new file name is created that has
-    not been used before.
-    """
-    warnings.warn("netsa.script.get_temp_dir_file_name is deprecated, "
-                  "please see netsa.files.get_temp_file_name",
-                  DeprecationWarning)
-    return netsa.files.get_temp_file_name(file_name)
-
-
-def get_temp_dir_file(file_name=None, append=False):
-    """
-    *Deprecated* as of netsa-python v1.4.  Use
-    :func:`netsa.files.get_temp_file` instead.
-
-    Returns an open :class:`file` object for the file named
-    *file_name* in the script's temporary working directory.  If
-    *append* is ``True``, the file is opened for append.  Otherwise,
-    the file is opened for write.  If *file_name* is ``None`` then a
-    new file name is used that has not been used before.
-    """
-    warnings.warn("netsa.script.get_temp_dir_file is deprecated, "
-                  "please see netsa.files.get_temp_file",
-                  DeprecationWarning)
-    mode = 'wb'
-    if append:
-        mode = 'ab'
-    return netsa.files.get_temp_file(file_name, mode)
-
-def get_temp_dir_pipe_name(file_name=None):
-    """
-    *Deprecated* as of netsa-python v1.4.  Use
-    :func:`netsa.files.get_temp_pipe_name` instead.
-
-    Returns the path to a named pipe *file_name* that has been created
-    in a temporary directory that will be cleaned up when the process
-    exits. If *file_name* is ``None`` then a new file name is created
-    that has not been used before.
-    """
-    warnings.warn("netsa.script.get_temp_dir_pipe_name is deprecated, "
-                  "please see netsa.files.get_temp_pipe_name",
-                  DeprecationWarning)
-    return netsa.files.get_temp_pipe_name(file_name)
 
 def execute(func):
     """
@@ -1639,11 +1545,11 @@ def execute(func):
             if start_date > end_date:
                 _print_failure(sys.stderr, "end-date of %s is earlier than\n"
                                "        start-date of %s" % (edate, sdate))
-    
+
     # Store any unhandled arguments.
     global _script_extra_args
     _script_extra_args = args
-    
+
     # If argument parsing was correct, execute main function.
     try:
         func()
@@ -1697,11 +1603,6 @@ __all__ = """
     get_output_file
     get_output_dir_file_name
     get_output_dir_file
-
-    get_temp_dir_file_name
-    get_temp_dir_file
-
-    get_temp_dir_pipe_name
 
     execute
 

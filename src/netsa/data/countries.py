@@ -1,62 +1,44 @@
 # -*- coding: utf-8 -*-
-
-# Copyright 2008-2013 by Carnegie Mellon University
-
-# @OPENSOURCE_HEADER_START@
-# Use of the Network Situational Awareness Python support library and
-# related source code is subject to the terms of the following licenses:
-# 
-# GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
-# 
-# NO WARRANTY
-# 
-# ANY INFORMATION, MATERIALS, SERVICES, INTELLECTUAL PROPERTY OR OTHER 
-# PROPERTY OR RIGHTS GRANTED OR PROVIDED BY CARNEGIE MELLON UNIVERSITY 
-# PURSUANT TO THIS LICENSE (HEREINAFTER THE "DELIVERABLES") ARE ON AN 
-# "AS-IS" BASIS. CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY 
-# KIND, EITHER EXPRESS OR IMPLIED AS TO ANY MATTER INCLUDING, BUT NOT 
-# LIMITED TO, WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE, 
-# MERCHANTABILITY, INFORMATIONAL CONTENT, NONINFRINGEMENT, OR ERROR-FREE 
-# OPERATION. CARNEGIE MELLON UNIVERSITY SHALL NOT BE LIABLE FOR INDIRECT, 
-# SPECIAL OR CONSEQUENTIAL DAMAGES, SUCH AS LOSS OF PROFITS OR INABILITY 
-# TO USE SAID INTELLECTUAL PROPERTY, UNDER THIS LICENSE, REGARDLESS OF 
-# WHETHER SUCH PARTY WAS AWARE OF THE POSSIBILITY OF SUCH DAMAGES. 
-# LICENSEE AGREES THAT IT WILL NOT MAKE ANY WARRANTY ON BEHALF OF 
-# CARNEGIE MELLON UNIVERSITY, EXPRESS OR IMPLIED, TO ANY PERSON 
-# CONCERNING THE APPLICATION OF OR THE RESULTS TO BE OBTAINED WITH THE 
-# DELIVERABLES UNDER THIS LICENSE.
-# 
-# Licensee hereby agrees to defend, indemnify, and hold harmless Carnegie 
-# Mellon University, its trustees, officers, employees, and agents from 
-# all claims or demands made against them (and any related losses, 
-# expenses, or attorney's fees) arising out of, or relating to Licensee's 
-# and/or its sub licensees' negligent use or willful misuse of or 
-# negligent conduct or willful misconduct regarding the Software, 
-# facilities, or other rights or assistance granted by Carnegie Mellon 
-# University under this License, including, but not limited to, any 
-# claims of product liability, personal injury, death, damage to 
-# property, or violation of any laws or regulations.
-# 
-# Carnegie Mellon University Software Engineering Institute authored 
-# documents are sponsored by the U.S. Department of Defense under 
-# Contract FA8721-05-C-0003. Carnegie Mellon University retains 
-# copyrights in all material produced under this contract. The U.S. 
-# Government retains a non-exclusive, royalty-free license to publish or 
-# reproduce these documents, or allow others to do so, for U.S. 
-# Government purposes only pursuant to the copyright license under the 
-# contract clause at 252.227.7013.
-# @OPENSOURCE_HEADER_END@
+# Copyright 2008-2016 by Carnegie Mellon University
+# See license information in LICENSE-OPENSOURCE.txt
 
 """
 Definitions of country and region names and codes as defined by ISO
 3166-1 and the UN Statistics Division.  The information in this module
-is current as of January 2010.
+is current as of September 2015.
 """
+
+# ISO-3166-1 alpha-2, alpha-3, and numeric codes are from Wikipedia:
+#   https://en.wikipedia.org/wiki/ISO_3166-1
+# The list at the bottom contains English short name, alpha-2,
+# alpha-3, and numeric codes)
+#
+# The sub-regions and regions are from
+#   http://unstats.un.org/unsd/methods/m49/m49alpha.htm
+#
+# ccTLDs are from IANA, via
+#   https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains#Country_code_top-level_domains
+#
+# It might also be useful to add STANAG 1059 three-letter codes (used
+# by NATO) to this. These are mostly but not entirely the same as
+# ISO-3166-1 alpha-3 codes.
+
 
 ### | CC | CCC | Name                                        | Sub | Reg | TLDs
 _country_info = """
-900 |    |     | Ascension Island                            |     | 990 | ac
+
+# Source Notes:
+#   !UNS: United Nations Statistics Division does not use this entry
+#   UNS: UNSD uses this entry, but it does not exist in ISO-3166-1
+#   A2-ER: ISO-3166-1 alpha-2 exceptional reservation
+#   A3-ER: ISO-3166-1 alpha-3 exceptional reservation
+#   A2-TR: ISO-3166-1 alpha-2 transitional reservation
+#   A3-TR: ISO-3166-1 alpha-3 transitional reservation
+#   IANA: IANA has a country code for this entry, but it doesn't exist in ISO-3166-1
+#   IANA-R: IANA has a retired entry for this
+
+# Entries which are in ISO-3166-1 (according to Wikipedia)
+
 004 | AF | AFG | Afghanistan                                 | 034 | 142 | af
 248 | AX | ALA | Åland Islands                               | 154 | 150 | ax
 008 | AL | ALB | Albania                                     | 039 | 150 | al
@@ -65,7 +47,7 @@ _country_info = """
 020 | AD | AND | Andorra                                     | 039 | 150 | ad
 024 | AO | AGO | Angola                                      | 017 | 002 | ao
 660 | AI | AIA | Anguilla                                    | 029 | 019 | ai
-010 | AQ | ATA | Antarctica                                  |     | 990 | aq
+010 | AQ | ATA | Antarctica                                  |     | 990 | aq # !UNS
 028 | AG | ATG | Antigua and Barbuda                         | 029 | 019 | ag
 032 | AR | ARG | Argentina                                   | 005 | 019 | ar
 051 | AM | ARM | Armenia                                     | 145 | 142 | am
@@ -83,36 +65,38 @@ _country_info = """
 204 | BJ | BEN | Benin                                       | 011 | 002 | bj
 060 | BM | BMU | Bermuda                                     | 021 | 019 | bm
 064 | BT | BTN | Bhutan                                      | 034 | 142 | bt
-068 | BO | BOL | Bolivia, Plurinational State of             | 005 | 019 | bo
+068 | BO | BOL | Bolivia (Plurinational State of)            | 005 | 019 | bo
+535 | BQ | BES | Bonaire, Sint Eustatius and Saba            | 029 | 019 | bq
 070 | BA | BIH | Bosnia and Herzegovina                      | 039 | 150 | ba
 072 | BW | BWA | Botswana                                    | 018 | 002 | bw
-074 | BV | BVT | Bouvet Island                               |     | 990 | bv
+074 | BV | BVT | Bouvet Island                               |     | 990 | bv # !UNS
 076 | BR | BRA | Brazil                                      | 005 | 019 | br
-086 | IO | IOT | British Indian Ocean Territory              |     | 990 | io
+086 | IO | IOT | British Indian Ocean Territory              |     | 990 | io # !UNS
 096 | BN | BRN | Brunei Darussalam                           | 035 | 142 | bn
-854 | BF | BFA | Burkina Faso                                | 011 | 002 | bf
 100 | BG | BGR | Bulgaria                                    | 151 | 150 | bg
+854 | BF | BFA | Burkina Faso                                | 011 | 002 | bf
 108 | BI | BDI | Burundi                                     | 014 | 002 | bi
+132 | CV | CPV | Cabo Verde                                  | 011 | 002 | cv
 116 | KH | KHM | Cambodia                                    | 035 | 142 | kh
 120 | CM | CMR | Cameroon                                    | 017 | 002 | cm
 124 | CA | CAN | Canada                                      | 021 | 019 | ca
-132 | CV | CPV | Cape Verde                                  | 011 | 002 | cv
 136 | KY | CYM | Cayman Islands                              | 029 | 019 | ky
 140 | CF | CAF | Central African Republic                    | 017 | 002 | cf
 148 | TD | TCD | Chad                                        | 017 | 002 | td
 152 | CL | CHL | Chile                                       | 005 | 019 | cl
 156 | CN | CHN | China                                       | 030 | 142 | cn
-162 | CX | CXR | Christmas Island                            |     | 990 | cx
-166 | CC | CCK | Cocos (Keeling) Islands                     |     | 990 | cc
+162 | CX | CXR | Christmas Island                            |     | 990 | cx # !UNS
+166 | CC | CCK | Cocos (Keeling) Islands                     |     | 990 | cc # !UNS
 170 | CO | COL | Colombia                                    | 005 | 019 | co
 174 | KM | COM | Comoros                                     | 014 | 002 | km
 178 | CG | COG | Congo                                       | 017 | 002 | cg
-180 | CD | COD | Congo, The Democratic Republic of the       | 017 | 002 | cd
+180 | CD | COD | Congo (Democratic Republic of the)          | 017 | 002 | cd
 184 | CK | COK | Cook Islands                                | 061 | 009 | ck
 188 | CR | CRI | Costa Rica                                  | 013 | 019 | cr
 384 | CI | CIV | Côte d'Ivoire                               | 011 | 002 | ci
 191 | HR | HRV | Croatia                                     | 039 | 150 | hr
 192 | CU | CUB | Cuba                                        | 029 | 019 | cu
+531 | CW | CUW | Curaçao                                     | 029 | 019 | cw
 196 | CY | CYP | Cyprus                                      | 145 | 142 | cy
 203 | CZ | CZE | Czech Republic                              | 151 | 150 | cz
 208 | DK | DNK | Denmark                                     | 154 | 150 | dk
@@ -126,7 +110,6 @@ _country_info = """
 232 | ER | ERI | Eritrea                                     | 014 | 002 | er
 233 | EE | EST | Estonia                                     | 154 | 150 | ee
 231 | ET | ETH | Ethiopia                                    | 014 | 002 | et
-901 |    |     | European Union                              |     | 990 | eu
 238 | FK | FLK | Falkland Islands (Malvinas)                 | 005 | 019 | fk
 234 | FO | FRO | Faroe Islands                               | 154 | 150 | fo
 242 | FJ | FJI | Fiji                                        | 054 | 009 | fj
@@ -134,7 +117,7 @@ _country_info = """
 250 | FR | FRA | France                                      | 155 | 150 | fr
 254 | GF | GUF | French Guiana                               | 005 | 019 | gf
 258 | PF | PYF | French Polynesia                            | 061 | 009 | pf
-260 | TF | ATF | French Southern Territories                 |     | 990 | tf
+260 | TF | ATF | French Southern Territories                 |     | 990 | tf # !UNS
 266 | GA | GAB | Gabon                                       | 017 | 002 | ga
 270 | GM | GMB | Gambia                                      | 011 | 002 | gm
 268 | GE | GEO | Georgia                                     | 145 | 142 | ge
@@ -152,15 +135,15 @@ _country_info = """
 624 | GW | GNB | Guinea-Bissau                               | 011 | 002 | gw
 328 | GY | GUY | Guyana                                      | 005 | 019 | gy
 332 | HT | HTI | Haiti                                       | 029 | 019 | ht
-334 | HM | HMD | Heard Island and Mcdonald Islands           |     | 990 | hm
-336 | VA | VAT | Holy See (Vatican City State)               | 039 | 150 | va
+334 | HM | HMD | Heard Island and Mcdonald Islands           |     | 990 | hm # !UNS
+336 | VA | VAT | Holy See                                    | 039 | 150 | va
 340 | HN | HND | Honduras                                    | 013 | 019 | hn
 344 | HK | HKG | Hong Kong                                   | 030 | 142 | hk
 348 | HU | HUN | Hungary                                     | 151 | 150 | hu
 352 | IS | ISL | Iceland                                     | 154 | 150 | is
 356 | IN | IND | India                                       | 034 | 142 | in
 360 | ID | IDN | Indonesia                                   | 035 | 142 | id
-364 | IR | IRN | Iran, Islamic Republic of                   | 034 | 142 | ir
+364 | IR | IRN | Iran (Islamic Republic of)                  | 034 | 142 | ir
 368 | IQ | IRQ | Iraq                                        | 145 | 142 | iq
 372 | IE | IRL | Ireland                                     | 154 | 150 | ie
 833 | IM | IMN | Isle of Man                                 | 154 | 150 | im
@@ -173,8 +156,8 @@ _country_info = """
 398 | KZ | KAZ | Kazakhstan                                  | 143 | 142 | kz
 404 | KE | KEN | Kenya                                       | 014 | 002 | ke
 296 | KI | KIR | Kiribati                                    | 057 | 009 | ki
-408 | KP | PRK | Korea, Democratic People's Republic of      | 030 | 142 | kp
-410 | KR | KOR | Korea, Republic of                          | 030 | 142 | kr
+408 | KP | PRK | Korea (Democratic People's Republic of)     | 030 | 142 | kp
+410 | KR | KOR | Korea (Republic of)                         | 030 | 142 | kr
 414 | KW | KWT | Kuwait                                      | 145 | 142 | kw
 417 | KG | KGZ | Kyrgyzstan                                  | 143 | 142 | kg
 418 | LA | LAO | Lao People's Democratic Republic            | 035 | 142 | la
@@ -182,12 +165,12 @@ _country_info = """
 422 | LB | LBN | Lebanon                                     | 145 | 142 | lb
 426 | LS | LSO | Lesotho                                     | 018 | 002 | ls
 430 | LR | LBR | Liberia                                     | 011 | 002 | lr
-434 | LY | LBY | Libyan Arab Jamahiriya                      | 015 | 002 | ly
+434 | LY | LBY | Libya                                       | 015 | 002 | ly
 438 | LI | LIE | Liechtenstein                               | 155 | 150 | li
 440 | LT | LTU | Lithuania                                   | 154 | 150 | lt
 442 | LU | LUX | Luxembourg                                  | 155 | 150 | lu
 446 | MO | MAC | Macao                                       | 030 | 142 | mo
-807 | MK | MKD | Macedonia, The Former Yugoslav Republic of  | 039 | 150 | mk
+807 | MK | MKD | Macedonia (the Former Yugoslav Republic of) | 039 | 150 | mk
 450 | MG | MDG | Madagascar                                  | 014 | 002 | mg
 454 | MW | MWI | Malawi                                      | 014 | 002 | mw
 458 | MY | MYS | Malaysia                                    | 035 | 142 | my
@@ -196,12 +179,12 @@ _country_info = """
 470 | MT | MLT | Malta                                       | 039 | 150 | mt
 584 | MH | MHL | Marshall Islands                            | 057 | 009 | mh
 474 | MQ | MTQ | Martinique                                  | 029 | 019 | mq
-478 | MR | MRT | Mauritania                                  | 011 | 002 | mr 
+478 | MR | MRT | Mauritania                                  | 011 | 002 | mr
 480 | MU | MUS | Mauritius                                   | 014 | 002 | mu
 175 | YT | MYT | Mayotte                                     | 014 | 002 | yt
 484 | MX | MEX | Mexico                                      | 013 | 019 | mx
-583 | FM | FSM | Micronesia, Federated States of             | 057 | 009 | fm
-498 | MD | MDA | Moldova, Republic of                        | 151 | 150 | md
+583 | FM | FSM | Micronesia (Federated States of)            | 057 | 009 | fm
+498 | MD | MDA | Moldova (Republic of)                       | 151 | 150 | md
 492 | MC | MCO | Monaco                                      | 155 | 150 | mc
 496 | MN | MNG | Mongolia                                    | 030 | 142 | mn
 499 | ME | MNE | Montenegro                                  | 039 | 150 | me
@@ -213,7 +196,6 @@ _country_info = """
 520 | NR | NRU | Nauru                                       | 057 | 009 | nr
 524 | NP | NPL | Nepal                                       | 034 | 142 | np
 528 | NL | NLD | Netherlands                                 | 155 | 150 | nl
-530 | AN | ANT | Netherlands Antilles                        | 029 | 019 | an
 540 | NC | NCL | New Caledonia                               | 054 | 009 | nc
 554 | NZ | NZL | New Zealand                                 | 053 | 009 | nz
 558 | NI | NIC | Nicaragua                                   | 013 | 019 | ni
@@ -226,7 +208,7 @@ _country_info = """
 512 | OM | OMN | Oman                                        | 145 | 142 | om
 586 | PK | PAK | Pakistan                                    | 034 | 142 | pk
 585 | PW | PLW | Palau                                       | 057 | 009 | pw
-275 | PS | PSE | Palestinian Territory, Occupied             | 145 | 142 | ps
+275 | PS | PSE | Palestine, State of                         | 145 | 142 | ps
 591 | PA | PAN | Panama                                      | 013 | 019 | pa
 598 | PG | PNG | Papua New Guinea                            | 054 | 009 | pg
 600 | PY | PRY | Paraguay                                    | 005 | 019 | py
@@ -235,7 +217,6 @@ _country_info = """
 612 | PN | PCN | Pitcairn                                    | 061 | 009 | pn
 616 | PL | POL | Poland                                      | 151 | 150 | pl
 620 | PT | PRT | Portugal                                    | 039 | 150 | pt
-902 |    |     | Portuguese Timor (being phased out)         |     | 990 | tp
 630 | PR | PRI | Puerto Rico                                 | 029 | 019 | pr
 634 | QA | QAT | Qatar                                       | 145 | 142 | qa
 638 | RE | REU | Réunion                                     | 014 | 002 | re
@@ -243,10 +224,10 @@ _country_info = """
 643 | RU | RUS | Russian Federation                          | 151 | 150 | ru
 646 | RW | RWA | Rwanda                                      | 014 | 002 | rw
 652 | BL | BLM | Saint Barthélemy                            | 029 | 019 | bl
-654 | SH | SHN | Saint Helena                                | 011 | 002 | sh
+654 | SH | SHN | Saint Helena, Ascension and Tristan da Cunha| 011 | 002 | sh
 659 | KN | KNA | Saint Kitts and Nevis                       | 029 | 019 | kn
 662 | LC | LCA | Saint Lucia                                 | 029 | 019 | lc
-663 | MF | MAF | Saint Martin                                | 029 | 019 | mf
+663 | MF | MAF | Saint Martin (French part)                  | 029 | 019 | mf
 666 | PM | SPM | Saint Pierre and Miquelon                   | 021 | 019 | pm
 670 | VC | VCT | Saint Vincent and the Grenadines            | 029 | 019 | vc
 882 | WS | WSM | Samoa                                       | 061 | 009 | ws
@@ -258,16 +239,17 @@ _country_info = """
 690 | SC | SYC | Seychelles                                  | 014 | 002 | sc
 694 | SL | SLE | Sierra Leone                                | 011 | 002 | sl
 702 | SG | SGP | Singapore                                   | 035 | 142 | sg
+534 | SX | SXM | Sint Maarten (Dutch part)                   | 029 | 019 | sx
 703 | SK | SVK | Slovakia                                    | 151 | 150 | sk
 705 | SI | SVN | Slovenia                                    | 039 | 150 | si
 090 | SB | SLB | Solomon Islands                             | 054 | 009 | sb
 706 | SO | SOM | Somalia                                     | 014 | 002 | so
 710 | ZA | ZAF | South Africa                                | 018 | 002 | za
-239 | GS | SGS | South Georgia and the South Sandwich Island |     | 990 | gs
-903 |    |     | Soviet Union (being phased out)             |     | 990 | su
+239 | GS | SGS | South Georgia and the South Sandwich Islands|     | 990 | gs # !UNS
+728 | SS | SSD | South Sudan                                 | 014 | 002 | ss
 724 | ES | ESP | Spain                                       | 039 | 150 | es
 144 | LK | LKA | Sri Lanka                                   | 034 | 142 | lk
-736 | SD | SDN | Sudan                                       | 015 | 002 | sd
+729 | SD | SDN | Sudan                                       | 015 | 002 | sd
 740 | SR | SUR | Suriname                                    | 005 | 019 | sr
 744 | SJ | SJM | Svalbard and Jan Mayen                      | 154 | 150 | sj
 748 | SZ | SWZ | Swaziland                                   | 018 | 002 | sz
@@ -291,22 +273,57 @@ _country_info = """
 800 | UG | UGA | Uganda                                      | 014 | 002 | ug
 804 | UA | UKR | Ukraine                                     | 151 | 150 | ua
 784 | AE | ARE | United Arab Emirates                        | 145 | 142 | ae
-826 | GB | GBR | United Kingdom                              | 154 | 150 | uk gb
-840 | US | USA | United States                               | 021 | 019 | us
-581 | UM | UMI | United States Minor Outlying Islands        |     | 990 | um
+826 | GB | GBR | United Kingdom of Great Britain and Northern Ireland | 154 | 150 | uk gb
+581 | UM | UMI | United States Minor Outlying Islands        |     | 990 | um # !UNS
+840 | US | USA | United States of America                    | 021 | 019 | us
 858 | UY | URY | Uruguay                                     | 005 | 019 | uy
 860 | UZ | UZB | Uzbekistan                                  | 143 | 142 | uz
 548 | VU | VUT | Vanuatu                                     | 054 | 009 | vu
-862 | VE | VEN | Venezuela, Bolivarian Republic of           | 005 | 019 | ve
+862 | VE | VEN | Venezuela (Bolivarian Republic of)          | 005 | 019 | ve
 704 | VN | VNM | Viet Nam                                    | 035 | 142 | vn
-092 | VG | VGB | Virgin Islands, British                     | 029 | 019 | vg
-850 | VI | VIR | Virgin Islands, U.S.                        | 029 | 019 | vi
+092 | VG | VGB | Virgin Islands (British)                    | 029 | 019 | vg
+850 | VI | VIR | Virgin Islands (U.S.)                       | 029 | 019 | vi
 876 | WF | WLF | Wallis and Futuna                           | 061 | 009 | wf
 732 | EH | ESH | Western Sahara                              | 015 | 002 | eh
 887 | YE | YEM | Yemen                                       | 145 | 142 | ye
-904 |    |     | Yugoslavia (being phased out)               |     | 990 | yu
 894 | ZM | ZMB | Zambia                                      | 014 | 002 | zm
 716 | ZW | ZWE | Zimbabwe                                    | 014 | 002 | zw
+
+# Reserved entries from ISO-3166-1 data.
+
+900 | AC | ASC | Ascension Island                            |     | 990 | ac # A2-ER,A3-ER,IANA
+901 | CP | CPT | Clipperton Island                           |     | 990 |    # A2-ER,A3-ER
+902 | DG | DGA | Diego Garcia                                |     | 990 |    # A2-ER,A3-ER
+903 | EA |     | Ceuta, Melilla                              |     | 990 |    # A2-ER
+904 | EU |     | European Union                              |     | 990 | eu # A2-ER,IANA
+905 | EZ |     | Eurozone                                    |     | 990 |    # A2-ER
+906 | FX | FXX | France, Metropolitan                        |     | 990 |    # A2-ER,A3-ER
+907 | IC |     | Canary Islands                              |     | 990 |    # A2-ER
+908 | SU | SUN | Union of Soviet Socialist Republics         |     | 990 | su # A2-ER,A3-ER,IANA
+909 | TA | TAA | Tristan da Cunha                            |     | 990 |    # A2-ER,A3-ER
+#910| UK |     | United Kingdom                              |     | 990 |    # A2-ER
+#This entry is a clusterfuck because of the UK/GB thing
+911 | UN |     | United Nations                              |     | 990 |    # A2-ER
+
+912 | AN | ANT | Netherlands Antilles                        |     | 990 | an # A2-TR,IANA-R
+913 | BU | BUR | Burma                                       |     | 990 |    # A2-TR
+914 |    | BYS | Byelorussian SSR                            |     | 990 |    # A3-TR
+915 | CS | SCG | Serbia and Montenegro                       |     | 990 |    # A2-TR
+916 |    | CSK | Czechoslovakia                              |     | 990 |    # A3-TR
+917 | NT | NTZ | Neutral Zone                                |     | 990 |    # A2-TR
+918 |    | ROM | Romania                                     |     | 990 |    # A3-TR
+919 | SF |     | Finland                                     |     | 990 |    # A2-TR
+920 |    | TMP | East Timor                                  |     | 990 | tp # A2-TR,IANA-R
+921 | YU | YUG | Yugoslavia                                  |     | 990 |    # A2-TR
+922 | ZR | ZAR | Zaire                                       |     | 990 |    # A2-TR
+
+# Entries in UN Statistics Division data, but not ISO-3166-1
+
+830 |    |     | Channel Islands                             | 154 | 150 |    # UNS
+680 |    |     | Sark                                        | 154 | 150 |    # UNS
+
+# Private use entries
+
 991 | QM | QMZ | Anonymous Proxies                           |     | 990 | a1
 992 | QN | QNZ | Satellite Providers                         |     | 990 | a2
 999 | ZZ | ZZZ | Unknown                                     |     | 990 | --
@@ -317,7 +334,7 @@ _region_info = """
 002 | Africa                    | 015 014 017 018 011 |
 015 | Northern Africa           |                     | 002
 014 | Eastern Africa            |                     | 002
-017 | Middle Africa             |                     | 002 
+017 | Middle Africa             |                     | 002
 018 | Southern Africa           |                     | 002
 011 | Western Africa            |                     | 002
 019 | Americas                  | 029 013 005 021     |
@@ -349,6 +366,8 @@ _area_tlds = {}                 # Numeric ID to list of TLDs
 
 _country_alpha2 = {}            # Numeric ID to alpha-2 or None
 _country_alpha3 = {}            # Numeric ID to alpha-3 or None
+_country_region = {}            # Numeric ID to region's numeric ID
+_country_subregion = {}         # Numeric ID to subregion's numeric ID
 _country_lookup = {}            # Name to numeric ID
 
 _region_countries = {}          # List for each region of countries
@@ -360,8 +379,10 @@ _region_list = []               # List of numeric IDs for regions
 
 # Parse country data from giant text blob
 for line in _country_info.split("\n"):
+    if '#' in line: line = line[:line.index('#')]
     line = line.strip()
     if not line: continue
+    if line.startswith('#'): continue
     (num, alpha2, alpha3, name, subregion, region, tlds) = [
         column.strip() for column in line.split("|")]
     tlds = [tld.strip() for tld in tlds.split()]
@@ -374,6 +395,7 @@ for line in _country_info.split("\n"):
         if subregion not in _region_countries:
             _region_countries[subregion] = []
         _region_countries[subregion].append(num)
+        _country_subregion[num] = subregion
     else:
         subregion = None
     if region:
@@ -381,6 +403,9 @@ for line in _country_info.split("\n"):
         if region not in _region_countries:
             _region_countries[region] = []
         _region_countries[region].append(num)
+        _country_region[num] = region
+        if region == 990:       # "Other" special case
+            _country_subregion[num] = region
     else:
         region = None
     _area_name[num] = name
@@ -548,7 +573,28 @@ def get_country_tlds(code):
     """
     return _area_tlds.get(get_country_numeric(code), [])
 
+def get_country_region(code):
+    """
+    Given a country code as a string or integer, returns the numeric
+    code of the top-level UN Statistics Division region that country
+    belongs to as an integer. (See also `iter_regions`.)
+
+    Raises :exc:`KeyError` if the country code is unrecognized.
+    """
+    return _country_region.get(get_country_numeric(code), None)
+
+def get_country_subregion(code):
+    """
+    Given a country code as a string or integer, returns the numeric
+    code of the lowest-level UN Statistics Division region that
+    country belongs to as an integer.
+
+    Raises :exc:`KeyError` if the country code is unrecognized.
+    """
+    return _country_subregion.get(get_country_numeric(code), None)
+
 def iter_countries():
+
     """
     Returns an iterator which yields all known ISO 3166-1 numeric
     country codes as integers, including user-assigned code elements
@@ -561,7 +607,7 @@ def get_region_numeric(code):
     """
     Given a UN Statistics Division region code as a string or integer,
     returns the code as an integer.
-    
+
     Raises :exc:`KeyError` if the region code is unrecognized.
     """
     v = code
@@ -642,6 +688,8 @@ __all__ = """
     get_country_alpha2
     get_country_alpha3
     get_country_tlds
+    get_country_region
+    get_country_subregion
     iter_countries
 
     get_region_numeric

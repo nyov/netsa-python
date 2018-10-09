@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 1.5 - 2016-05-24
+------------------------
+
+ * netsa-python no longer supports versions of Python prior to 2.6.
+
+ * Removed functions and modules deprecated in netsa-python 1.4.
+
+ * Bug fixes and improvements to netsa.script.golem.
+
 Version 1.4.4 - 2014-01-29
 --------------------------
 

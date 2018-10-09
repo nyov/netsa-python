@@ -10,10 +10,6 @@ line processing system, which provides tools for managing extremely
 complicated collections of shell processes that should fail or
 succeed together (extremely useful when working with named pipes).
 
-NOTE: Version 1.4 of NetSA Python is the last major version
-      that will support Python 2.4 or 2.5.  Future major versions
-      of NetSA Python will require Python 2.6 or greater.
-
 Installation
 ------------
 

@@ -1,50 +1,5 @@
-# Copyright 2008-2013 by Carnegie Mellon University
-
-# @OPENSOURCE_HEADER_START@
-# Use of the Network Situational Awareness Python support library and
-# related source code is subject to the terms of the following licenses:
-# 
-# GNU Public License (GPL) Rights pursuant to Version 2, June 1991
-# Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
-# 
-# NO WARRANTY
-# 
-# ANY INFORMATION, MATERIALS, SERVICES, INTELLECTUAL PROPERTY OR OTHER 
-# PROPERTY OR RIGHTS GRANTED OR PROVIDED BY CARNEGIE MELLON UNIVERSITY 
-# PURSUANT TO THIS LICENSE (HEREINAFTER THE "DELIVERABLES") ARE ON AN 
-# "AS-IS" BASIS. CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY 
-# KIND, EITHER EXPRESS OR IMPLIED AS TO ANY MATTER INCLUDING, BUT NOT 
-# LIMITED TO, WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE, 
-# MERCHANTABILITY, INFORMATIONAL CONTENT, NONINFRINGEMENT, OR ERROR-FREE 
-# OPERATION. CARNEGIE MELLON UNIVERSITY SHALL NOT BE LIABLE FOR INDIRECT, 
-# SPECIAL OR CONSEQUENTIAL DAMAGES, SUCH AS LOSS OF PROFITS OR INABILITY 
-# TO USE SAID INTELLECTUAL PROPERTY, UNDER THIS LICENSE, REGARDLESS OF 
-# WHETHER SUCH PARTY WAS AWARE OF THE POSSIBILITY OF SUCH DAMAGES. 
-# LICENSEE AGREES THAT IT WILL NOT MAKE ANY WARRANTY ON BEHALF OF 
-# CARNEGIE MELLON UNIVERSITY, EXPRESS OR IMPLIED, TO ANY PERSON 
-# CONCERNING THE APPLICATION OF OR THE RESULTS TO BE OBTAINED WITH THE 
-# DELIVERABLES UNDER THIS LICENSE.
-# 
-# Licensee hereby agrees to defend, indemnify, and hold harmless Carnegie 
-# Mellon University, its trustees, officers, employees, and agents from 
-# all claims or demands made against them (and any related losses, 
-# expenses, or attorney's fees) arising out of, or relating to Licensee's 
-# and/or its sub licensees' negligent use or willful misuse of or 
-# negligent conduct or willful misconduct regarding the Software, 
-# facilities, or other rights or assistance granted by Carnegie Mellon 
-# University under this License, including, but not limited to, any 
-# claims of product liability, personal injury, death, damage to 
-# property, or violation of any laws or regulations.
-# 
-# Carnegie Mellon University Software Engineering Institute authored 
-# documents are sponsored by the U.S. Department of Defense under 
-# Contract FA8721-05-C-0003. Carnegie Mellon University retains 
-# copyrights in all material produced under this contract. The U.S. 
-# Government retains a non-exclusive, royalty-free license to publish or 
-# reproduce these documents, or allow others to do so, for U.S. 
-# Government purposes only pursuant to the copyright license under the 
-# contract clause at 252.227.7013.
-# @OPENSOURCE_HEADER_END@
+# Copyright 2008-2016 by Carnegie Mellon University
+# See license information in LICENSE-OPENSOURCE.txt
 
 """
 Overview
@@ -412,7 +367,7 @@ class Task_process(Task):
             self._ignore_exits = ignore_exits
             self._pid = None
             self._stderr_text = ""
-            
+
             # If ferr is None, let's set up a collector thread
             used_own_ferr = False
             if ferr is None:
@@ -588,7 +543,7 @@ class Task_process(Task):
             self._cond_var.release()
     def get_exit_status(self):
         return [self._exit_status]
-                
+
 
 def _interpolate_vars(arg_list, vars):
     # First interpolate any "argument list" variables
@@ -823,6 +778,7 @@ def command(*argv, **options):
     (i.e. respecting single and double quotation marks, backslashes,
     etc.)  For example::
 
+        # Shell: ls /etc
         new_command = command("ls /etc")
 
     If there is only a single argument and it is a :class:`list` or a
@@ -830,12 +786,14 @@ def command(*argv, **options):
     command (with the first argument being the command to be
     executed.)  For example::
 
+        # Shell: ls /etc
         new_command = command(["ls", "/etc"])
 
     If there are multiple arguments, each argument is taken as being
     one element of the argument vector, with the first bring the
     command to be executed.  For example::
 
+        # Shell: ls /etc
         new_command = command("ls", "/etc")
 
     The following keyword arguments may be given as options to a
@@ -861,6 +819,7 @@ def command(*argv, **options):
 
     Example: Define a command spec using a single string::
 
+        # Shell: ls -lR /tmp/foo
         c = command("ls -lR /tmp/foo")
 
     Example: Define a command as the same as an old command with
@@ -870,14 +829,16 @@ def command(*argv, **options):
 
     Example: Define a command using a list of strings::
 
+        # Shell: ls -lR /tmp/foo
         e = command(["ls", "-lR", "/tmp/foo"])
 
     Example: Define a command using individual string arguments::
 
+        # Shell: ls -lR /tmp/foo
         f = command("ls", "-lR", "/tmp/foo")
 
     **Short-hand Form:**
-    
+
     In the :func:`pipeline`, :func:`run_parallel`, and
     :func:`run_collect` functions, commands may be given in a
     short-hand form where convenient.  The short-hand form of a
@@ -986,13 +947,15 @@ def pipeline(*commands, **options):
     :class:`tuple`, interpret it as being a list of commands and I/O
     redirection short-hands to run in the pipeline.  For example::
 
-        new_pipeline = pipeline(["ls /etc", "tac"])
+        # Shell: ls /etc | sort -r
+        new_pipeline = pipeline(["ls /etc", "sort -r"])
 
     If there are multiple arguments, these arguments are treated as a
     list of commands and I/O redirection short-hands (as if they were
     passed as a single list.)  For example::
 
-        new_pipeline = pipeline("ls /etc", "tac")
+        # Shell: ls /etc | sort -r
+        new_pipeline = pipeline("ls /etc", "sort -r")
 
     The following keyword arguments may be given as options to a
     pipeline specification:
@@ -1026,6 +989,7 @@ def pipeline(*commands, **options):
 
     Example: Define a pipeline using a list of commands::
 
+        # Shell: ls -lR /tmp/foo | sort > /tmp/testout
         a = pipeline(command("ls -lR /tmp/foo"),
                      command("sort"),
                      stdout="/tmp/testout")
@@ -1033,6 +997,7 @@ def pipeline(*commands, **options):
     Example: Define the same pipeline using the short-hand form of
     commands, and the shorthand method of setting stdout::
 
+        # Shell: ls -lR /tmp/foo | sort > /tmp/testout
         b = pipeline("ls -lR /tmp/foo",
                      "sort",
                      ">/tmp/testout")
@@ -1040,6 +1005,7 @@ def pipeline(*commands, **options):
     Example: Define the same pipeline using a list instead of multiple
     arguments::
 
+        # Shell: ls -lR /tmp/foo | sort > /tmp/testout
         c = pipeline(["ls -lR /tmp/foo",
                       "sort",
                       ">/tmp/testout"])
@@ -1056,7 +1022,9 @@ def pipeline(*commands, **options):
     pipeline is a list of commands and I/O redirection short-hands.
     Here are some examples::
 
+        # Shell: ls /tmp/die | xargs rm
         ["ls /tmp/die", "xargs rm"]  =>  pipeline(["ls /tmp/die", "xargs rm"])
+        # Shell: sort < /tmp/testin > /tmp/testsort
         ["</tmp/testin", "sort", ">/tmp/testsort"]  =>
                  pipeline(["sort"], stdin="/tmp/testin", stdout="/tmp/testsort")
 
@@ -1074,10 +1042,11 @@ def pipeline(*commands, **options):
     pipeline.  However, variable expansion also occurs in filenames
     provided for the *stdin* and *stdout* options.  For example::
 
+        # Shell: ls -lR > $output_file
         pipeline("ls -lR", ">%(output_file)s")
         pipeline("ls -lR", stdout="%(output_file)s")
 
-    
+
     """
     # Already a pipeline spec?  Re-use, possibly with new options
     if len(commands) == 1 and isinstance(commands[0], PipelineSpec):
@@ -1139,6 +1108,7 @@ def run_parallel(*args, **options):
 
     Example: Run three mkdirs in parallel and fail if any of them fails::
 
+        # Shell: mkdir a & mkdir b & mkdir c & wait
         run_parallel("mkdir a", "mkdir b", "mkdir c")
 
     Example: Make a fifo, then afterwards, use it to do some work.
@@ -1147,14 +1117,23 @@ def run_parallel(*args, **options):
 
     .. sourcecode:: python
 
+        # Shell: mkfifo test.fifo
         run_parallel("mkfifo test.fifo")
+        # Shell:
+        #   cat /etc/passwd | sort -r | cut -f1 -d: > $f &
+        #   cat $f | sed -e 's/a/b/g' > $f2 &
+        #   wait
         run_parallel(["cat /etc/passwd", "sort -r", "cut -f1 -d:", ">%(f)s"],
                      ["cat %(f)s", "sed -e 's/a/b/g'", ">%(f2)s"],
-                     vars={'f': 'test.fifo', 'f2': 'test.
+                     vars={'f': 'test.fifo', 'f2': 'test.txt'})
 
     Example: run two pipelines in parallel, then investigate their
     processes' exit statuses::
 
+        # Shell:
+        #   ls -l | grep ^d &
+        #   cat /etc/passwd | sort -r | cut -f1 -d: &
+        #   wait
         exits = run_parallel(["ls -l", "grep ^d"],
                              ["cat /etc/passwd", "sort -r", "cut -f1 -d:"])
         # If all complete successfully, exits will be:
@@ -1207,6 +1186,7 @@ def run_collect_files(*args, **options):
     Example: Iterate over the lines of ``ls -l | sort -r`` and print
     them out with line numbers::
 
+        # Shell: ls -l | sort -r
         (f_stdout, f_stderr) = run_collect_files("ls -l", "sort -r")
         for (line_no, line) in enumerate(f_stdout):
             print ("%3d %s" % (line_no, line[:-1]))
@@ -1259,20 +1239,21 @@ def run_collect(*args, **options):
     Example: Reverse sort the output of ``ls -1`` and store the output
     and error in the variables `a_stdout` and `a_stderr`::
 
-        # Reverse sort the output of ls -1
+        # Shell: ls -1 | sort -r
         (a_stdout, a_stderr) = run_collect("ls -1", "sort -r")
 
     Example: Do the same as the above, but run ``ls -1`` on a named
     directory instead of the current working directory::
 
-        # The same with a named directory
+        # Shell: ls -1 $dir | sort -r
         (b_stdout, b_stderr) = run_collect("ls -1 %(dir)s", "sort -r",
                                            vars={'dir': 'some_directory'})
 
     Example: The following *does not collect output*, but instead
     writes it to a file.  If there were any error output, it would be
     returned in the variable `c_stderr`::
-                                           
+
+        # Shell: ls -1 | sort -r > test.out
         (empty_stdout, c_stderr) = run_collect("ls -1", "sort -r", ">test.out")
 
     """

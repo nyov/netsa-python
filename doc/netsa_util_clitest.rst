@@ -47,4 +47,4 @@
 
         .. automethod:: get_info() -> str
 
-        
+

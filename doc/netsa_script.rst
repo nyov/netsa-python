@@ -67,7 +67,7 @@
 
     .. autofunction:: add_int_param(name : str, help : str, [required=False, default : int, default_help : str, expert=False, minimum : int, maximum : int])
 
-    .. autofunction:: add_float_param(name : str, help : str, [required=False, default : float, default_help : str, expert=False, minimum : float, maximum : float]) 
+    .. autofunction:: add_float_param(name : str, help : str, [required=False, default : float, default_help : str, expert=False, minimum : float, maximum : float])
 
     .. autofunction:: add_date_param(name : str, help : str, [required=False, default : datetime, default_help : str, expert=False])
 

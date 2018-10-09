@@ -124,14 +124,14 @@ options affect both repository and query operations.
 Repository Parameters
 ^^^^^^^^^^^^^^^^^^^^^
 
-Repository parameters allow maintenance of the result repository,
-typically via a cron job. They are categorized as 'expert' options,
-therefore showing up in ``--help-expert`` rather than ``--help``.
+Repository parameters control the core data processing and generation
+of data in the result repository, typically run via a cron job.
 
-.. option:: --data-load
+.. option:: --data-process
 
-        Generate and store incomplete or missing analysis results in the
-        data repository, skipping those that are complete (unless
+        This is the main parameter that makes the script do its work.
+        It generates and stores incomplete or missing analysis results
+        in the data repository, skipping those that are complete (unless
         :option:`--overwrite` is given).
 
 .. option:: --data-status
@@ -270,6 +270,8 @@ The following functions configure the behavior of golem scripts.
 
 .. autofunction:: set_span([days : int, minutes : int, hours : int, weeks : int])
 
+.. autofunction:: set_skew([days : int, minutes : int, hours : int, weeks : int])
+
 .. autofunction:: set_lag([days : int, minutes : int, hours : int, weeks : int])
 
 .. autofunction:: set_realtime(enable=True)
@@ -282,7 +284,7 @@ The following functions configure the behavior of golem scripts.
 
 .. autofunction:: add_loop(name : str, value : str list or func [, group_by : str or func, group_name : str, sep=','])
 
-.. autofunction:: add_sensor_loop([name='sensor' : str, sensors : str list or func, group_by : str or func, group_name : str, auto_group=False]) 
+.. autofunction:: add_sensor_loop([name='sensor' : str, sensors : str list or func, group_by : str or func, group_name : str, auto_group=False])
 
 .. autofunction:: add_flow_tag(name : str [, flow_class : str, flow_type : str, flowtypes : str, sensors : str, start_date : str, end_date : str, input_pipe : str, xargs : str, filenames : str])
 
@@ -291,6 +293,10 @@ The following functions configure the behavior of golem scripts.
 .. autofunction:: add_input_template(name : str, template : str [, required=True, mime_type : str, descriptions : str])
 
 .. autofunction:: add_golem_input(golem_script : str, name : str [, output_name : str, count : int, cover=False, offset : int, span : timedelta, join_on : str or str list, join : dict, required=True)
+
+.. autofunction:: add_input_group(name : str, group : list)
+
+.. autofunction:: add_output_group(name : str, group : list)
 
 .. autofunction:: add_query_handler(name : str, query_handler : func)
 
@@ -433,59 +439,77 @@ something like this::
 The following template tags are automatically available to each
 iteration over a golem processing loop:
 
-=========================== ===================================================
-Tag Name                    Contents
-=========================== ===================================================
-``golem_name``              golem script name
-``golem_suite``             suite name, if any
-``golem_span``              timedelta obj for span
-``golem_interval``          timedelta obj for interval
-``golem_span_iso``          iso string repr of ``golem_span``
-``golem_interval_iso``      iso string repr of ``golem_interval``
---------------------------- ---------------------------------------------------
---------------------------- ---------------------------------------------------
-``golem_bin_date``          start datetime for this interval
-``golem_bin_year``          interval datetime component 'year'
-``golem_bin_month``         interval datetime component 'month'
-``golem_bin_day``           interval datetime component 'day'
-``golem_bin_hour``          interval datetime component 'hour'
-``golem_bin_second``        interval datetime component 'second'
-``golem_bin_microsecond``   interval datetime component 'microsecond'
-``golem_bin_iso``           iso string repr for ``golem_bin_date``
-``golem_bin_basic``         iso basic string repr for ``golem_bin_date``
-``golem_bin_silk``          silk string repr for ``golem_bin_date``
---------------------------- ---------------------------------------------------
---------------------------- ---------------------------------------------------
-``golem_start_date``        start datetime for this span
-``golem_start_year``        start datetime component 'year'
-``golem_start_month``       start datetime component 'month'
-``golem_start_day``         start datetime component 'day'
-``golem_start_hour``        start datetime component 'hour'
-``golem_start_second``      start datetime component 'second'
-``golem_start_microsecond`` start datetime component 'microsecond'
-``golem_start_iso``         iso string repr for ``golem_start_date``
-``golem_start_basic``       iso basic string repr for ``golem_start_date``
-``golem_start_silk``        silk string repr for ``golem_start_date``
---------------------------- ---------------------------------------------------
---------------------------- ---------------------------------------------------
-``golem_end_date``          end datetime for this span
-``golem_end_year``          end datetime component 'year'
-``golem_end_month``         end datetime component 'month'
-``golem_end_day``           end datetime component 'day'
-``golem_end_hour``          end datetime component 'hour'
-``golem_end_second``        end datetime component 'second'
-``golem_end_microsecond``   end datetime component 'microsecond'
-``golem_end_iso``           iso string repr for ``golem_end_date``
-``golem_end_basic``         iso basic string repr for ``golem_end_date``
-``golem_end_silk``          silk string repr for ``golem_end_date``
---------------------------- ---------------------------------------------------
---------------------------- ---------------------------------------------------
-``golem_view``              the GolemView object which produced these tags
-=========================== ===================================================
+============================== ===================================================
+Tag Name                       Contents
+============================== ===================================================
+``golem_name``                 golem script name
+``golem_suite``                suite name, if any
+``golem_span``                 timedelta obj for span
+``golem_interval``             timedelta obj for interval
+``golem_span_iso``             iso string repr of ``golem_span``
+``golem_interval_iso``         iso string repr of ``golem_interval``
+``golem_repository``           data directory for this script
+------------------------------ ---------------------------------------------------
+------------------------------ ---------------------------------------------------
+``golem_bin_date``             start datetime for this interval
+``golem_bin_year``             interval datetime component 'year'
+``golem_bin_month``            interval datetime component 'month'
+``golem_bin_day``              interval datetime component 'day'
+``golem_bin_hour``             interval datetime component 'hour'
+``golem_bin_second``           interval datetime component 'second'
+``golem_bin_microsecond``      interval datetime component 'microsecond'
+``golem_bin_iso``              iso string repr for ``golem_bin_date``
+``golem_bin_basic``            iso basic string repr for ``golem_bin_date``
+``golem_bin_silk``             silk string repr for ``golem_bin_date``
+------------------------------ ---------------------------------------------------
+------------------------------ ---------------------------------------------------
+``golem_start_date``           start datetime for this span
+``golem_start_year``           start datetime component 'year'
+``golem_start_month``          start datetime component 'month'
+``golem_start_day``            start datetime component 'day'
+``golem_start_hour``           start datetime component 'hour'
+``golem_start_second``         start datetime component 'second'
+``golem_start_microsecond``    start datetime component 'microsecond'
+``golem_start_iso``            iso string repr for ``golem_start_date``
+``golem_start_basic``          iso basic string repr for ``golem_start_date``
+``golem_start_silk``           silk string repr for ``golem_start_date``
+------------------------------ ---------------------------------------------------
+------------------------------ ---------------------------------------------------
+``golem_end_date``             end datetime for this span
+``golem_end_year``             end datetime component 'year'
+``golem_end_month``            end datetime component 'month'
+``golem_end_day``              end datetime component 'day'
+``golem_end_hour``             end datetime component 'hour'
+``golem_end_second``           end datetime component 'second'
+``golem_end_microsecond``      end datetime component 'microsecond'
+``golem_end_iso``              iso string repr for ``golem_end_date``
+``golem_end_basic``            iso basic string repr for ``golem_end_date``
+``golem_end_silk``             silk string repr for ``golem_end_date``
+------------------------------ ---------------------------------------------------
+------------------------------ ---------------------------------------------------
+``golem_next_bin_date``        next bin datetime for this span
+``golem_next_bin_year``        next bin datetime component 'year'
+``golem_next_bin_month``       next bin datetime component 'month'
+``golem_next_bin_day``         next bin datetime component 'day'
+``golem_next_bin_hour``        next bin datetime component 'hour'
+``golem_next_bin_second``      next bin datetime component 'second'
+``golem_next_bin_microsecond`` next bin datetime component 'microsecond'
+``golem_next_bin_iso``         iso string repr for ``golem_next_bin_date``
+``golem_next_bin_basic``       iso basic string repr for ``golem_next_bin_date``
+``golem_next_bin_silk``        silk string repr for ``golem_next_bin_date``
+------------------------------ ---------------------------------------------------
+------------------------------ ---------------------------------------------------
+``golem_view``                 the GolemView object which produced these tags
+``golem_inputs``               a collected dictionary of all inputs that are
+                               defined in the tags
+``golem_outputs``              a collected dictionary of all outputs that are
+                               defined in the tags
+============================== ===================================================
 
-For both intervals and spans, time bins are represented by the first
-date within that bin. For details on how intervals and spans relate
-to one another and format precisions, see
+For intervals, time bins are bounded by ``golem_bin_date`` and
+``golem_end_date``. Spans, on the other hand, are bounded by
+``golem_start_date`` and ``golem_end_date``. For details on how
+intervals and spans relate to one another and format precisions, see
 :ref:`golem-interval-span-explained`.
 
 In addition to the standard golem tags defined above, all other tags,
@@ -589,7 +613,8 @@ worth of data, akin to a monthly snapshot.
 Intervals are *anchored* relative to a particular epoch. Intervals are
 always relative to midnight of the first Monday after January 1st, 1970
 which was January 5th. Weeks therefore begin with Monday and multiples
-of weeks are always relative to that particular Monday.
+of weeks are always relative to that particular Monday. If another day
+of the week is desired, use the `set_skew` configuration function.
 
 Spans are always anchored relative to the *end* of the processing
 interval.
@@ -606,8 +631,11 @@ aligned like so::
                      |                               |
     span:       start_date                        end_date
 
-Note that ``end_date`` is not inclusive---its actual value is
-the value of ``next_bin_date`` minus one millisecond.
+Note that ``end_date`` is not inclusive---its actual value is the value
+of ``next_bin_date`` minus one millisecond. ``next_bin_date``, on the
+other hand, can be handy if you want to represent your results files by
+the end of the processing interval ("as of" ``next_bin_date`` as opposed
+to "begining with" ``bin_date``).
 
 Each of these entries are represented by :class:`datetime.datetime`
 objects along with an assortment of formatted string representations. If
@@ -841,7 +869,7 @@ couple of SiLK command line tools::
 
     from netsa.script.golem import script
     from netsa.util import shell
-    from netsa.data.format import datetime_silk_day
+    from netsa import files
 
     script.set_title('SiLK Daily Active Internal Hosts')
     script.set_description("""
@@ -862,26 +890,24 @@ couple of SiLK command line tools::
     script.add_tag('in_types',  'in,inweb')
     script.add_tag('out_types', 'out,outweb')
 
-    script.add_output_template('daily_set',
+    script.add_output_template('internal_set',
         "internal/daily/daily.%(golem_bin_iso)s.set",
         description="Daily Internal host activity",
         mime_type='application/x-silk-ipset')
 
     def main():
         for tags in script.process():
-            tags['silk_start'] = datetime_silk_day(tags['golem_start_date'])
-            tags['silk_end']   = datetime_silk_day(tags['golem_end_date'])
-            tags['out_fifo']   = script.get_temp_dir_pipe_name()
-            tags['in_fifo']    = script.get_temp_dir_pipe_name()
+            tags['out_fifo'] = files.get_temp_pipe_name()
+            tags['in_fifo']  = files.get_temp_pipe_name()
             cmd1 = [
-                "rwfilter --start-date=%(silk_start)s"
-                    " --end-date=%(silk_end)s"
+                "rwfilter --start-date=%(golem_start_silk)s"
+                    " --end-date=%(golem_end_silk)s"
                     " --type=%(in_types)s"
                     " --proto=0-255 --pass=stdout",
                 "rwset --sip=%(out_fifo)s"]
             cmd2 = [
-                "rwfilter --start-date=%(silk_start)s"
-                    " --end-date=%(silk_end)s"
+                "rwfilter --start-date=%(golem_start_silk)s"
+                    " --end-date=%(golem_end_silk)s"
                     " --type=%(out_types)s"
                     " --proto=0-255 --pass=stdout",
                 "rwset --dip=%(in_fifo)s"]
@@ -910,20 +936,15 @@ advanced usage of the :mod:`netsa.util.shell` module::
 
     def main():
         for tags in script.process():
-            tags['silk_start'] = datetime_silk_day(tags['golem_start_date'])
-            tags['silk_end']   = datetime_silk_day(tags['golem_end_date'])
-            tags['out_fifo']   = script.get_temp_dir_pipe_name()
-            tags['in_fifo']    = script.get_temp_dir_pipe_name()
+            tags['out_fifo'] = files.get_temp_pipe_name()
+            tags['in_fifo']  = files.get_temp_pipe_name()
 
 As mentioned earlier, a ``tags`` dictionary is provided for each
-processing interval and sensor. In the first four lines within the
-processing loop, some additional tags are added to the dictionary. The
-first two are reformatted date parameters destined to be used in the
-|rwfilter|_ commands. The ``%(golem_start_date)s`` and
-``%(golem_end_date)s`` are template tags automatically provided by
-golem. The second two lines illustrate how the :mod:`netsa.script`
-module can be used to create temporary named pipes so that data can be
-fed from one command to another.
+processing interval and sensor. In the two lines within the
+processing loop, some additional tags are added to the dictionary.
+The lines illustrate how the :mod:`netsa.files` module can be used to
+create temporary named pipes so that data can be fed from one command
+to another.
 
 These new template additions are then used in the construction of some
 command templates used to pull data from the SiLK repository::
@@ -1076,7 +1097,7 @@ interval and a larger data window::
 
     from netsa.script.golem import script
     from netsa.util import shell
-    from netsa.data.format import datetime_silk_day
+    from netsa import files
 
     script.set_title('Active Internal Hosts')
     script.set_description("""
@@ -1107,20 +1128,18 @@ interval and a larger data window::
 
     def main():
         for tags in script.process():
-            tags['silk_start'] = datetime_silk_day(tags['golem_start_date'])
-            tags['silk_end']   = datetime_silk_day(tags['golem_end_date'])
-            tags['out_fifo']   = script.get_temp_dir_pipe_name()
-            tags['in_fifo']    = script.get_temp_dir_pipe_name()
+            tags['out_fifo'] = files.get_temp_pipe_name()
+            tags['in_fifo']  = files.get_temp_pipe_name()
             cmd1 = [
-                "rwfilter --start-date=%(silk_start)s"
-                    " --end-date=%(silk_end)s"
+                "rwfilter --start-date=%(golem_start_silk)s"
+                    " --end-date=%(golem_end_silk)s"
                     " --type=%(in_types)s"
                     " --sensors=%(sensor)s"
                     " --proto=0-255 --pass=stdout",
                 "rwset --sip=%(out_fifo)s"]
             cmd2 = [
-                "rwfilter --start-date=%(silk_start)s"
-                    " --end-date=%(silk_end)s"
+                "rwfilter --start-date=%(golem_start_silk)s"
+                    " --end-date=%(golem_end_silk)s"
                     " --type=%(out_types)s"
                     " --sensors=%(sensor)s"
                     " --proto=0-255 --pass=stdout",
@@ -1182,7 +1201,7 @@ can be simplified using a few of these features as illustrated below::
 
     from netsa.script.golem import script
     from netsa.util import shell
-    from netsa.data.format import datetime_silk_day
+    from netsa import files
 
     script.set_title('Active Internal Hosts')
     script.set_description("""
@@ -1216,8 +1235,8 @@ can be simplified using a few of these features as illustrated below::
 
     def main():
         for tags in script.process():
-            tags['out_fifo'] = script.get_temp_dir_pipe_name()
-            tags['in_fifo']  = script.get_temp_dir_pipe_name()
+            tags['out_fifo'] = files.get_temp_pipe_name()
+            tags['in_fifo']  = files.get_temp_pipe_name()
             cmd1 = [
                 "rwfilter %(out_flow)s --proto=0-255 --pass=stdout",
                 "rwset --sip=%(out_fifo)s"]
@@ -1253,7 +1272,7 @@ construction of |rwfilter|_ command line templates.
 
 Each call to :func:`add_flow_tag` implicitly binds the
 ``start_date`` and ``end_date`` object attributes to the value of the
-template tags ``golem_start_date`` and ``golem_end_date``. Given that
+template tags ``golem_start_silk`` and ``golem_end_silk``. Given that
 a sensor-specific loop was declared earlier, the function calls will
 also bind the ``sensors`` attribute to the value of the ``sensor``
 tag for each loop.
@@ -1297,6 +1316,7 @@ sensors. The following assumes that the prior inventory script is called
 
     from netsa.script.golem import script
     from netsa.util import shell
+    from netsa import files
 
     script.set_title('Daily Internal Port 25 Activity')
     script.set_description("""
@@ -1329,7 +1349,7 @@ sensors. The following assumes that the prior inventory script is called
 
     def main():
         for tags in script.process():
-            tags['in_fifo'] = script.get_temp_dir_pipe_name()
+            tags['in_fifo'] = files.get_temp_pipe_name()
             cmd1 = [
                 "rwsettool --union"
                     " --output-path=%(in_fifo)s
@@ -1404,7 +1424,7 @@ Followed by the processing loop::
 
     def main():
         for tags in script.process():
-            tags['in_fifo'] = script.get_temp_dir_pipe_name()
+            tags['in_fifo'] = files.get_temp_pipe_name()
             cmd1 = [
                 "rwsettool --union"
                     " --output-path=%(in_fifo)s
@@ -1456,7 +1476,7 @@ produce *delta encoded* results on a daily basis::
 
     from netsa.script.golem import script
     from netsa.util import shell
-    from netsa.data.format import datetime_silk_day
+    from netsa import files
 
     script.set_title('Active Internal Hosts')
     script.set_description("""
@@ -1493,8 +1513,8 @@ produce *delta encoded* results on a daily basis::
 
     def main():
         for tags in script.process():
-            tags['out_fifo'] = script.get_temp_dir_pipe_name()
-            tags['in_fifo']  = script.get_temp_dir_pipe_name()
+            tags['out_fifo'] = files.get_temp_pipe_name()
+            tags['in_fifo']  = files.get_temp_pipe_name()
             cmds = []
             cmds.append([
                 "rwfilter %(out_flow)s --proto=0-255 --pass=stdout",
@@ -1506,7 +1526,7 @@ produce *delta encoded* results on a daily basis::
                 "rwsettool --union --output-path=%(current_set)s"
                     " %(out_fifo)s %(in_fifo)s"])
             if tags['prior_set']:
-                tags['current_set'] = script.get_temp_dir_pipe_name()
+                tags['current_set'] = files.get_temp_pipe_name()
                 cmds.append([
                   "rwsettool --difference"
                       " --output-path=%(internal_set)s"
@@ -1566,8 +1586,8 @@ Next is the main processing loop::
 
     def main():
         for tags in script.process():
-            tags['out_fifo'] = script.get_temp_dir_pipe_name()
-            tags['in_fifo']  = script.get_temp_dir_pipe_name()
+            tags['out_fifo'] = files.get_temp_pipe_name()
+            tags['in_fifo']  = files.get_temp_pipe_name()
             cmds = []
             cmds.append([
                 "rwfilter %(out_flow)s --proto=0-255 --pass=stdout",
@@ -1579,7 +1599,7 @@ Next is the main processing loop::
                 "rwsettool --union --output-path=%(current_set)s"
                     " %(out_fifo)s %(in_fifo)s"])
             if tags['prior_set']:
-                tags['current_set'] = script.get_temp_dir_pipe_name()
+                tags['current_set'] = files.get_temp_pipe_name()
                 cmds.append([
                   "rwsettool --difference"
                       " --output-path=%(internal_set)s"
@@ -1636,7 +1656,7 @@ GolemView
 
     .. automethod:: bin_dates() -> datetime iter
 
-    .. automethod:: by_bin_date() -> GolemView iter
+    .. automethod:: bins() -> GolemView iter
 
     .. automethod:: group_by(key : str [, ...]) -> (str tuple, GolemView) iter
 
@@ -1733,7 +1753,7 @@ GolemProcess
 
     .. automethod:: product() -> GolemProcess iter
 
-    .. automethod:: by_bin_date() -> GolemProcess iter
+    .. automethod:: bins() -> GolemProcess iter
 
     .. automethod:: group_by(key : str [, ...]) -> (str tuple, GolemProcess) iter
 

@@ -16,7 +16,7 @@
     .. autofunction:: get_country_alpha2(code : int or str) -> str
 
     .. autofunction:: get_country_alpha3(code : int or str) -> str
-    
+
     .. autofunction:: get_country_tlds(code : int or str) -> str list
 
     .. autofunction:: iter_countries() -> int iter
