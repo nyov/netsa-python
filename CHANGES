@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 1.4.4 - 2014-01-29
+--------------------------
+
+ * Fixed error in netsa.script that caused a default for file params to
+   be checked for before command-line arguments were handled.
+
+ * Fixed default regex for label params in netsa.script.
+
 Version 1.4.3 - 2013-02-18
 --------------------------
 

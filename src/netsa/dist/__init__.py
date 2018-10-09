@@ -631,7 +631,8 @@ class netsa_gen_doc_man(Command):
                                      self.distribution.netsa_doc_dir),
                         self.gen_doc_man)
                 else:
-                    log.info("using pre-generated man pages")
+                    log.info("sphinx not found, using pre-generated man "
+                             "pages (if available)")
                 for man_page in os.listdir(self.gen_doc_man):
                     section = man_page.split('.')[-1]
                     man_dir = os.path.join(self.distribution.netsa_doc_dir,

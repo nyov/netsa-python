@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2008-2013 by Carnegie Mellon University
+# Copyright 2008-2014 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -509,6 +509,9 @@ def _print_usage(out, expert=False):
             out.write("EXPERT SWITCHES:\n")
             for p in _script._params:
                 if p['expert']:
+                    required = ""
+                    if p['required'] == True:
+                        required = "Required. "
                     req_arg = ""
                     if p['kind'] == params.KIND_FLAG:
                         req_arg = "No Arg. "
@@ -1418,7 +1421,8 @@ def execute(func):
         if not param['required']:
             if param['default'] != None:
                 _script_param_values[param['name']] = \
-                    params.parse_value(param, param['default'])
+                    params.parse_value(param, param['default'],
+                                       is_default=True)
             else:
                 _script_param_values[param['name']] = None
     i = 0
@@ -1647,6 +1651,8 @@ def execute(func):
         _print_failure(sys.stderr, str(sys.exc_info()[1]))
     except ParamError:
         _print_failure(sys.stderr, str(sys.exc_info()[1]))
+
+    return func
 
 __all__ = """
 

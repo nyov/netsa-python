@@ -1,4 +1,4 @@
-# Copyright 2008-2013 by Carnegie Mellon University
+# Copyright 2008-2014 by Carnegie Mellon University
 
 # @OPENSOURCE_HEADER_START@
 # Use of the Network Situational Awareness Python support library and
@@ -277,46 +277,55 @@ def check_param_kind(kind, kind_args):
 
 ########################################################################
 
-def parse_value(param, value):
+def parse_value(param, value, is_default=False):
     if param['kind'] == KIND_TEXT:
-        return parse_param_text_value(param, value)
+        return parse_param_text_value(param, value, is_default)
     elif param['kind'] == KIND_INT:
-        return parse_param_int_value(param, value)
+        return parse_param_int_value(param, value, is_default)
     elif param['kind'] == KIND_FLOAT:
-        return parse_param_float_value(param, value)
+        return parse_param_float_value(param, value, is_default)
     elif param['kind'] == KIND_DATE:
-        return parse_param_date_value(param, value)
+        return parse_param_date_value(param, value, is_default)
     elif param['kind'] == KIND_LABEL:
-        return parse_param_label_value(param, value)
+        return parse_param_label_value(param, value, is_default)
     elif param['kind'] == KIND_FILE:
-        return parse_param_file_value(param, value)
+        return parse_param_file_value(param, value, is_default)
     elif param['kind'] == KIND_DIR:
-        return parse_param_dir_value(param, value)
+        return parse_param_dir_value(param, value, is_default)
     elif param['kind'] == KIND_PATH:
-        return parse_param_path_value(param, value)
+        return parse_param_path_value(param, value, is_default)
     elif param['kind'] == KIND_FLAG:
-        return parse_param_flag_value(param, value)
+        return parse_param_flag_value(param, value, is_default)
     elif param['kind'] == KIND_FLOW_CLASS:
-        return parse_param_text_value(param, value)
+        return parse_param_text_value(param, value, is_default)
     elif param['kind'] == KIND_FLOW_TYPE:
-        return parse_param_text_value(param, value)
+        return parse_param_text_value(param, value, is_default)
     elif param['kind'] == KIND_FLOW_FLOWTYPES:
-        return parse_param_text_value(param, value)
+        return parse_param_text_value(param, value, is_default)
     elif param['kind'] == KIND_FLOW_SENSORS:
-        return parse_param_text_value(param, value)
+        return parse_param_text_value(param, value, is_default)
     elif param['kind'] == KIND_FLOW_DATE:
         # Sanity check it as a date, but return it as text
-        return parse_param_flow_date_value(param, value)
+        return parse_param_flow_date_value(param, value, is_default)
     elif param['kind'] == KIND_OUTPUT_FILE:
-        return parse_param_output_file_value(param, value)
+        return parse_param_output_file_value(param, value, is_default)
     elif param['kind'] == KIND_OUTPUT_DIR:
-        return parse_param_output_dir_value(param, value)
+        return parse_param_output_dir_value(param, value, is_default)
     else:
-        error = ValueError("Unknown param kind: %s" % repr(param['kind']))
+        if is_default:
+            default_msg = " in script default"
+        else:
+            default_msg = ""
+        error = ValueError("Unknown param kind: %s%s" %
+                           (repr(param['kind']), default_msg))
         raise error
 
-def parse_param_text_value(param, value):
+def parse_param_text_value(param, value, is_default):
     kind_args = param['kind_args']
+    if is_default:
+        default_msg = " in script default"
+    else:
+        default_msg = ""
     if 'regex' in kind_args:
         regex = kind_args['regex']
         regex_help = kind_args.get('regex_help',
@@ -328,15 +337,19 @@ def parse_param_text_value(param, value):
                                (param['name'], repr(regex)))
             raise error
         if not regex.match(value):
-            error = ParamError(param, value, regex_help)
+            error = ParamError(param, value, regex_help + default_msg)
             raise error
     return value
 
-def parse_param_int_value(param, value):
+def parse_param_int_value(param, value, is_default):
+    if is_default:
+        default_msg = " in script default"
+    else:
+        default_msg = ""
     try:
         value = int(value)
     except ValueError:
-        error = ParamError(param, value, "not a valid integer")
+        error = ParamError(param, value, "not a valid integer" + default_msg)
         raise error
     kind_args = param['kind_args']
     minimum = kind_args.get("minimum", None)
@@ -344,20 +357,28 @@ def parse_param_int_value(param, value):
     if (minimum != None and value < minimum or
         maximum != None and value > maximum):
         if maximum == None:
-            error = ParamError(param, value, "%s must be >= %d" % minimum)
+            error = ParamError(param, value, "%s must be >= %d%s" %
+                               (minimum, default_msg))
         elif minimum == None:
-            error = ParamError(param, value, "must be <= %d" % maximum)
+            error = ParamError(param, value, "must be <= %d%s" % 
+                               (maximum, default_msg))
         else:
             error = ParamError(param, value,
-                               "must be %d <= x <= %d" % (minimum, maximum))
+                               "must be %d <= x <= %d%s" %
+                               (minimum, maximum, default_msg))
         raise error
     return value
 
-def parse_param_float_value(param, value):
+def parse_param_float_value(param, value, is_default):
+    if is_default:
+        default_msg = " in script default"
+    else:
+        default_msg = ""
     try:
         value = float(value)
     except ValueError:
-        error = ParamError(param, value, "not a valid floating point number")
+        error = ParamError(param, value,
+                           "not a valid floating point number" + default_msg)
         raise error
     kind_args = param['kind_args']
     minimum = kind_args.get("minimum", None)
@@ -365,38 +386,52 @@ def parse_param_float_value(param, value):
     if (minimum != None and value < minimum or
         maximum != None and value > maximum):
         if maximum == None:
-            error = ParamError(param, value, "must be >= %g" % minimum)
+            error = ParamError(param, value, "must be >= %g%s" % 
+                               (minimum, default_msg))
         elif minimum == None:
-            error = ParamError(param, value, "must be <= %g" % maximum)
+            error = ParamError(param, value, "must be <= %g" %
+                               (maximum, default_msg))
         else:
             error = ParamError(param, value,
-                               "must be %g <= x <= %g" % (minimum, maximum))
+                               "must be %g <= x <= %g%s" %
+                               (minimum, maximum, default_msg))
         raise error
     return value
 
-def parse_param_date_value(param, value):
+def parse_param_date_value(param, value, is_default):
+    if is_default:
+        default_msg = " in script default"
+    else:
+        default_msg = ""
     try:
         value = make_datetime(value)
     except ValueError:
-        error = ParamError(param, value, "not a valid date/time")
+        error = ParamError(param, value, "not a valid date/time" + default_msg)
         raise error
     return value
 
-def parse_param_label_value(param, value):
+def parse_param_label_value(param, value, is_default):
+    if is_default:
+        default_msg = " in script default"
+    else:
+        default_msg = ""
     kind_args = param['kind_args']
-    regex = kind_args.get('regex', r"[^\S,]+")
+    regex = kind_args.get('regex', r"[^\s,]+")
     regex_help = kind_args.get('regex_help', "not a valid label")
     try:
         regex = re.compile(regex)
         if not regex.match(value):
-            error = ParamError(param, value, regex_help)
+            error = ParamError(param, value, regex_help + default_msg)
             raise error
     except:
+        raise
         error = ValueError("Invalid regular expression")
         raise error
     return value
 
-def parse_param_file_value(param, value):
+def parse_param_file_value(param, value, is_default):
+    if is_default:
+        return value
     if not os.path.exists(value):
         error = ParamError(param, value, "file does not exist")
         raise error
@@ -405,7 +440,9 @@ def parse_param_file_value(param, value):
         raise error
     return value
 
-def parse_param_dir_value(param, value):
+def parse_param_dir_value(param, value, is_default):
+    if is_default:
+        return value
     if not os.path.exists(value):
         error = ParamError(param, value, "directory does not exist")
         raise error
@@ -414,10 +451,12 @@ def parse_param_dir_value(param, value):
         raise error
     return value
 
-def parse_param_path_value(param, value):
+def parse_param_path_value(param, value, is_default):
     return value
 
-def parse_param_output_file_value(param, value):
+def parse_param_output_file_value(param, value, is_default):
+    if is_default:
+        return value
     if os.environ.get("SILK_CLOBBER", "0") in ("0", ""):
         if os.path.exists(value):
             error = ParamError(param, value, "output file already exists")
@@ -428,14 +467,16 @@ def parse_param_output_file_value(param, value):
             raise error
     return value
 
-def parse_param_output_dir_value(param, value):
+def parse_param_output_dir_value(param, value, is_default):
+    if is_default:
+        return value
     if os.path.exists(value):
         if not os.path.isdir(value):
             error = ParamError(param, value, "output directory is a file")
             raise error
     return value
 
-def parse_param_flag_value(param, value):
+def parse_param_flag_value(param, value, is_default):
     if value or value == None:
         return True
     else:
@@ -457,14 +498,20 @@ PRECISION_MINUTE = 3
 PRECISION_SECOND = 4
 PRECISION_MSEC = 5
 
-def parse_param_flow_date_value(param, value):
+def parse_param_flow_date_value(param, value, is_default):
+    if is_default:
+        default_msg = " in script default"
+    else:
+        default_msg = ""
     # We want to return a date and a precision.
     precision_error = ParamError(
-        param, value, "Date %s does not have at least day precision" % value)
+        param, value, "Date %s does not have at least day precision%s" %
+        (value, default_msg))
     m = re_silk_datetime.match(value)
     if not m:
         parse_error = ParamError(
-            param, value, "Did not match expected YYYY/MM/DD[:HH] format")
+            param, value, "Did not match expected YYYY/MM/DD[:HH] format" +
+            default_msg)
         raise parse_error
     year = m.group("year")
     if year == None:
@@ -473,7 +520,7 @@ def parse_param_flow_date_value(param, value):
     if year < 1970 or year > 2039:
         range_error = ParamError(
             param, value, ("Year value (%d) out of range: use 1970 <= "
-                           "year <= 2039" % year))
+                           "year <= 2039%s" % (year, default_msg)))
         raise range_error
     month = m.group("month")
     if month == None:
@@ -482,7 +529,7 @@ def parse_param_flow_date_value(param, value):
     if month < 1 or month > 12:
         range_error = ParamError(
             param, value, ("Month value (%d) out of range: use 1 <= month "
-                           "<= 12" % month))
+                           "<= 12%s" % (month, default_msg)))
         raise range_error
     max_day = calendar.monthrange(year, month)[1]
     day = m.group("day")
@@ -492,7 +539,7 @@ def parse_param_flow_date_value(param, value):
     if day < 1 or day > max_day:
         range_error = ParamError(
             param, value, ("Day value (%d) out of range: use 1 <= day "
-                           "<= %d" % (day, max_day)))
+                           "<= %d%s" % (day, max_day, default_msg)))
         raise range_error
     hour = m.group("hour")
     if hour == None:
@@ -502,7 +549,7 @@ def parse_param_flow_date_value(param, value):
     if hour < 0 or hour > 23:
         range_error = ParamError(
             param, value, ("Hour value (%d) out of range: use 0 <= hour "
-                           "<= 23" % hour))
+                           "<= 23%s" % (hour, default_msg)))
         raise range_error
     minute = m.group("minute")
     if minute == None:
@@ -512,7 +559,7 @@ def parse_param_flow_date_value(param, value):
     if minute < 0 or minute > 59:
         range_error = ParamError(
             param, value, ("Minute value (%d) out of range: use 0 <= minute "
-                           "<= 23" % minute))
+                           "<= 23%s" % (minute, default_msg)))
         raise range_error
     second = m.group("second")
     if second == None:
@@ -522,7 +569,7 @@ def parse_param_flow_date_value(param, value):
     if second < 0 or second > 59:
         range_error = ParamError(
             param, value, ("Second value (%d) out of range: use 0 <= minute "
-                           "<= 23" % second))
+                           "<= 23%s" % (second, default_msg)))
         raise range_error
     fsec = m.group("fsec")
     if fsec == None:
